@@ -387,6 +387,10 @@ def edit_article(title: str, edit_block: str) -> str:
 
 def _generate_image_dalle(art_prompt: str) -> str:
     """Generate image using DALLE-3."""
+    import os
+    api_key = os.getenv('OPENAI_API_KEY', 'NOT_SET')
+    print(f"🔑 DALLE API key: {api_key[:8]}...{api_key[-4:] if len(api_key) >= 4 else 'SHORT'}")
+    
     client = OpenAI()
     
     response = client.images.generate(
@@ -530,6 +534,7 @@ def exit_when_complete() -> str:
     
     This signals that you are done with the wiki creation process. Only call this when:
     - You have read through the entire story to the end
+    - You see the end of story marker in the text
     - You have created comprehensive wiki articles for all notable elements
     - You believe the wiki documentation is complete and thorough
     

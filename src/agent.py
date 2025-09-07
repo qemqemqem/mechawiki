@@ -118,10 +118,8 @@ Start by advancing to get the first chunk of the story, then begin creating arti
         
         initial_prompt: str = """You are a wiki creation agent. You MUST use the provided tools to process the story. The story "Tales of Wonder" is already loaded.
 
-CRITICAL: You MUST call the advance() function RIGHT NOW to begin reading the story. Do not explain or hesitate - just call advance() immediately.
-
 Available tools (you MUST use these):
-- advance(num_words) - Call this NOW to start reading
+- advance(num_words) - Move through the story (starts at beginning)
 - add_article(title, content) - Create comprehensive wiki pages
 - edit_article(title, edit_block) - Update existing wiki pages
 - create_image(art_prompt) - Generate artwork for characters, locations, and scenes
@@ -133,7 +131,7 @@ IMPORTANT: Create images for major story elements! Use create_image() to generat
 - Key objects (magical items, weapons)
 - Dramatic scenes (battles, important events)
 
-Your first action: Call advance() with num_words=1000 to get the first chunk of the story. Do this NOW."""
+Start by calling advance() to begin reading the story from the beginning."""
         
         try:
             response = await self.agent.ainvoke(

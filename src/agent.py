@@ -122,9 +122,16 @@ CRITICAL: You MUST call the advance() function RIGHT NOW to begin reading the st
 
 Available tools (you MUST use these):
 - advance(num_words) - Call this NOW to start reading
-- add_article(title, content) - Create wiki pages
-- edit_article(title, edit_block) - Update wiki pages
+- add_article(title, content) - Create comprehensive wiki pages
+- edit_article(title, edit_block) - Update existing wiki pages
+- create_image(art_prompt) - Generate artwork for characters, locations, and scenes
 - exit_when_complete() - Call when finished
+
+IMPORTANT: Create images for major story elements! Use create_image() to generate artwork for:
+- Main characters (portraits, action scenes)  
+- Important locations (landscapes, buildings)
+- Key objects (magical items, weapons)
+- Dramatic scenes (battles, important events)
 
 Your first action: Call advance() with num_words=1000 to get the first chunk of the story. Do this NOW."""
         

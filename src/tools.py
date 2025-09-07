@@ -66,14 +66,49 @@ class StoryState:
         return self.current_position >= len(words)
     
     def get_article_context(self) -> str:
-        """Get context of currently loaded articles."""
+        """Get context of currently loaded articles with associated media."""
         if not self.linked_articles:
             return "No articles currently in context."
         
         context = "📚 Articles currently in context:\n"
         for article in self.linked_articles:
-            context += f"• {article['title']} ({article['slug']}.md)\n"
+            context += f"\n• {article['title']} ({article['slug']}.md)\n"
+            
+            # Check for associated image
+            image_info = self._check_associated_image(article['title'], article['slug'])
+            context += f"  Image: {image_info}\n"
+            
+            # Check for associated song
+            song_info = self._check_associated_song(article['title'], article['slug'])
+            context += f"  Song: {song_info}\n"
+        
         return context
+    
+    def _check_associated_image(self, title: str, slug: str) -> str:
+        """Check if an image exists for this article."""
+        story_name = config["story"]["current_story"]
+        images_dir = Path(config["paths"]["content_dir"]) / story_name / config["paths"]["images_dir"]
+        
+        # Common image extensions
+        for ext in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
+            image_path = images_dir / f"{slug}{ext}"
+            if image_path.exists():
+                return f"{slug}{ext}"
+        
+        return f"no image exists for {title}"
+    
+    def _check_associated_song(self, title: str, slug: str) -> str:
+        """Check if a song exists for this article."""
+        story_name = config["story"]["current_story"]
+        songs_dir = Path(config["paths"]["content_dir"]) / story_name / config["paths"]["songs_dir"]
+        
+        # Common audio extensions
+        for ext in ['.mp3', '.wav', '.ogg', '.m4a']:
+            song_path = songs_dir / f"{slug}{ext}"
+            if song_path.exists():
+                return f"{slug}{ext}"
+        
+        return f"no song exists for {title}"
     
     def load_article_to_context(self, title: str, slug: str, path: str) -> bool:
         """Load an article into context if it exists."""
@@ -193,7 +228,21 @@ def add_article(title: str, content: str) -> str:
         title: Article title as it will appear in the wiki. Special characters will be
                removed and spaces converted to hyphens for the filename (e.g., "King Arthur" -> "king-arthur.md").
         content: Full article content in markdown format. Should include detailed descriptions,
-                story context, and cross-references using [link text](./filename.md) syntax.
+                story context, and cross-references using wiki-style linking.
+                
+                WIKI LINKING - USE PROLIFICALLY:
+                Link to other articles using [Display Text](./filename.md) syntax:
+                - Characters: [Lord Dunsany](./lord-dunsany.md)
+                - Locations: [London](./london.md) 
+                - Objects: [Magic Sword](./magic-sword.md)
+                - Concepts: [Time Travel](./time-travel.md)
+                
+                LINKING GUIDELINES:
+                - Link liberally - every mention of another entity should be a link
+                - Use descriptive link text, not just the filename
+                - Link to articles that might exist, even if you haven't created them yet
+                - Create interconnected web of articles like Wikipedia
+                - Link multiple times in long articles for different mentions
                 
                 DUPLICATE PREVENTION:
                 - Cannot create articles with identical titles (case-insensitive)
@@ -266,6 +315,14 @@ def edit_article(title: str, edit_block: str) -> str:
                    =======
                    new text to replace it with
                    >>>>>>> REPLACE
+                   
+                   WIKI LINKING IN EDITS - USE PROLIFICALLY:
+                   When adding content, include extensive links using [Display Text](./filename.md):
+                   - Link every mention of characters, locations, objects, concepts
+                   - Create interconnected web of articles like Wikipedia
+                   - Use descriptive link text that flows naturally in sentences
+                   - Link to articles that might exist, even if not created yet
+                   - Multiple links per article are encouraged for comprehensiveness
                    
                    IMPORTANT MATCHING RULES:
                    - First tries exact string match for precision

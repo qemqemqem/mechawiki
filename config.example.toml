@@ -1,0 +1,62 @@
+# Example configurations for different LLM and image providers
+
+# ===== DEFAULT: Anthropic Claude + DALLE =====
+[story]
+chunk_size = 1000
+min_advance = -2000
+max_advance = 2000
+current_story = "tales_of_wonder"
+
+[context]
+max_linked_articles = 15
+words_per_article = 500
+
+[agent]
+llm_provider = "anthropic"
+model = "claude-3-sonnet-20240229"
+temperature = 0.7
+
+[image]
+generator = "dalle"
+size = "1024x1024"
+quality = "standard"
+
+[paths]
+content_dir = "content"
+articles_dir = "articles"
+images_dir = "images"
+songs_dir = "songs"
+
+# ===== EXAMPLE: OpenAI GPT-4 + DALLE =====
+# [agent]
+# llm_provider = "openai"
+# model = "gpt-4"
+# temperature = 0.7
+
+# ===== EXAMPLE: Together AI + DALLE =====
+# [agent]
+# llm_provider = "together"
+# model = "meta-llama/Llama-2-70b-chat-hf"
+# temperature = 0.7
+
+# ===== EXAMPLE: GPT-4 + Replicate (planned) =====
+# [agent]
+# llm_provider = "openai"
+# model = "gpt-4"
+# temperature = 0.7
+#
+# [image]
+# generator = "replicate"
+# size = "1024x1024"
+# quality = "standard"
+
+# ===== EXAMPLE: Claude + Midjourney (planned) =====
+# [agent]
+# llm_provider = "anthropic"
+# model = "claude-3-sonnet-20240229"
+# temperature = 0.7
+#
+# [image]
+# generator = "midjourney"
+# size = "1024x1024"
+# quality = "standard"

@@ -1,0 +1,50 @@
+[story]
+# How many words to advance per chunk
+chunk_size = 1000
+
+# Minimum words per advance (guardrail) - negative allows going backwards
+min_advance = -2000
+
+# Maximum words per advance (guardrail) 
+max_advance = 2000
+
+# Current story being processed
+current_story = "tales_of_wonder"
+
+[context]
+# Number of recently linked articles to keep in context
+max_linked_articles = 15
+
+# Estimated words per article for context calculation
+words_per_article = 500
+
+[agent]
+# LLM provider and model to use
+# Supported providers: anthropic, openai, together, replicate
+llm_provider = "anthropic"
+model = "claude-3-sonnet-20240229"
+
+# Temperature for creativity
+temperature = 0.7
+
+[image]
+# Image generator to use
+# Supported: dalle, replicate, midjourney (planned)
+generator = "dalle"
+
+# Image generation parameters
+size = "1024x1024"
+quality = "standard"
+
+[paths]
+# Base content directory
+content_dir = "content"
+
+# Articles subdirectory  
+articles_dir = "articles"
+
+# Images subdirectory
+images_dir = "images"
+
+# Songs subdirectory  
+songs_dir = "songs"

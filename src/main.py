@@ -1,9 +1,10 @@
 """Main entry point for the WikiAgent system."""
 import argparse
+import asyncio
 from typing import Any
 from agent import WikiAgent
 
-def main() -> None:
+async def main() -> None:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description="WikiAgent - Generate wikis from stories")
     parser.add_argument(
         "--session-id",
@@ -15,7 +16,8 @@ def main() -> None:
     
     # Initialize and run agent
     agent: WikiAgent = WikiAgent()
-    agent.process_story(args.session_id)
+    await agent.initialize()
+    await agent.process_story(args.session_id)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

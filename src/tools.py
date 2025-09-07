@@ -5,7 +5,7 @@ import toml
 import requests
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from openai import OpenAI
 
 # Load config
@@ -23,7 +23,7 @@ class StoryState:
         story_path = Path(config["paths"]["content_dir"]) / story_name / f"{story_name}.txt"
         if story_path.exists():
             with open(story_path, 'r', encoding='utf-8') as f:
-                self.story_text = f.read()
+                self.story_text = f.read() + "\n\nEND_OF_STORY"
             return True
         return False
     
@@ -45,19 +45,35 @@ class StoryState:
         max_advance: int = config["story"]["max_advance"]
         num_words = max(min_advance, min(num_words, max_advance))
         
-        old_position = self.current_position
+        # Get the chunk from current position BEFORE advancing
+        chunk = self.get_current_chunk(num_words)
+        
+        # Advance the position
         self.current_position += num_words
         
-        # Don't go past end of story
+        # Clamp position to not exceed story length (no special handling needed, END_OF_STORY is in the text)
         total_words = len(self.story_text.split())
         if self.current_position >= total_words:
             self.current_position = total_words
-            return "END_OF_STORY"
         
-        return self.get_current_chunk()
+        return chunk
+    
+    def is_story_complete(self) -> bool:
+        """Check if we've reached the end of the story."""
+        if not self.story_text:
+            return False
+        words = self.story_text.split()
+        return self.current_position >= len(words)
 
-# Initialize story state
+# Initialize story state and load the current story
 story_state = StoryState()
+current_story = config["story"]["current_story"]
+if not story_state.load_story(current_story):
+    print(f"❌ Warning: Could not load story '{current_story}'")
+else:
+    print(f"✅ Loaded story: {current_story} ({len(story_state.story_text)} characters)")
+    print(f"📊 Total words: {len(story_state.story_text.split())}")
+    print(f"📍 Initial position: {story_state.current_position}")
 
 # Initialize FastMCP server
 mcp = FastMCP("WikiAgent")
@@ -94,21 +110,23 @@ def advance(num_words: Optional[int] = None) -> str:
         Current story chunk text with position indicator, or 'END_OF_STORY' message if at end.
         Returns ERROR message if story file cannot be loaded.
     """
-    if not num_words:
+    # Handle default parameter explicitly  
+    if num_words is None or num_words == 0:
         num_words = config["story"]["chunk_size"]
     
     # Load story if not already loaded
     if not story_state.story_text:
         story_name = config["story"]["current_story"]
         if not story_state.load_story(story_name):
-            return f"ERROR: Could not load story '{story_name}'"
+            error_msg = f"ERROR: Could not load story '{story_name}'"
+            _log_tool_call("advance", {"num_words": num_words}, error_msg)
+            return error_msg
     
     new_chunk = story_state.advance_story(num_words)
     
-    if new_chunk == "END_OF_STORY":
-        return "You have reached the end of the story."
-    
-    return f"Current story position: word {story_state.current_position}\n\n{new_chunk}"
+    result = f"Current story position: word {story_state.current_position}\n\n{new_chunk}"
+    _log_tool_call("advance", {"num_words": num_words}, result)
+    return result
 
 @mcp.tool()
 def add_article(title: str, content: str) -> str:
@@ -145,7 +163,9 @@ def add_article(title: str, content: str) -> str:
     
     # Check if article already exists
     if article_path.exists():
-        return f"ERROR: Article '{title}' already exists. Use edit_article() to modify it."
+        error_msg = f"ERROR: Article '{title}' already exists. Use edit_article() to modify it."
+        _log_tool_call("add_article", {"title": title, "content": content}, error_msg)
+        return error_msg
     
     # Write article
     try:
@@ -164,10 +184,14 @@ def add_article(title: str, content: str) -> str:
         if len(story_state.linked_articles) > max_articles:
             story_state.linked_articles = story_state.linked_articles[-max_articles:]
         
-        return f"Successfully created article: {title} -> {slug}.md"
+        result = f"Successfully created article: {title} -> {slug}.md"
+        _log_tool_call("add_article", {"title": title, "content": content}, result)
+        return result
         
     except Exception as e:
-        return f"ERROR: Failed to create article - {str(e)}"
+        error_msg = f"ERROR: Failed to create article - {str(e)}"
+        _log_tool_call("add_article", {"title": title, "content": content}, error_msg)
+        return error_msg
 
 @mcp.tool()
 def edit_article(title: str, edit_block: str) -> str:
@@ -336,6 +360,57 @@ def create_image(art_prompt: str) -> str:
     except Exception as e:
         return f"ERROR: Failed to create image - {str(e)}"
 
+def _log_tool_call(tool_name: str, args: dict, result: str) -> None:
+    """Log tool usage for debugging and monitoring."""
+    # Truncate long strings for readability
+    def truncate_string(s: str, max_length: int = 150) -> str:
+        if len(s) <= max_length:
+            return s
+        return s[:max_length] + "..."
+    
+    print("=" * 60)
+    print(f"🔧 TOOL CALLED: {tool_name.upper()}")
+    print("=" * 60)
+    
+    if args:
+        print("📋 ARGUMENTS:")
+        for key, value in args.items():
+            if isinstance(value, str):
+                print(f"  • {key}: {truncate_string(value)}")
+            else:
+                print(f"  • {key}: {value}")
+    else:
+        print("📋 ARGUMENTS: None")
+    
+    print(f"✅ RESULT: {truncate_string(result)}")
+    print("=" * 60)
+    print()
+
+@mcp.tool()
+def exit_when_complete() -> str:
+    """Call this tool when you have completely finished processing the entire story and created all possible wiki articles.
+    
+    This signals that you are done with the wiki creation process. Only call this when:
+    - You have read through the entire story to the end
+    - You have created comprehensive wiki articles for all notable elements
+    - You believe the wiki documentation is complete and thorough
+    
+    Args:
+        None
+        
+    Returns:
+        Confirmation message that the process is complete.
+    """
+    _log_tool_call("exit_when_complete", {}, "Wiki creation process marked as complete!")
+    
+    # Check if story is actually complete
+    if story_state.is_story_complete():
+        return "✅ Wiki creation process complete! You have successfully processed the entire story and documented all notable elements."
+    else:
+        words = story_state.story_text.split() if story_state.story_text else []
+        progress = (story_state.current_position / len(words)) * 100 if words else 0
+        return f"⚠️ Note: You're exiting at {progress:.1f}% story completion (word {story_state.current_position} of {len(words)}). The story may not be fully processed."
+
 if __name__ == "__main__":
-    # Run the MCP server
-    mcp.run(transport="stdio")
+    # Run the MCP server with suppressed banner
+    mcp.run(transport="stdio", show_banner=False)

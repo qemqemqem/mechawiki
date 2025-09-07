@@ -3,7 +3,7 @@ import toml
 from typing import Dict, Any, Optional
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import InMemorySaver
-from langchain_mcp_adapters.client import MCPClient
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 
@@ -15,25 +15,28 @@ class WikiAgent:
         self.config: Dict[str, Any] = config
         self.agent: Optional[Any] = None
         self.checkpointer: InMemorySaver = InMemorySaver()
-        self._setup_agent()
     
-    def _setup_agent(self) -> None:
+    async def initialize(self) -> None:
+        """Initialize the agent asynchronously."""
+        await self._setup_agent()
+    
+    async def _setup_agent(self) -> None:
         """Initialize the LangGraph agent with MCP tools."""
         
         # Setup LLM based on configured provider
         llm = self._create_llm()
         
         # Setup MCP client for tools
-        mcp_client = MCPClient({
+        mcp_client = MultiServerMCPClient({
             "wiki_tools": {
-                "command": "python",
+                "command": ".venv/bin/python",
                 "args": ["src/tools.py"],
                 "transport": "stdio"
             }
         })
         
         # Get tools from MCP server
-        tools = mcp_client.get_tools()
+        tools = await mcp_client.get_tools()
         
         # Create system prompt
         system_prompt = self._create_system_prompt()
@@ -79,7 +82,7 @@ class WikiAgent:
     
     def _create_system_prompt(self) -> str:
         """Create the system prompt for the wiki agent."""
-        return f\"\"\"You are a specialized wiki writer agent reading through "{self.config['story']['current_story']}" and creating comprehensive wiki-style documentation.
+        return f"""You are a specialized wiki writer agent reading through "{self.config['story']['current_story']}" and creating comprehensive wiki-style documentation.
 
 Your task is to read through the story section by section and create detailed wiki articles about:
 - Characters (major and minor)
@@ -103,9 +106,9 @@ GUIDELINES:
 - Take your time - thorough documentation is the goal
 - Don't advance too quickly - ensure you've captured all notable elements
 
-Start by advancing to get the first chunk of the story, then begin creating articles for everything noteworthy you encounter.\"\"\"
+Start by advancing to get the first chunk of the story, then begin creating articles for everything noteworthy you encounter."""
     
-    def process_story(self, session_id: str = "auto") -> None:
+    async def process_story(self, session_id: str = "auto") -> None:
         """Process the entire story and generate wiki automatically."""
         config_dict: Dict[str, Any] = {"configurable": {"thread_id": session_id}}
         
@@ -113,15 +116,25 @@ Start by advancing to get the first chunk of the story, then begin creating arti
         print(f"📖 Processing: {self.config['story']['current_story']}")
         print("🚀 Running in automatic mode...")
         
-        initial_prompt: str = \"\"\"Begin reading and documenting the story. Start by advancing to get the first chunk, then systematically create wiki articles for every notable element you encounter. Continue until you've processed the entire story.\"\"\"
+        initial_prompt: str = """You are a wiki creation agent. You MUST use the provided tools to process the story. The story "Tales of Wonder" is already loaded.
+
+CRITICAL: You MUST call the advance() function RIGHT NOW to begin reading the story. Do not explain or hesitate - just call advance() immediately.
+
+Available tools (you MUST use these):
+- advance(num_words) - Call this NOW to start reading
+- add_article(title, content) - Create wiki pages
+- edit_article(title, edit_block) - Update wiki pages
+- exit_when_complete() - Call when finished
+
+Your first action: Call advance() with num_words=1000 to get the first chunk of the story. Do this NOW."""
         
         try:
-            response = self.agent.invoke(
+            response = await self.agent.ainvoke(
                 {"messages": [{"role": "user", "content": initial_prompt}]},
                 config_dict
             )
             
-            agent_message: str = response["messages"][-1]["content"]
+            agent_message: str = response["messages"][-1].content
             print(f"\n🤖 WikiAgent: {agent_message}")
             
         except Exception as e:

@@ -22,7 +22,7 @@ words_per_article = 500
 # LLM provider and model to use
 # Supported providers: anthropic, openai, together, replicate
 llm_provider = "anthropic"
-model = "claude-3-sonnet-20240229"
+model = "claude-3-5-haiku-20241022"
 
 # Temperature for creativity
 temperature = 0.7

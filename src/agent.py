@@ -79,7 +79,7 @@ class WikiAgent:
     
     def _create_system_prompt(self) -> str:
         """Create the system prompt for the wiki agent."""
-        return f"""You are a specialized wiki writer agent reading through "{self.config['story']['current_story']}" and creating comprehensive wiki-style documentation.
+        return f\"\"\"You are a specialized wiki writer agent reading through "{self.config['story']['current_story']}" and creating comprehensive wiki-style documentation.
 
 Your task is to read through the story section by section and create detailed wiki articles about:
 - Characters (major and minor)
@@ -91,7 +91,8 @@ Your task is to read through the story section by section and create detailed wi
 TOOLS AVAILABLE:
 - advance(num_words): Move forward/backward in the story (-2000 to +2000 words)
 - add_article(title, content): Create a new wiki article in markdown
-- edit_article(title, search_text, replace_text): Edit existing articles
+- edit_article(title, edit_block): Edit existing articles using Aider-style search/replace
+- create_image(art_prompt): Generate artwork for articles
 
 GUIDELINES:
 - Follow specialized wiki standards (like fandom wikis) - be comprehensive
@@ -102,45 +103,17 @@ GUIDELINES:
 - Take your time - thorough documentation is the goal
 - Don't advance too quickly - ensure you've captured all notable elements
 
-Start by advancing to get the first chunk of the story, then begin creating articles for everything noteworthy you encounter."""
-
-    def run_session(self, session_id: str = "main"):
-        """Run an interactive wiki generation session."""
-        config_dict = {"configurable": {"thread_id": session_id}}
-        
-        print(">�B WikiAgent starting session...")
-        print(f"=� Processing: {self.config['story']['current_story']}")
-        print("=� Type your instructions or 'quit' to exit\n")
-        
-        while True:
-            user_input = input("\n=d You: ")
-            
-            if user_input.lower() in ['quit', 'exit', 'q']:
-                print("=� Wiki session ended.")
-                break
-            
-            try:
-                # Send message to agent
-                response = self.agent.invoke(
-                    {"messages": [{"role": "user", "content": user_input}]},
-                    config_dict
-                )
-                
-                # Display agent's response
-                agent_message = response["messages"][-1]["content"]
-                print(f"\n> WikiAgent: {agent_message}")
-                
-            except Exception as e:
-                print(f"L Error: {str(e)}")
+Start by advancing to get the first chunk of the story, then begin creating articles for everything noteworthy you encounter.\"\"\"
     
-    def process_story_automatically(self, session_id: str = "auto"):
-        """Automatically process the entire story and generate wiki."""
-        config_dict = {"configurable": {"thread_id": session_id}}
+    def process_story(self, session_id: str = "auto") -> None:
+        """Process the entire story and generate wiki automatically."""
+        config_dict: Dict[str, Any] = {"configurable": {"thread_id": session_id}}
         
-        print(">�B WikiAgent starting automatic processing...")
-        print(f"=� Processing: {self.config['story']['current_story']}")
+        print("🧙‍♂️ WikiAgent starting processing...")
+        print(f"📖 Processing: {self.config['story']['current_story']}")
+        print("🚀 Running in automatic mode...")
         
-        initial_prompt = """Begin reading and documenting the story. Start by advancing to get the first chunk, then systematically create wiki articles for every notable element you encounter. Continue until you've processed the entire story."""
+        initial_prompt: str = \"\"\"Begin reading and documenting the story. Start by advancing to get the first chunk, then systematically create wiki articles for every notable element you encounter. Continue until you've processed the entire story.\"\"\"
         
         try:
             response = self.agent.invoke(
@@ -148,12 +121,12 @@ Start by advancing to get the first chunk of the story, then begin creating arti
                 config_dict
             )
             
-            agent_message = response["messages"][-1]["content"]
-            print(f"\n> WikiAgent: {agent_message}")
+            agent_message: str = response["messages"][-1]["content"]
+            print(f"\n🤖 WikiAgent: {agent_message}")
             
         except Exception as e:
-            print(f"L Error: {str(e)}")
+            print(f"❌ Error: {str(e)}")
 
 if __name__ == "__main__":
     agent = WikiAgent()
-    agent.run_session()
+    agent.process_story()

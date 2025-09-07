@@ -1,0 +1,10 @@
+langgraph
+langchain-anthropic
+langchain-openai
+langchain-mcp-adapters
+fastmcp
+toml
+requests
+openai
+pathlib
+typing-extensions

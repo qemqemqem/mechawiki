@@ -64,6 +64,60 @@ class StoryState:
             return False
         words = self.story_text.split()
         return self.current_position >= len(words)
+    
+    def get_article_context(self) -> str:
+        """Get context of currently loaded articles."""
+        if not self.linked_articles:
+            return "No articles currently in context."
+        
+        context = "📚 Articles currently in context:\n"
+        for article in self.linked_articles:
+            context += f"• {article['title']} ({article['slug']}.md)\n"
+        return context
+    
+    def load_article_to_context(self, title: str, slug: str, path: str) -> bool:
+        """Load an article into context if it exists."""
+        article_path = Path(path)
+        if not article_path.exists():
+            return False
+        
+        # Check if already in context
+        for article in self.linked_articles:
+            if article['slug'] == slug:
+                return True  # Already loaded
+        
+        # Add to context
+        self.linked_articles.append({
+            'title': title,
+            'slug': slug,
+            'path': path
+        })
+        
+        # Keep only max_linked_articles most recent
+        max_articles = config["context"]["max_linked_articles"]
+        if len(self.linked_articles) > max_articles:
+            self.linked_articles = self.linked_articles[-max_articles:]
+        
+        return True
+    
+    def find_existing_article(self, title: str) -> Optional[Dict[str, str]]:
+        """Find if an article exists on disk and return its info."""
+        # Slugify title to find file
+        slug = re.sub(r'[^\w\s-]', '', title.lower())
+        slug = re.sub(r'[-\s]+', '-', slug).strip('-')
+        
+        # Find article path
+        story_name = config["story"]["current_story"]
+        articles_dir = Path(config["paths"]["content_dir"]) / story_name / config["paths"]["articles_dir"]
+        article_path = articles_dir / f"{slug}.md"
+        
+        if article_path.exists():
+            return {
+                'title': title,
+                'slug': slug,
+                'path': str(article_path)
+            }
+        return None
 
 # Initialize story state and load the current story
 story_state = StoryState()
@@ -163,7 +217,11 @@ def add_article(title: str, content: str) -> str:
     
     # Check if article already exists
     if article_path.exists():
-        error_msg = f"ERROR: Article '{title}' already exists. Use edit_article() to modify it."
+        # Load the existing article into context
+        story_state.load_article_to_context(title, slug, str(article_path))
+        
+        context_info = story_state.get_article_context()
+        error_msg = f"ERROR: Article '{title}' already exists and has been loaded into context. Use edit_article() to modify it.\n\n{context_info}\n\nPlease try your operation again now that the article is in context."
         _log_tool_call("add_article", {"title": title, "content": content}, error_msg)
         return error_msg
     
@@ -237,7 +295,12 @@ def edit_article(title: str, edit_block: str) -> str:
     article_path = articles_dir / f"{slug}.md"
     
     if not article_path.exists():
-        return f"ERROR: Article '{title}' does not exist. Use add_article() to create it."
+        error_msg = f"ERROR: Article '{title}' does not exist. Use add_article() to create it."
+        _log_tool_call("edit_article", {"title": title, "edit_block": edit_block}, error_msg)
+        return error_msg
+    
+    # Load the article into context if not already there
+    story_state.load_article_to_context(title, slug, str(article_path))
     
     try:
         # Read current content
@@ -248,16 +311,22 @@ def edit_article(title: str, edit_block: str) -> str:
         result = apply_search_replace_block(content, edit_block, max_retries=2)
         
         if not result.success:
-            return f"ERROR: Edit failed for article '{title}' - {result.message}"
+            error_msg = f"ERROR: Edit failed for article '{title}' - {result.message}"
+            _log_tool_call("edit_article", {"title": title, "edit_block": edit_block}, error_msg)
+            return error_msg
         
         # Write back the new content
         with open(article_path, 'w', encoding='utf-8') as f:
             f.write(result.new_content)
         
-        return f"Successfully edited article '{title}' - {result.message}"
+        success_msg = f"Successfully edited article '{title}' - {result.message}"
+        _log_tool_call("edit_article", {"title": title, "edit_block": edit_block}, success_msg)
+        return success_msg
         
     except Exception as e:
-        return f"ERROR: Failed to edit article - {str(e)}"
+        error_msg = f"ERROR: Failed to edit article - {str(e)}"
+        _log_tool_call("edit_article", {"title": title, "edit_block": edit_block}, error_msg)
+        return error_msg
 
 def _generate_image_dalle(art_prompt: str) -> str:
     """Generate image using DALLE-3."""
@@ -322,7 +391,9 @@ def create_image(art_prompt: str) -> str:
         elif generator == "midjourney":
             image_url = _generate_image_midjourney(art_prompt)
         else:
-            return f"ERROR: Unsupported image generator: {generator}. Supported: dalle, replicate, midjourney"
+            error_msg = f"ERROR: Unsupported image generator: {generator}. Supported: dalle, replicate, midjourney"
+            _log_tool_call("create_image", {"art_prompt": art_prompt}, error_msg)
+            return error_msg
         
         # Download the image
         image_response = requests.get(image_url, timeout=60)
@@ -355,36 +426,46 @@ def create_image(art_prompt: str) -> str:
         with open(image_path, 'wb') as f:
             f.write(image_response.content)
         
-        return f"Successfully created image using {generator}: {filename}\nPrompt: {art_prompt}\nSaved to: {image_path}"
+        success_msg = f"Successfully created image using {generator}: {filename}\nPrompt: {art_prompt}\nSaved to: {image_path}"
+        _log_tool_call("create_image", {"art_prompt": art_prompt}, success_msg)
+        return success_msg
         
     except Exception as e:
-        return f"ERROR: Failed to create image - {str(e)}"
+        error_msg = f"ERROR: Failed to create image - {str(e)}"
+        _log_tool_call("create_image", {"art_prompt": art_prompt}, error_msg)
+        return error_msg
 
 def _log_tool_call(tool_name: str, args: dict, result: str) -> None:
     """Log tool usage for debugging and monitoring."""
+    import sys
+    
     # Truncate long strings for readability
     def truncate_string(s: str, max_length: int = 150) -> str:
         if len(s) <= max_length:
             return s
         return s[:max_length] + "..."
     
-    print("=" * 60)
-    print(f"🔧 TOOL CALLED: {tool_name.upper()}")
-    print("=" * 60)
+    log_message = f"""
+{"=" * 60}
+🔧 TOOL CALLED: {tool_name.upper()}
+{"=" * 60}"""
     
     if args:
-        print("📋 ARGUMENTS:")
+        log_message += "\n📋 ARGUMENTS:"
         for key, value in args.items():
             if isinstance(value, str):
-                print(f"  • {key}: {truncate_string(value)}")
+                log_message += f"\n  • {key}: {truncate_string(value)}"
             else:
-                print(f"  • {key}: {value}")
+                log_message += f"\n  • {key}: {value}"
     else:
-        print("📋 ARGUMENTS: None")
+        log_message += "\n📋 ARGUMENTS: None"
     
-    print(f"✅ RESULT: {truncate_string(result)}")
-    print("=" * 60)
-    print()
+    log_message += f"\n✅ RESULT: {truncate_string(result)}"
+    log_message += f"\n{'=' * 60}\n"
+    
+    # Print to both stdout and stderr to ensure visibility
+    print(log_message, flush=True)
+    print(log_message, file=sys.stderr, flush=True)
 
 @mcp.tool()
 def exit_when_complete() -> str:
@@ -412,5 +493,9 @@ def exit_when_complete() -> str:
         return f"⚠️ Note: You're exiting at {progress:.1f}% story completion (word {story_state.current_position} of {len(words)}). The story may not be fully processed."
 
 if __name__ == "__main__":
+    # Log server start
+    import sys
+    print("🚀 MCP Server Starting - Tool logging enabled", file=sys.stderr, flush=True)
+    
     # Run the MCP server with suppressed banner
     mcp.run(transport="stdio", show_banner=False)

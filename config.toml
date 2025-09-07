@@ -5,7 +5,7 @@ chunk_size = 1000
 # Minimum words per advance (guardrail) - negative allows going backwards
 min_advance = -2000
 
-# Maximum words per advance (guardrail) 
+# Maximum words per advance (guardrail)
 max_advance = 2000
 
 # Current story being processed
@@ -40,11 +40,11 @@ quality = "standard"
 # Base content directory
 content_dir = "content"
 
-# Articles subdirectory  
+# Articles subdirectory
 articles_dir = "articles"
 
 # Images subdirectory
 images_dir = "images"
 
-# Songs subdirectory  
+# Songs subdirectory
 songs_dir = "songs"

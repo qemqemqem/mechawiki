@@ -64,13 +64,35 @@ mcp = FastMCP("WikiAgent")
 
 @mcp.tool()
 def advance(num_words: Optional[int] = None) -> str:
-    """Advance the story by specified number of words and return new chunk.
+    """Navigate through the story by advancing or rewinding by specified words.
+    
+    IMPORTANT: This tool controls your reading position in the story text. Unlike typical tools,
+    this changes your current location and affects what content you can see. You maintain a 
+    single "reading position" that moves forward or backward through the story.
+    
+    USAGE GUIDANCE:
+    - Only advance when you've thoroughly processed the current content
+    - Create wiki articles for all notable elements before moving forward
+    - You can rewind (negative numbers) to revisit earlier sections if needed
+    - Each call shows you a new chunk of text from your new position
+    - Your reading position persists between tool calls
+    
+    Use this tool to move through the story text and get new content to analyze.
+    Supports both forward movement (positive numbers) and backward movement (negative numbers).
     
     Args:
-        num_words: Number of words to advance (default from config)
+        num_words: Number of words to advance. Range: -2000 to +2000. 
+                  Positive advances forward, negative rewinds backward.
+                  If not provided, uses default chunk size from config (1000).
+                  
+                  Examples:
+                  - advance() -> moves forward 1000 words (default)
+                  - advance(500) -> moves forward 500 words  
+                  - advance(-300) -> rewinds backward 300 words
     
     Returns:
-        The new story chunk or 'END_OF_STORY' if finished
+        Current story chunk text with position indicator, or 'END_OF_STORY' message if at end.
+        Returns ERROR message if story file cannot be loaded.
     """
     if not num_words:
         num_words = config["story"]["chunk_size"]
@@ -90,14 +112,25 @@ def advance(num_words: Optional[int] = None) -> str:
 
 @mcp.tool()
 def add_article(title: str, content: str) -> str:
-    """Create a new wiki article.
+    """Create a new wiki-style article for story elements like characters, locations, objects.
+    
+    Use this tool to document any notable story element that merits a wiki page.
+    Articles are saved as markdown files with auto-generated filenames.
     
     Args:
-        title: Article title (will be slugified for filename)
-        content: Article content in markdown format
+        title: Article title as it will appear in the wiki. Special characters will be
+               removed and spaces converted to hyphens for the filename (e.g., "King Arthur" -> "king-arthur.md").
+        content: Full article content in markdown format. Should include detailed descriptions,
+                story context, and cross-references using [link text](./filename.md) syntax.
+                
+                DUPLICATE PREVENTION:
+                - Cannot create articles with identical titles (case-insensitive)
+                - If article exists, you must use edit_article() instead
+                - Different titles that generate the same filename will conflict
         
     Returns:
-        Success message or error
+        Success message with generated filename, or ERROR message if article already exists
+        or file creation fails.
     """
     # Slugify title for filename
     slug = re.sub(r'[^\w\s-]', '', title.lower())
@@ -138,19 +171,35 @@ def add_article(title: str, content: str) -> str:
 
 @mcp.tool()
 def edit_article(title: str, edit_block: str) -> str:
-    """Edit an existing wiki article using Aider-style search/replace blocks.
+    """Update existing wiki articles using precise search/replace operations.
+    
+    Use this tool to modify articles when you learn new information about characters,
+    locations, or other story elements. Supports fuzzy matching for whitespace differences.
     
     Args:
-        title: Article title to edit
-        edit_block: Search/replace block in format:
+        title: Exact title of the article to edit (must match existing article).
+        edit_block: Aider-style search/replace block with exact format:
                    <<<<<<< SEARCH
-                   text to find
+                   exact text to find and replace
                    =======
-                   text to replace with
+                   new text to replace it with
                    >>>>>>> REPLACE
+                   
+                   IMPORTANT MATCHING RULES:
+                   - First tries exact string match for precision
+                   - If that fails, tries "normalized whitespace" matching where:
+                     * Leading/trailing spaces on each line are removed
+                     * Empty lines are ignored
+                     * Multiple consecutive spaces become single spaces
+                   - If multiple exact matches exist, edit fails (make search text more specific)
+                   - Search text cannot be empty or identical to replace text
         
     Returns:
-        Success message or error
+        Success message indicating edit was applied, or ERROR message if:
+        - Article doesn't exist (use add_article to create new ones)
+        - Search text not found in article
+        - Edit block format is invalid
+        - File write operation fails
     """
     from utils.diffing import apply_search_replace_block
     
@@ -210,13 +259,32 @@ def _generate_image_midjourney(art_prompt: str) -> str:
 
 @mcp.tool()
 def create_image(art_prompt: str) -> str:
-    """Generate an image using configured generator and save it to the images directory.
+    """Generate artwork for wiki articles using AI image generation (DALLE, Replicate, etc).
+    
+    Use this tool to create visual representations of characters, locations, objects, or scenes
+    from the story. Images are automatically saved to the story's images directory.
     
     Args:
-        art_prompt: Detailed prompt describing the image to generate
+        art_prompt: Detailed artistic description of what to generate. Be specific about:
+                   - Subject matter (character, location, object, scene)
+                   - Visual style (fantasy art, portrait, landscape, etc.)
+                   - Important details (clothing, architecture, mood, lighting)
+                   Example: "A tall wizard with silver beard in flowing blue robes, fantasy art style"
+                   
+                   FILENAME GENERATION:
+                   - Filename created from first 50 characters of prompt
+                   - Special characters removed, spaces become hyphens
+                   - Duplicate filenames get "-2", "-3", etc. suffixes
+                   - Always saved as .png format
         
     Returns:
-        Success message with filename or error
+        Success message with generated filename and save location, or ERROR message if:
+        - Image generation API fails
+        - Unsupported generator configured
+        - Network/download issues occur
+        - File write operation fails
+        
+        Note: Generator used depends on config.toml [image] settings.
     """
     try:
         # Get configured image generator

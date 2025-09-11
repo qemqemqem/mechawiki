@@ -123,6 +123,45 @@ GUIDELINES:
 - Take your time - thorough documentation is the goal
 - Don't advance too quickly - ensure you've captured all notable elements"""
     
+    def _scan_existing_articles(self) -> List[Dict[str, str]]:
+        """Scan for existing articles and return them as a list."""
+        from pathlib import Path
+        import re
+        
+        story_name = self.config["story"]["current_story"]
+        articles_dir = Path(self.config["paths"]["content_dir"]) / story_name / self.config["paths"]["articles_dir"]
+        
+        existing_articles = []
+        
+        if articles_dir.exists():
+            for article_file in articles_dir.glob("*.md"):
+                # Extract slug from filename
+                slug = article_file.stem
+                
+                # Try to extract title from file content
+                try:
+                    with open(article_file, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        # Look for markdown title (# Title)
+                        title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
+                        if title_match:
+                            title = title_match.group(1).strip()
+                        else:
+                            # Fallback to slug converted to title
+                            title = slug.replace('-', ' ').title()
+                except Exception:
+                    # Fallback to slug converted to title
+                    title = slug.replace('-', ' ').title()
+                
+                existing_articles.append({
+                    'title': title,
+                    'slug': slug, 
+                    'path': str(article_file)
+                })
+        
+        # Sort by title for consistent ordering
+        return sorted(existing_articles, key=lambda x: x['title'])
+    
     async def process_story(self, session_id: str = "auto", user_message: str = None) -> None:
         """Process the entire story and generate wiki automatically."""
         config_dict: Dict[str, Any] = {"configurable": {"thread_id": session_id}}
@@ -156,15 +195,37 @@ IMPORTANT: Create images for major story elements! Use create_image() to generat
 
 This is a specific instruction from the user about how to approach this wiki creation task. Make sure to keep this request in mind throughout the entire process."""
 
+        # Scan for existing articles and add to prompt
+        existing_articles = self._scan_existing_articles()
+        if existing_articles:
+            base_prompt += f"""
+
+📚 EXISTING ARTICLES IN CONTEXT: {len(existing_articles)} articles are already loaded into your context:"""
+            for article in existing_articles:
+                base_prompt += f"\n  • {article['title']} ({article['slug']}.md)"
+            base_prompt += """
+
+You can reference and edit these existing articles as needed. They contain information that may be relevant to new content you encounter in the story."""
+        
+        base_prompt += """
+
+Start by calling advance() to begin reading the story from the beginning."""
+
         initial_prompt: str = base_prompt
         
         try:
-            # Initialize state with empty story_info and linked_articles
+            # Print existing articles info (already scanned above)
+            if existing_articles:
+                print(f"📚 Found {len(existing_articles)} existing articles - loading into context")
+                for article in existing_articles:
+                    print(f"  • {article['title']} ({article['slug']}.md)")
+            
+            # Initialize state with pre-loaded articles
             initial_state = {
                 "messages": [{"role": "user", "content": initial_prompt}],
                 "remaining_steps": 25,  # Default for create_react_agent
                 "story_info": {},  # Will be populated by advance() tool
-                "linked_articles": []
+                "linked_articles": existing_articles
             }
             
             response = await self.agent.ainvoke(initial_state, config_dict)

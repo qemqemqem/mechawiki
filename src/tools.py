@@ -554,7 +554,34 @@ def create_image(art_prompt: str, orientation: str = "landscape") -> str:
     
     # Generate image based on configured generator
     if generator == "dalle":
-        image_url = _generate_image_dalle(art_prompt, image_size)
+        # Handle DALLE safety rejections gracefully
+        try:
+            # Try to import specific error for clearer handling
+            try:
+                from openai import BadRequestError as _OpenAIBadRequestError  # type: ignore
+            except Exception:
+                _OpenAIBadRequestError = Exception  # Fallback
+
+            image_url = _generate_image_dalle(art_prompt, image_size)
+        except _OpenAIBadRequestError as e:  # type: ignore
+            guidance = (
+                "DALL·E 3 may reject prompts involving: real people/public figures, sexual or erotic content, "
+                "self-harm, hate/harassment, graphic violence or gore, illegal activities, political persuasion, "
+                "copyrighted logos/brands, or personal data (PII/PHI). Rephrase to use fictional or generic subjects, "
+                "avoid explicit/graphic details, omit names/trademarks, and keep content safe and non-violent."
+            )
+            error_msg = f"ERROR: DALLE request rejected: {str(e)}\nAdvice: {guidance}"
+            _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, error_msg)
+            return error_msg
+        except Exception as e:
+            guidance = (
+                "If this is a safety rejection, see: real people, explicit sexual content, graphic violence, "
+                "illegal activities, targeted hate, political persuasion, trademarks/brands, or personal data are not allowed. "
+                "Try a safer, fictional, and non-graphic rephrasing without names or logos."
+            )
+            error_msg = f"ERROR: DALLE request failed: {str(e)}\nAdvice: {guidance}"
+            _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, error_msg)
+            return error_msg
     elif generator == "replicate":
         image_url = _generate_image_replicate(art_prompt)
     elif generator == "midjourney":

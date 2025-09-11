@@ -11,13 +11,18 @@ async def main() -> None:
         default="auto", 
         help="Session ID for memory persistence"
     )
+    parser.add_argument(
+        "message",
+        nargs="?",
+        help="Special instructions to include in LLM context (e.g., 'add more images')"
+    )
     
     args: Any = parser.parse_args()
     
     # Initialize and run agent
     agent: WikiAgent = WikiAgent()
     await agent.initialize()
-    await agent.process_story(args.session_id)
+    await agent.process_story(args.session_id, args.message)
 
 if __name__ == "__main__":
     asyncio.run(main())

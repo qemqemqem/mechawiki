@@ -1,14 +1,23 @@
 """LangGraph agent for wiki generation."""
 import toml
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, TypedDict, Annotated
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph.message import add_messages
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 
 # Load config
 config = toml.load("config.toml")
+
+# Define the WikiAgent state schema (must match tools.py)
+class WikiAgentState(TypedDict):
+    """State schema for WikiAgent - contains persistent story state"""
+    messages: Annotated[list, add_messages]
+    remaining_steps: int  # Required by create_react_agent
+    story_info: Dict[str, Any]  # Contains position, text, complete status
+    linked_articles: List[Dict[str, str]]
 
 class WikiAgent:
     def __init__(self) -> None:
@@ -26,12 +35,19 @@ class WikiAgent:
         # Setup LLM based on configured provider
         llm = self._create_llm()
         
-        # Setup MCP client for tools
+        # Setup MCP client for tools with environment variables
+        import os
         mcp_client = MultiServerMCPClient({
             "wiki_tools": {
                 "command": ".venv/bin/python",
                 "args": ["src/tools.py"],
-                "transport": "stdio"
+                "transport": "stdio",
+                "env": {
+                    "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY", ""),
+                    "PATH": os.getenv("PATH", ""),
+                    # Inherit other important environment variables
+                    "PYTHONPATH": os.getenv("PYTHONPATH", ""),
+                }
             }
         })
         
@@ -45,6 +61,7 @@ class WikiAgent:
         self.agent = create_react_agent(
             model=llm,
             tools=tools,
+            state_schema=WikiAgentState,
             checkpointer=self.checkpointer,
             prompt=system_prompt
         )
@@ -104,19 +121,20 @@ GUIDELINES:
 - Include detailed descriptions, story context, and cross-references
 - Update articles as you learn more about characters/locations
 - Take your time - thorough documentation is the goal
-- Don't advance too quickly - ensure you've captured all notable elements
-
-Start by advancing to get the first chunk of the story, then begin creating articles for everything noteworthy you encounter."""
+- Don't advance too quickly - ensure you've captured all notable elements"""
     
-    async def process_story(self, session_id: str = "auto") -> None:
+    async def process_story(self, session_id: str = "auto", user_message: str = None) -> None:
         """Process the entire story and generate wiki automatically."""
         config_dict: Dict[str, Any] = {"configurable": {"thread_id": session_id}}
         
         print("🧙‍♂️ WikiAgent starting processing...")
         print(f"📖 Processing: {self.config['story']['current_story']}")
+        if user_message:
+            print(f"💬 User message: {user_message}")
         print("🚀 Running in automatic mode...")
         
-        initial_prompt: str = """You are a wiki creation agent. You MUST use the provided tools to process the story. The story "Tales of Wonder" is already loaded.
+        # Build initial prompt with optional user message
+        base_prompt = """You are a wiki creation agent. You MUST use the provided tools to process the story. The story "Tales of Wonder" is already loaded.
 
 Available tools (you MUST use these):
 - advance(num_words) - Move through the story (starts at beginning)
@@ -129,15 +147,27 @@ IMPORTANT: Create images for major story elements! Use create_image() to generat
 - Main characters (portraits, action scenes)  
 - Important locations (landscapes, buildings)
 - Key objects (magical items, weapons)
-- Dramatic scenes (battles, important events)
+- Dramatic scenes (battles, important events)"""
 
-Start by calling advance() to begin reading the story from the beginning."""
+        if user_message:
+            base_prompt += f"""
+
+🚨 SPECIAL REQUEST FROM USER - PLEASE PAY ATTENTION: {user_message}
+
+This is a specific instruction from the user about how to approach this wiki creation task. Make sure to keep this request in mind throughout the entire process."""
+
+        initial_prompt: str = base_prompt
         
         try:
-            response = await self.agent.ainvoke(
-                {"messages": [{"role": "user", "content": initial_prompt}]},
-                config_dict
-            )
+            # Initialize state with empty story_info and linked_articles
+            initial_state = {
+                "messages": [{"role": "user", "content": initial_prompt}],
+                "remaining_steps": 25,  # Default for create_react_agent
+                "story_info": {},  # Will be populated by advance() tool
+                "linked_articles": []
+            }
+            
+            response = await self.agent.ainvoke(initial_state, config_dict)
             
             agent_message: str = response["messages"][-1].content
             print(f"\n🤖 WikiAgent: {agent_message}")

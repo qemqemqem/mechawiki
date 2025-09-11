@@ -27,6 +27,9 @@ model = "claude-3-5-haiku-20241022"
 # Temperature for creativity
 temperature = 0.7
 
+# Number of most recent messages to pass to the LLM each turn
+message_window = 12
+
 [image]
 # Image generator to use
 # Supported: dalle, replicate, midjourney (planned)

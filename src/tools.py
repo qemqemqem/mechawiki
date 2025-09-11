@@ -177,120 +177,73 @@ else:
     print(f"📊 Total words: {len(story_state.story_text.split())}")
     print(f"📍 Initial position: {story_state.current_position}")
 
+def _advance_impl(num_words: Optional[int] = None, current_position: int = 0) -> Dict[str, Any]:
+    """Internal implementation of advance that accepts explicit position parameter."""
+    # Handle default parameter
+    if num_words is None or num_words == 0:
+        num_words = config["story"]["chunk_size"]
+    
+    # Load story text if not already loaded
+    if not story_state.story_text:
+        story_name = config["story"]["current_story"]
+        if not story_state.load_story(story_name):
+            raise ValueError(f"Could not load story '{story_name}'")
+    
+    # Get words from story text
+    story_words = story_state.story_text.split()
+    
+    # Validate range
+    num_words = max(config["story"]["min_advance"], min(num_words, config["story"]["max_advance"]))
+    
+    # Calculate new position
+    new_pos = current_position + num_words
+    new_pos = max(0, min(new_pos, len(story_words)))
+    
+    # Get chunk of words to show
+    if new_pos > current_position:
+        # Moving forward - show words from current to new position
+        start_pos = current_position
+        end_pos = new_pos
+    else:
+        # Moving backward - show words from new to current position  
+        start_pos = new_pos
+        end_pos = current_position
+    
+    chunk_words = story_words[start_pos:end_pos]
+    chunk = ' '.join(chunk_words)
+    
+    # Prepare result message
+    chunk_words_count = len(chunk.split()) if chunk.strip() else 0
+    result_content = f"Showing words {start_pos} - {end_pos} ({chunk_words_count} words)\n\n{chunk}"
+    
+    # Return the result data
+    return {
+        "position": new_pos,
+        "content": result_content,
+        "story_info": {"position": new_pos, "total_words": len(story_words)}
+    }
+
 # Initialize FastMCP server
 mcp = FastMCP("WikiAgent")
 
 @mcp.tool()
-def advance(
-    num_words: Optional[int] = None,
-    state: Annotated[WikiAgentState, InjectedState] = None
-) -> Command:
+def advance(num_words: Optional[int] = None) -> Dict[str, Any]:
     """Navigate through the story by advancing or rewinding by specified words.
     
-    IMPORTANT: This tool controls your reading position in the story text. Unlike typical tools,
-    this changes your current location and affects what content you can see. You maintain a 
-    single "reading position" that moves forward or backward through the story.
-    
-    USAGE GUIDANCE:
-    - Only advance when you've thoroughly processed the current content
-    - Create wiki articles for all notable elements before moving forward
-    - You can rewind (negative numbers) to revisit earlier sections if needed
-    - Each call shows you a new chunk of text from your new position
-    - Your reading position persists between tool calls
-    
-    Use this tool to move through the story text and get new content to analyze.
-    Supports both forward movement (positive numbers) and backward movement (negative numbers).
-    
     Args:
-        num_words: Number of words to advance. Range: -2000 to +2000. 
-                  Positive advances forward, negative rewinds backward.
+        num_words: Number of words to advance (positive) or rewind (negative)
                   If not provided, uses default chunk size from config (1000).
-                  
-                  Examples:
-                  - advance() -> moves forward 1000 words (default)
-                  - advance(500) -> moves forward 500 words  
-                  - advance(-300) -> rewinds backward 300 words
+                  Range: -2000 to +2000
     
     Returns:
-        Command object with updated story state and current chunk content.
-    """
-    # Handle default parameter explicitly  
-    if num_words is None or num_words == 0:
-        num_words = config["story"]["chunk_size"]
-    
-    # Get or initialize story info from state
-    story_info = state.get("story_info", {}) if state else {}
-    
-    # Load story if needed
-    if not story_info:
-        story_name = config["story"]["current_story"]
-        story_path = Path(config["paths"]["content_dir"]) / story_name / f"{story_name}.txt"
+        Dict with story content and position. Position will be injected by
+        custom tool node in LangGraph agent.
         
-        try:
-            with open(story_path, 'r', encoding='utf-8') as f:
-                text = f.read() + "\n\nEND_OF_STORY"
-            
-            story_info = {
-                "name": story_name,
-                "text": text,
-                "position": 0,
-                "total_words": len(text.split()),
-                "complete": False
-            }
-            _log_tool_call("advance", {"num_words": num_words}, f"Loaded story: {story_name}")
-        except Exception as e:
-            error_msg = f"ERROR: Could not load story '{story_name}': {e}"
-            _log_tool_call("advance", {"num_words": num_words}, error_msg)
-            return Command(resume=error_msg)
-    
-    # Apply guardrails
-    min_adv = config["story"]["min_advance"]
-    max_adv = config["story"]["max_advance"]
-    num_words = max(min_adv, min(num_words, max_adv))
-    
-    # Get current position and calculate chunk
-    current_pos = story_info.get("position", 0)
-    words = story_info["text"].split()
-    
-    # Get chunk from current position
-    chunk_size = config["story"]["chunk_size"]
-    start_pos = current_pos
-    end_pos = min(start_pos + chunk_size, len(words))
-    chunk = " ".join(words[start_pos:end_pos])
-    
-    # Apply guardrails and calculate new position (AFTER getting chunk)
-    new_pos = max(0, min(current_pos + num_words, len(words)))
-    
-    # Update story info with new position
-    story_info.update({
-        "position": new_pos,
-        "complete": new_pos >= story_info["total_words"]
-    })
-    
-    # Log current context
-    linked_articles = state.get("linked_articles", []) if state else []
-    if linked_articles:
-        context_log = f"\n{'='*50}\n📚 ARTICLES IN CONTEXT ({len(linked_articles)})\n{'='*50}\n"
-        for article in linked_articles:
-            context_log += f"  • {article['title']} ({article['slug']}.md)\n"
-        context_log += f"{'='*50}\n"
-    else:
-        context_log = f"\n{'='*50}\n📚 NO ARTICLES IN CONTEXT YET\n{'='*50}\n"
-    
-    print(context_log, flush=True)
-    import sys
-    print(context_log, file=sys.stderr, flush=True)
-    
-    # Prepare result message
-    chunk_words = len(chunk.split()) if chunk.strip() else 0
-    result_content = f"Showing words {start_pos} - {end_pos} ({chunk_words} words)\n\n{chunk}"
-    
-    _log_tool_call("advance", {"num_words": num_words}, result_content)
-    
-    return Command(
-        update={"story_info": story_info},
-        resume=result_content
-    )
+    Note: This is the public interface that LLMs see. The LangGraph agent
+    will intercept calls and use _advance_impl directly with state injection.
+    """
+    # This should NEVER be called - the custom tool node should intercept all calls
+    raise ValueError("advance() called without state injection! Custom tool node should handle all calls to advance().")
 
 @mcp.tool()
 def add_article(
@@ -540,44 +493,26 @@ def _generate_image_midjourney(art_prompt: str) -> str:
     """Generate image using Midjourney (placeholder for future implementation)."""
     raise NotImplementedError("Midjourney image generation not yet implemented")
 
-def _parse_aspect_ratio_to_size(aspect_ratio: str) -> str:
-    """Parse aspect ratio string and return DALL-E compatible size string.
-    
-    Args:
-        aspect_ratio: String like "16:9", "1:1", "9:16"
-        
-    Returns:
-        Size string like "1792x1024", "1024x1024", "1024x1792"
-        The smaller dimension is scaled to 1024px.
+def _map_orientation_to_size(orientation: str) -> str:
+    """Map human-friendly orientation to DALL·E-compatible size.
+
+    Supported orientations:
+    - square -> 1024x1024
+    - landscape -> 1792x1024
+    - portrait -> 1024x1792
+
+    Falls back to landscape if input is invalid.
     """
-    try:
-        # Parse ratio
-        parts = aspect_ratio.split(":")
-        if len(parts) != 2:
-            raise ValueError("Invalid format")
-        
-        width_ratio = float(parts[0])
-        height_ratio = float(parts[1])
-        
-        # Calculate dimensions with smaller side = 1024
-        if width_ratio <= height_ratio:
-            # Width is smaller or equal, scale width to 1024
-            width = 1024
-            height = int((height_ratio / width_ratio) * 1024)
-        else:
-            # Height is smaller, scale height to 1024  
-            height = 1024
-            width = int((width_ratio / height_ratio) * 1024)
-        
-        # Return the calculated size
-        return f"{width}x{height}"
-                
-    except (ValueError, ZeroDivisionError):
-        # Default to 16:9 landscape if parsing fails
-        return "1792x1024"
+    key = (orientation or "").strip().lower()
+    if key == "square":
+        return "1024x1024"
+    if key == "portrait":
+        return "1024x1792"
+    # Default and explicit landscape
+    return "1792x1024"
 
 @mcp.tool()
-def create_image(art_prompt: str, aspect_ratio: str = "16:9") -> str:
+def create_image(art_prompt: str, orientation: str = "landscape") -> str:
     """Generate artwork for wiki articles using AI image generation (DALLE, Replicate, etc).
     
     Use this tool to create visual representations of characters, locations, objects, or scenes
@@ -590,13 +525,11 @@ def create_image(art_prompt: str, aspect_ratio: str = "16:9") -> str:
                    - Important details (clothing, architecture, mood, lighting)
                    Example: "A tall wizard with silver beard in flowing blue robes, fantasy art style"
                    
-        aspect_ratio: Image aspect ratio as string (default "16:9"). Examples:
-                     - "16:9" -> 1792x1024 (landscape)
-                     - "9:16" -> 1024x1792 (portrait)  
-                     - "1:1" -> 1024x1024 (square)
-                     - "3:4" -> 1024x1365 (portrait)
-                     - "4:3" -> 1365x1024 (landscape)
-                     The smaller dimension is scaled to 1024px.
+        orientation: One of: "square", "landscape", or "portrait" (default "landscape").
+                     These map to the DALL·E-3 supported sizes:
+                     - square -> 1024x1024
+                     - landscape -> 1792x1024
+                     - portrait -> 1024x1792
                    
                    FILENAME GENERATION:
                    - Filename created from first 50 characters of prompt
@@ -613,8 +546,8 @@ def create_image(art_prompt: str, aspect_ratio: str = "16:9") -> str:
         
         Note: Generator used depends on config.toml [image] settings.
     """
-    # Parse aspect ratio to get image size
-    image_size = _parse_aspect_ratio_to_size(aspect_ratio)
+    # Map orientation to a valid DALL·E size
+    image_size = _map_orientation_to_size(orientation)
     
     # Get configured image generator
     generator: str = config["image"]["generator"].lower()
@@ -628,7 +561,7 @@ def create_image(art_prompt: str, aspect_ratio: str = "16:9") -> str:
         image_url = _generate_image_midjourney(art_prompt)
     else:
         error_msg = f"ERROR: Unsupported image generator: {generator}. Supported: dalle, replicate, midjourney"
-        _log_tool_call("create_image", {"art_prompt": art_prompt, "aspect_ratio": aspect_ratio}, error_msg)
+        _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, error_msg)
         return error_msg
     
     # Download the image
@@ -662,8 +595,8 @@ def create_image(art_prompt: str, aspect_ratio: str = "16:9") -> str:
     with open(image_path, 'wb') as f:
         f.write(image_response.content)
     
-    success_msg = f"Successfully created image using {generator}: {filename}\nAspect ratio: {aspect_ratio} ({image_size})\nPrompt: {art_prompt}\nSaved to: {image_path}"
-    _log_tool_call("create_image", {"art_prompt": art_prompt, "aspect_ratio": aspect_ratio}, success_msg)
+    success_msg = f"Successfully created image using {generator}: {filename}\nOrientation: {orientation} ({image_size})\nPrompt: {art_prompt}\nSaved to: {image_path}"
+    _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, success_msg)
     return success_msg
 
 def _log_tool_call(tool_name: str, args: dict, result: str) -> None:

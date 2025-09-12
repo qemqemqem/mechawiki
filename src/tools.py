@@ -591,9 +591,19 @@ def create_image(art_prompt: str, orientation: str = "landscape") -> str:
         _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, error_msg)
         return error_msg
     
-    # Download the image
-    image_response = requests.get(image_url, timeout=60)
-    image_response.raise_for_status()
+    # Download the image (with graceful error handling)
+    try:
+        image_response = requests.get(image_url, timeout=60)
+        image_response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        error_msg = (
+            f"ERROR: Failed to download generated image: {str(e)}\n"
+            f"URL: {image_url}\n"
+            "Advice: Verify network connectivity and that the URL is accessible. "
+            "If this persists, retry later or regenerate the image."
+        )
+        _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, error_msg)
+        return error_msg
     
     # Create filename from prompt (slugified)
     filename_base = re.sub(r'[^\w\s-]', '', art_prompt.lower())
@@ -619,8 +629,13 @@ def create_image(art_prompt: str, orientation: str = "landscape") -> str:
         counter += 1
     
     # Save image
-    with open(image_path, 'wb') as f:
-        f.write(image_response.content)
+    try:
+        with open(image_path, 'wb') as f:
+            f.write(image_response.content)
+    except Exception as e:
+        error_msg = f"ERROR: Failed to save image to disk: {str(e)}"
+        _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, error_msg)
+        return error_msg
     
     success_msg = f"Successfully created image using {generator}: {filename}\nOrientation: {orientation} ({image_size})\nPrompt: {art_prompt}\nSaved to: {image_path}"
     _log_tool_call("create_image", {"art_prompt": art_prompt, "orientation": orientation}, success_msg)

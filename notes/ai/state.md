@@ -11,7 +11,10 @@ System is complete and ready for first run, but bash environment has issues prev
   - `advance(num_words)` - navigate story with guardrails (-2000 to +2000)
   - `add_article(title, content)` - create markdown wiki articles
   - `edit_article(title, edit_block)` - Aider-style search/replace with retry logic
-  - `create_image(art_prompt)` - DALLE-3 image generation (configurable)
+  - `create_image(art_prompt, orientation)` - DALLE-3 image generation
+    - `orientation`: `square | landscape | portrait`
+    - Maps to sizes: `1024x1024 | 1792x1024 | 1024x1792`
+    - Gracefully handles DALLE safety rejections and returns advice
 - **Configuration**: Claude 3.5 Haiku selected (fast + cheap)
 - **Content Ready**: Tales of Wonder downloaded in `content/tales_of_wonder/`
 - **Interactive Mode Removed**: User didn't want chat interface, now auto-only
@@ -54,6 +57,8 @@ All bash commands returning "Error" - permission/environment issue preventing te
 - Chunk size: 1000 words
 - Advance range: -2000 to +2000 words
 - Context: 15 linked articles max
+- LLM prompt window: `agent.message_window = 12` (sends only last 12 messages to model)
+- Max steps: `agent.max_steps` (default very high; long runs supported)
 
 ### Architecture Notes Location
 - `notes/ai/architecture.md` - LangGraph + FastMCP integration details

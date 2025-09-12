@@ -181,10 +181,11 @@ SPECIAL INSTRUCTIONS (PRIORITIZE THESE):
                 except Exception:
                     return 0
             total_chars = sum(_msg_len(m) for m in llm_messages)
+            approx_tokens = max(1, total_chars // 4)  # rough heuristic
             from collections import Counter
             type_counts = Counter(type(m).__name__ for m in llm_messages)
             print(
-                f"🧠 LLM call -> msgs:{len(llm_messages)} chars:{total_chars} window:{message_window} types:{dict(type_counts)}",
+                f"🧠 LLM call -> msgs:{len(llm_messages)} chars:{total_chars} ~tokens:{approx_tokens} window:{message_window} types:{dict(type_counts)}",
                 file=sys.stderr,
                 flush=True,
             )

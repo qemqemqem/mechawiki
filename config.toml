@@ -30,6 +30,9 @@ temperature = 0.7
 # Number of most recent messages to pass to the LLM each turn
 message_window = 12
 
+# Maximum number of agent model turns per run (very high by default)
+max_steps = 1000000
+
 [image]
 # Image generator to use
 # Supported: dalle, replicate, midjourney (planned)

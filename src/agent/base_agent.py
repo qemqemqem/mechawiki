@@ -151,6 +151,15 @@ class BaseAgent:
         }
         self.messages.append(new_msg)
     
+    def _post_tool_execution_hook(self):
+        """Hook for subclasses to override for post-tool-execution processing.
+        
+        Called after all tool calls in a turn have been executed and their
+        results added to the conversation. Override in subclasses to add
+        custom behavior like content processing, state updates, etc.
+        """
+        pass
+    
     def _execute_tool(self, tool_call: Dict) -> str:
         """
         Execute a single tool call. Override in subclasses for custom logic.
@@ -332,6 +341,16 @@ class BaseAgent:
                         "name": function_name,
                         "content": result_content
                     })
+
+                # If the last message isn't a user message, add a user message
+                if self.messages[-1]["role"] != "user":
+                    self.messages.append({
+                        "role": "user",
+                        "content": "Please continue."
+                    })
+                
+                # Hook for subclasses to perform post-tool-execution processing
+                self._post_tool_execution_hook()
             else:
                 # No tool calls - add assistant message and continue
                 if collected_content:

@@ -8,6 +8,9 @@ chunk_size = 5000
 # Current story being processed
 current_story = "tales_of_wonder"
 
+# Number of recent advance() content blocks to keep fully visible
+active_content_blocks = 2
+
 [context]
 # Number of recently linked articles to keep in context
 max_linked_articles = 15

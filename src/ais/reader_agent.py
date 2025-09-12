@@ -5,6 +5,7 @@ Uses the HighlightContent system to manage story windows efficiently.
 """
 import sys
 import os
+import json
 import toml
 import litellm
 from pathlib import Path
@@ -13,7 +14,7 @@ from typing import Optional
 # Add parent directory to sys.path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from agent.base_agent import BaseAgent, HighlightContent
+from agent.base_agent import BaseAgent, EndConversation
 
 # Load config
 config = toml.load("config.toml")
@@ -141,6 +142,9 @@ Read systematically through the entire story, advancing the window as you go."""
         # Set initial memory
         self.set_memory("story_name", story_name)
         self.set_memory("story_path", str(story_path))
+        
+        # Initialize pending content tracking
+        self._pending_content = None
     
     def advance(self, num_words: Optional[int] = None):
         """
@@ -163,14 +167,18 @@ Read systematically through the entire story, advancing the window as you go."""
             "is_complete": pos_info["is_complete"]
         })
         
-        # Create highlighted content with position info
-        content = f"""Story Section (Words {pos_info['current_position'] - len(chunk.split())} - {pos_info['current_position']}):
-Progress: {pos_info['progress_percent']:.1f}%
-
-{chunk}"""
+        # Calculate start word for this chunk
+        chunk_word_count = len(chunk.split()) if chunk.strip() else 0
+        start_word = pos_info["current_position"] - chunk_word_count
         
-        # Return HighlightContent signal - BaseAgent will handle the rest
-        return HighlightContent(content)
+        # Store content for deferred addition (after tool result is processed)
+        self._pending_content = {
+            'content': chunk,
+            'start_word': start_word
+        }
+        
+        # Return simple confirmation - the content will be added after tool execution
+        return f"Advanced to word {pos_info['current_position']} ({pos_info['progress_percent']:.1f}% complete)."
     
     def get_status(self):
         """
@@ -195,6 +203,98 @@ Status: {"✅ Complete" if pos_info['is_complete'] else "🔄 In Progress"}
 Use advance() to continue reading."""
         
         return status
+    
+    def process_pending_content(self):
+        """Process any pending content after tool execution is complete."""
+        if self._pending_content:
+            self.advance_content(
+                self._pending_content['content'], 
+                self._pending_content['start_word']
+            )
+            self._pending_content = None
+    
+    def run_forever(self, initial_message: str, max_turns: int = 3):
+        """Override to handle pending content after tool execution."""
+        # Add initial message
+        self.add_user_message(initial_message)
+        
+        turn = 0
+        while True:
+            turn += 1
+            
+            # Check turn limit
+            if max_turns is not None and turn > max_turns:
+                return "Max turns reached"
+            
+            print(f"\n--- Agent Turn {turn} ---")
+            
+            # Make LLM call
+            response = litellm.completion(
+                model=self.model,
+                messages=self.messages,
+                tools=self.tools if self.tools else None,
+                tool_choice="auto" if self.tools else None,
+                stream=self.stream
+            )
+            
+            # Handle response based on streaming mode
+            if self.stream:
+                collected_content, tool_calls = self._handle_streaming_response(response)
+            else:
+                collected_content, tool_calls = self._handle_non_streaming_response(response)
+            
+            # Check for tool calls
+            if tool_calls and any(tc.get("id") for tc in tool_calls):
+                valid_tool_calls = [tc for tc in tool_calls if tc.get("id")]
+                print(f"\n--- Executing {len(valid_tool_calls)} tool calls ---")
+                
+                # Add assistant message
+                assistant_message = {
+                    "role": "assistant",
+                    "content": collected_content if collected_content else None,
+                    "tool_calls": valid_tool_calls
+                }
+                self.messages.append(assistant_message)
+                
+                # Execute each tool call
+                for tool_call in valid_tool_calls:
+                    function_name = tool_call["function"]["name"]
+                    function_args = json.loads(tool_call["function"]["arguments"])
+                    
+                    print(f"Calling {function_name} with args: {function_args}")
+                    
+                    # Execute tool (can be overridden by subclasses)
+                    raw_result = self._execute_tool(tool_call)
+                    
+                    # Check if tool returned EndConversation signal
+                    if isinstance(raw_result, EndConversation):
+                        print(f"Agent called end() - terminating conversation")
+                        return "Conversation ended by agent"
+                    
+                    # Regular result
+                    result_content = str(raw_result)
+                    print(f"Result: {raw_result}")
+                    
+                    # Add function result to conversation
+                    self.messages.append({
+                        "tool_call_id": tool_call["id"],
+                        "role": "tool", 
+                        "name": function_name,
+                        "content": result_content
+                    })
+                
+                # Process any pending content after all tool results are added
+                self.process_pending_content()
+                
+            else:
+                # No tool calls - add assistant message and continue
+                if collected_content:
+                    self.messages.append({
+                        "role": "assistant", 
+                        "content": collected_content
+                    })
+                
+                # Continue loop regardless - only exit on turn limit
 
 
 def main():

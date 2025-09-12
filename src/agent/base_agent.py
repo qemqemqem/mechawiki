@@ -14,10 +14,6 @@ class EndConversation():
     """Simple object for ending the conversation."""
     pass
 
-class HighlightContent():
-    """Signal to highlight specific content in conversation."""
-    def __init__(self, content: str):
-        self.content = content
 
 
 class BaseAgent:
@@ -108,18 +104,52 @@ class BaseAgent:
         """Add a user message to the conversation."""
         self.messages.append({"role": "user", "content": content})
     
-    def highlight_content(self, content: str):
-        """Update/insert highlighted content message in conversation."""
-        highlight_msg = {"role": "user", "content": f"[HIGHLIGHTED CONTENT]\n{content}"}
+    
+    def advance_content(self, content: str, start_word: int):
+        """Add new advance content and archive old content blocks to prevent context bloat.
         
-        # Find existing highlight message and replace it
+        This system maintains a sliding window of story content by:
+        1. Archiving older advance() content blocks beyond the configured limit
+        2. Adding the new content block with metadata tags
+        
+        Args:
+            content: The story content to add
+            start_word: Starting word position of this content block
+        """
+        # Import config here to avoid circular imports
+        try:
+            import toml
+            config = toml.load("config.toml")
+            active_limit = config["story"]["active_content_blocks"]
+        except:
+            active_limit = 2  # Fallback default
+        
+        # Find all existing advance content message indices
+        advance_messages = []
         for i, msg in enumerate(self.messages):
-            if msg.get("content", "").startswith("[HIGHLIGHTED CONTENT]"):
-                self.messages[i] = highlight_msg
-                return
+            if msg.get("_advance_content", False):
+                advance_messages.append(i)
         
-        # No existing highlight - just append to end
-        self.messages.append(highlight_msg)
+        # Archive older advance messages (keep only last N-1 active to make room for new one)
+        if len(advance_messages) >= active_limit:
+            messages_to_archive = advance_messages[:-(active_limit-1)]
+            
+            for msg_idx in messages_to_archive:
+                original_start = self.messages[msg_idx].get("_start_word", 0)
+                self.messages[msg_idx]["content"] = f"""Content starting at word {original_start}:
+
+[Content removed for length reasons. Use advance() to view current content]"""
+        
+        # Add new advance message with metadata
+        new_msg = {
+            "role": "user",
+            "content": f"""Content starting at word {start_word}:
+
+{content}""",
+            "_advance_content": True,
+            "_start_word": start_word
+        }
+        self.messages.append(new_msg)
     
     def _execute_tool(self, tool_call: Dict) -> str:
         """
@@ -145,10 +175,6 @@ class BaseAgent:
             if isinstance(result, EndConversation):
                 return result  # Return the signal directly
             
-            # Check if result is HighlightContent signal
-            if isinstance(result, HighlightContent):
-                # Store for deferred processing - don't modify conversation during tool execution
-                return result  # Return the HighlightContent object directly
             
             return result # Return the result directly
         except Exception as e:
@@ -281,7 +307,6 @@ class BaseAgent:
                 self.messages.append(assistant_message)
                 
                 # Execute each tool call
-                highlight_contents = []  # Collect HighlightContent results
                 for tool_call in valid_tool_calls:
                     function_name = tool_call["function"]["name"]
                     function_args = json.loads(tool_call["function"]["arguments"])
@@ -296,17 +321,9 @@ class BaseAgent:
                         print(f"Agent called end() - terminating conversation")
                         return "Conversation ended by agent"
                     
-                    # Check if the raw result is HighlightContent
-                    if isinstance(raw_result, HighlightContent):
-                        # Process HighlightContent after tool result is added
-                        result_content = f"Content highlighted ({len(raw_result.content)} characters)"
-                        print(f"Result: Content highlighted: {len(raw_result.content)} characters")
-                        # Store the HighlightContent to process after this loop
-                        highlight_contents.append(raw_result)
-                    else:
-                        # Regular result
-                        result_content = str(raw_result)
-                        print(f"Result: {raw_result}")
+                    # Regular result
+                    result_content = str(raw_result)
+                    print(f"Result: {raw_result}")
                     
                     # Add function result to conversation
                     self.messages.append({
@@ -315,10 +332,6 @@ class BaseAgent:
                         "name": function_name,
                         "content": result_content
                     })
-                
-                # Process any HighlightContent after all tool results are added
-                for highlight_content in highlight_contents:
-                    self.highlight_content(highlight_content.content)
             else:
                 # No tool calls - add assistant message and continue
                 if collected_content:

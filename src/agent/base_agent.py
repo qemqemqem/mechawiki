@@ -30,7 +30,7 @@ class BaseAgent:
     def __init__(
         self, 
         model: str = "claude-3-5-haiku-20241022",
-        system_prompt: str = "You are a helpful AI assistant.",
+        system_prompt: str = "You love good stories.",
         tools: Optional[List[Dict]] = None,
         available_functions: Optional[Dict[str, Callable]] = None,
         memory: Optional[Dict[str, Any]] = None,
@@ -121,7 +121,8 @@ class BaseAgent:
             import toml
             config = toml.load("config.toml")
             active_limit = config["story"]["active_content_blocks"]
-        except:
+        except Exception as e:
+            print(f"Error loading config: {e}")
             active_limit = 2  # Fallback default
         
         # Find all existing advance content message indices
@@ -239,29 +240,7 @@ class BaseAgent:
         Returns:
             Tuple of (content, tool_calls)
         """
-        message = response.choices[0].message
-        content = message.content if message.content else ""
-        tool_calls = message.tool_calls if hasattr(message, 'tool_calls') and message.tool_calls else []
-        
-        if content:
-            print(content)
-            
-        # Convert tool_calls to our expected format if needed
-        if tool_calls and hasattr(tool_calls[0], 'id'):
-            # Convert from OpenAI format to dict format
-            formatted_tool_calls = []
-            for tc in tool_calls:
-                formatted_tool_calls.append({
-                    "id": tc.id,
-                    "type": "function",
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments
-                    }
-                })
-            tool_calls = formatted_tool_calls
-        
-        return content, tool_calls
+        raise NotImplementedError("Non-streaming response handling not implemented")
     
     def run_forever(self, initial_message: str, max_turns: int = 3) -> str:
         """

@@ -6,6 +6,15 @@ import litellm
 from typing import Dict, List, Callable, Any, Optional
 
 
+class ToolError(Exception):
+    """Simple exception for tool execution errors."""
+    pass
+
+class EndConversation():
+    """Simple object for ending the conversation."""
+    pass
+
+
 class BaseAgent:
     """
     Modular agent that uses litellm for tool use with streaming support.
@@ -45,6 +54,9 @@ class BaseAgent:
         self.stream = stream
         self.messages = []
         
+        # Add the built-in end() tool
+        self._add_end_tool()
+        
     def add_tool(self, tool_def: Dict, function: Callable):
         """Add a single tool to the agent."""
         self.tools.append(tool_def)
@@ -65,6 +77,23 @@ class BaseAgent:
     def update_memory(self, updates: Dict[str, Any]):
         """Update multiple memory values."""
         self.memory.update(updates)
+    
+    def _add_end_tool(self):
+        """Add the built-in end() tool to terminate conversations."""
+        def end(reason: str = "Task completed"):
+            """End the conversation.
+            
+            Parameters
+            ----------
+            reason : str
+                Reason for ending the conversation
+            """
+            return EndConversation()
+        
+        # Create tool definition using litellm helper
+        end_tool = {"type": "function", "function": litellm.utils.function_to_dict(end)}
+        self.tools.append(end_tool)
+        self.available_functions["end"] = end
     
     def reset_conversation(self):
         """Clear the conversation history."""
@@ -93,9 +122,14 @@ class BaseAgent:
         try:
             function_to_call = self.available_functions[function_name]
             result = function_to_call(**function_args)
-            return str(result)
+            
+            # Check if result is EndConversation signal
+            if isinstance(result, EndConversation):
+                return result  # Return the signal directly
+            
+            return str(result)  # Convert other results to string
         except Exception as e:
-            return f"Error executing {function_name}: {str(e)}"
+            return ToolError(f"Error executing {function_name}: {str(e)}")
     
     def _handle_streaming_response(self, response) -> tuple[str, List[Dict]]:
         """
@@ -171,22 +205,29 @@ class BaseAgent:
         
         return content, tool_calls
     
-    def run_conversation(self, initial_message: str, max_turns: int = 10) -> str:
+    def run_forever(self, initial_message: str, max_turns: int = 3) -> str:
         """
-        Run a complete conversation with the agent.
+        Run a conversation with the agent.
         
         Args:
             initial_message: First user message
-            max_turns: Maximum number of conversation turns
+            max_turns: Maximum turns (None = run forever, int = limit turns)
             
         Returns:
-            Final response from the agent
+            Final response from the agent (or never returns if max_turns=None)
         """
-        # Add initial user message
+        # Add initial message
         self.add_user_message(initial_message)
         
-        for turn in range(max_turns):
-            print(f"\n--- LLM Response (Turn {turn + 1}) ---")
+        turn = 0
+        while True:
+            turn += 1
+            
+            # Check turn limit
+            if max_turns is not None and turn > max_turns:
+                return "Max turns reached"
+            
+            print(f"\n--- Agent Turn {turn} ---")
             
             # Make LLM call
             response = litellm.completion(
@@ -225,6 +266,12 @@ class BaseAgent:
                     
                     # Execute tool (can be overridden by subclasses)
                     result = self._execute_tool(tool_call)
+                    
+                    # Check if tool returned EndConversation signal
+                    if isinstance(result, EndConversation):
+                        print(f"Agent called end() - terminating conversation")
+                        return "Conversation ended by agent"
+                    
                     print(f"Result: {result}")
                     
                     # Add function result to conversation
@@ -232,39 +279,15 @@ class BaseAgent:
                         "tool_call_id": tool_call["id"],
                         "role": "tool", 
                         "name": function_name,
-                        "content": result
+                        "content": str(result)
                     })
             else:
-                # No tool calls, conversation complete
-                # Add final assistant message
+                # No tool calls - add assistant message and continue
                 if collected_content:
                     self.messages.append({
                         "role": "assistant", 
                         "content": collected_content
                     })
-                return collected_content
-        
-        return "Max turns reached"
+                
+                # Continue loop regardless - only exit on turn limit
     
-    def single_turn(self, message: str) -> str:
-        """
-        Single turn interaction - doesn't maintain conversation history.
-        
-        Args:
-            message: User message
-            
-        Returns:
-            Agent response
-        """
-        temp_messages = [{"role": "user", "content": message}]
-        
-        response = litellm.completion(
-            model=self.model,
-            messages=temp_messages,
-            tools=self.tools if self.tools else None,
-            tool_choice="auto" if self.tools else None,
-            stream=False  # Single turn is always non-streaming
-        )
-        
-        message_obj = response.choices[0].message
-        return message_obj.content if message_obj.content else "No response"

@@ -129,9 +129,9 @@ def main():
     agent = MathAgent(stream=True)
     
     # Run a conversation
-    result = agent.run_conversation(
-        "Add 3 to x, then multiply by 4", 
-        max_turns=10
+    result = agent.run_forever(
+        "Add 3 to x, then multiply by 4. When finished, call the end() tool.", 
+        max_turns=6
     )
     
     print(f"\nFinal x: {x}")

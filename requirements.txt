@@ -8,3 +8,4 @@ requests
 openai
 pathlib
 typing-extensions
+litellm

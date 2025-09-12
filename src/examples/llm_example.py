@@ -50,37 +50,32 @@ def main():
     while True:
         print("\n--- LLM Response ---")
         
-        # Stream the response
+        # Get response (non-streaming for now to debug)
         response = litellm.completion(
             model="claude-3-5-haiku-20241022",
             messages=messages,
             tools=tools,
             tool_choice="auto",
-            stream=True
+            stream=False
         )
         
-        # Collect streamed response
-        full_response = None
-        for chunk in response:
-            if chunk.choices[0].delta.content:
-                print(chunk.choices[0].delta.content, end="", flush=True)
-            
-            # Store the complete response when streaming ends
-            if chunk.choices[0].finish_reason:
-                full_response = chunk.choices[0]
-                break
+        # Get response content and tool calls
+        message = response.choices[0].message
         
-        print()  # New line after streaming
+        if message.content:
+            print(message.content)
+        
+        tool_calls = message.tool_calls if hasattr(message, 'tool_calls') and message.tool_calls else None
         
         # Check for tool calls
-        if full_response and full_response.message.tool_calls:
-            print(f"\n--- Executing {len(full_response.message.tool_calls)} tool calls ---")
+        if tool_calls:
+            print(f"\n--- Executing {len(tool_calls)} tool calls ---")
             
-            # Add assistant message to conversation
-            messages.append(full_response.message)
+            # Add assistant message to conversation - litellm should handle this properly
+            messages.append(message)
             
             # Execute each tool call
-            for tool_call in full_response.message.tool_calls:
+            for tool_call in tool_calls:
                 function_name = tool_call.function.name
                 function_args = json.loads(tool_call.function.arguments)
                 

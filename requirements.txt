@@ -9,3 +9,4 @@ openai
 pathlib
 typing-extensions
 litellm
+numpydoc

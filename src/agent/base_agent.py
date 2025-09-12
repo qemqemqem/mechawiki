@@ -14,6 +14,11 @@ class EndConversation():
     """Simple object for ending the conversation."""
     pass
 
+class HighlightContent():
+    """Signal to highlight specific content in conversation."""
+    def __init__(self, content: str):
+        self.content = content
+
 
 class BaseAgent:
     """
@@ -103,6 +108,19 @@ class BaseAgent:
         """Add a user message to the conversation."""
         self.messages.append({"role": "user", "content": content})
     
+    def highlight_content(self, content: str):
+        """Update/insert highlighted content message in conversation."""
+        highlight_msg = {"role": "user", "content": f"[HIGHLIGHTED CONTENT]\n{content}"}
+        
+        # Find existing highlight message and replace it
+        for i, msg in enumerate(self.messages):
+            if msg.get("content", "").startswith("[HIGHLIGHTED CONTENT]"):
+                self.messages[i] = highlight_msg
+                return
+        
+        # No existing highlight - just append to end
+        self.messages.append(highlight_msg)
+    
     def _execute_tool(self, tool_call: Dict) -> str:
         """
         Execute a single tool call. Override in subclasses for custom logic.
@@ -127,7 +145,12 @@ class BaseAgent:
             if isinstance(result, EndConversation):
                 return result  # Return the signal directly
             
-            return str(result)  # Convert other results to string
+            # Check if result is HighlightContent signal
+            if isinstance(result, HighlightContent):
+                # Store for deferred processing - don't modify conversation during tool execution
+                return result  # Return the HighlightContent object directly
+            
+            return result # Return the result directly
         except Exception as e:
             return ToolError(f"Error executing {function_name}: {str(e)}")
     
@@ -258,6 +281,7 @@ class BaseAgent:
                 self.messages.append(assistant_message)
                 
                 # Execute each tool call
+                highlight_contents = []  # Collect HighlightContent results
                 for tool_call in valid_tool_calls:
                     function_name = tool_call["function"]["name"]
                     function_args = json.loads(tool_call["function"]["arguments"])
@@ -265,22 +289,36 @@ class BaseAgent:
                     print(f"Calling {function_name} with args: {function_args}")
                     
                     # Execute tool (can be overridden by subclasses)
-                    result = self._execute_tool(tool_call)
+                    raw_result = self._execute_tool(tool_call)
                     
                     # Check if tool returned EndConversation signal
-                    if isinstance(result, EndConversation):
+                    if isinstance(raw_result, EndConversation):
                         print(f"Agent called end() - terminating conversation")
                         return "Conversation ended by agent"
                     
-                    print(f"Result: {result}")
+                    # Check if the raw result is HighlightContent
+                    if isinstance(raw_result, HighlightContent):
+                        # Process HighlightContent after tool result is added
+                        result_content = f"Content highlighted ({len(raw_result.content)} characters)"
+                        print(f"Result: Content highlighted: {len(raw_result.content)} characters")
+                        # Store the HighlightContent to process after this loop
+                        highlight_contents.append(raw_result)
+                    else:
+                        # Regular result
+                        result_content = str(raw_result)
+                        print(f"Result: {raw_result}")
                     
                     # Add function result to conversation
                     self.messages.append({
                         "tool_call_id": tool_call["id"],
                         "role": "tool", 
                         "name": function_name,
-                        "content": str(result)
+                        "content": result_content
                     })
+                
+                # Process any HighlightContent after all tool results are added
+                for highlight_content in highlight_contents:
+                    self.highlight_content(highlight_content.content)
             else:
                 # No tool calls - add assistant message and continue
                 if collected_content:

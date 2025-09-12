@@ -1,12 +1,9 @@
 [story]
+# Which word to start the story on
+story_start = 0
+
 # How many words to advance per chunk
 chunk_size = 5000
-
-# Minimum words per advance (guardrail) - negative allows going backwards
-min_advance = -2000000
-
-# Maximum words per advance (guardrail)
-max_advance = 2000000
 
 # Current story being processed
 current_story = "tales_of_wonder"

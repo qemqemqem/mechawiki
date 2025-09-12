@@ -117,12 +117,6 @@ class ReaderAgent(BaseAgent):
 
 Your mission: Read through the story chunk by chunk, briefly commenting on the content.
 
-Available tools:
-- advance(num_words): Move the reading window forward by specified words (default {config['story']['chunk_size']})
-- get_status(): Get current reading position and progress information
-- create_image(art_prompt, name, orientation): Generate artwork for characters, locations, or scenes from the story
-- end(reason): End the reading session
-
 The current story section will be provided via the advance() tool using highlighted content.
 Focus on understanding the narrative, characters, settings, and notable story elements.
 

@@ -48,7 +48,6 @@ class BaseAgent:
             stream: Whether to stream responses
         """
         self.model = model
-        self.system_prompt = system_prompt
         self.tools = tools or []
         self.available_functions = available_functions or {}
         self.memory = memory or {}
@@ -57,6 +56,9 @@ class BaseAgent:
         
         # Add the built-in end() tool
         self._add_end_tool()
+        
+        # Enhance system prompt with auto-generated tool descriptions
+        self.system_prompt = self._enhance_system_prompt(system_prompt)
         
     def add_tool(self, tool_def: Dict, function: Callable):
         """Add a single tool to the agent."""
@@ -160,6 +162,52 @@ class BaseAgent:
         custom behavior like content processing, state updates, etc.
         """
         pass
+    
+    def _generate_tools_description(self) -> str:
+        """Generate a description of available tools from their definitions."""
+        if not self.tools:
+            return "No tools available."
+        
+        descriptions = ["Available tools:"]
+        
+        for tool in self.tools:
+            if tool.get("type") == "function":
+                func_def = tool.get("function", {})
+                name = func_def.get("name", "unknown")
+                description = func_def.get("description", "No description available")
+                
+                # Extract parameters for signature
+                parameters = func_def.get("parameters", {}).get("properties", {})
+                param_names = list(parameters.keys())
+                param_str = ", ".join(param_names) if param_names else ""
+                
+                # Format: - function_name(param1, param2): Description
+                descriptions.append(f"- {name}({param_str}): {description}")
+        
+        return "\n".join(descriptions)
+    
+    def _enhance_system_prompt(self, base_prompt: str) -> str:
+        """Enhance system prompt with auto-generated tool descriptions."""
+        tools_desc = self._generate_tools_description()
+        
+        # If the prompt already contains "Available tools:", replace that section
+        if "Available tools:" in base_prompt:
+            # Split on the tools section and replace it
+            parts = base_prompt.split("Available tools:")
+            if len(parts) > 1:
+                # Find the end of the tools section (next paragraph or end)
+                after_tools = parts[1]
+                next_section_start = after_tools.find("\n\n")
+                if next_section_start != -1:
+                    # There's content after the tools section
+                    after_section = after_tools[next_section_start:]
+                    return f"{parts[0]}{tools_desc}{after_section}"
+                else:
+                    # Tools section is at the end
+                    return f"{parts[0]}{tools_desc}"
+            
+        # If no tools section exists, append it
+        return f"{base_prompt}\n\n{tools_desc}"
     
     def _execute_tool(self, tool_call: Dict) -> str:
         """

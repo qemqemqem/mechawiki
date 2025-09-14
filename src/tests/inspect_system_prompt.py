@@ -29,7 +29,7 @@ def main():
     print(f"\n📊 STATISTICS:")
     print(f"   - System prompt length: {len(agent.system_prompt)} characters")
     print(f"   - Number of tools: {len(agent.tools)}")
-    print(f"   - Available functions: {list(agent.available_functions.keys())}")
+    print(f"   - Tool names: {[tool['function']['name'] for tool in agent.tools]}")
     
     print(f"\n🔧 RAW TOOL DESCRIPTIONS:")
     print("-" * 40)

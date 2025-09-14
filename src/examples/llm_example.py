@@ -45,7 +45,11 @@ def main():
         {"role": "user", "content": "Add 3 to x, then multiply by 4"}
     ]
     
-    available_functions = {"add": add, "mult": mult}
+    # Create tools with embedded functions
+    tools_with_functions = [
+        {"type": "function", "function": litellm.utils.function_to_dict(add), "_function": add},
+        {"type": "function", "function": litellm.utils.function_to_dict(mult), "_function": mult}
+    ]
     
     while True:
         print("\n--- LLM Response ---")
@@ -115,8 +119,16 @@ def main():
                 
                 print(f"Calling {function_name} with args: {function_args}")
                 
-                function_to_call = available_functions[function_name]
-                function_result = function_to_call(**function_args)
+                # Find the function in tools
+                function_to_call = None
+                for tool in tools_with_functions:
+                    if tool["function"]["name"] == function_name:
+                        function_to_call = tool["_function"]
+                        break
+                if function_to_call is None:
+                    function_result = f"Error: Function {function_name} not found"
+                else:
+                    function_result = function_to_call(**function_args)
                 
                 print(f"Result: {function_result}")
                 

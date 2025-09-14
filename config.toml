@@ -8,6 +8,10 @@ chunk_size = 5000
 # Current story being processed
 current_story = "tales_of_wonder"
 
+# Github branch suffix. If not set, will default to "main"
+# This is combined with the current_story as the branch named '[current_story]/[content_branch]', on the content_repo
+# content_branch = "main"
+
 # Number of recent advance() content blocks to keep fully visible
 active_content_blocks = 2
 
@@ -43,8 +47,9 @@ size = "1024x1024"
 quality = "standard"
 
 [paths]
-# Base content directory
-content_dir = "content"
+# Where is the content stored. This must be a local directory, and it must be a git repo
+# TODO(andrew): The user should be able to specify a git repo URL, and have downloading occur automatically
+content_repo = "/home/keenan/Dev/wikicontent"
 
 # Articles subdirectory
 articles_dir = "articles"

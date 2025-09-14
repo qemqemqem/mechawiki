@@ -8,6 +8,19 @@ import requests
 from pathlib import Path
 from typing import Optional
 
+# Load config once at module level
+try:
+    _config = toml.load("config.toml")
+    _content_repo_path = Path(_config["paths"]["content_repo"])
+    _current_story = _config["story"]["current_story"]
+    _images_dir_name = _config["paths"]["images_dir"]
+except Exception as e:
+    print(f"❌ Error loading config in images.py: {e}")
+    _config = None
+    _content_repo_path = None
+    _current_story = None
+    _images_dir_name = "images"
+
 
 def _map_orientation_to_size(orientation: str) -> str:
     """Map human-friendly orientation to DALL·E-compatible size.
@@ -32,8 +45,9 @@ def _generate_image_dalle(art_prompt: str, size: str = None) -> str:
     """Generate image using DALLE-3."""
     from openai import OpenAI
     
-    # Load config for image settings
-    config = toml.load("config.toml")
+    # Check if config is available
+    if _config is None:
+        raise Exception("Config not loaded")
     
     api_key = os.getenv('OPENAI_API_KEY', 'NOT_SET')
     print(f"🔑 DALLE API key: {api_key[:8]}...{api_key[-4:] if len(api_key) >= 4 else 'SHORT'}")
@@ -41,14 +55,14 @@ def _generate_image_dalle(art_prompt: str, size: str = None) -> str:
     client = OpenAI()
     
     # Use provided size or fall back to config
-    image_size = size or config["image"]["size"]
+    image_size = size or _config["image"]["size"]
     print(f"🖼️ Generating {image_size} image")
     
     response = client.images.generate(
         model="dall-e-3",
         prompt=art_prompt,
         size=image_size,
-        quality=config["image"]["quality"],
+        quality=_config["image"]["quality"],
         n=1
     )
     
@@ -134,18 +148,15 @@ def create_image(art_prompt: str, name: str, orientation: str = "landscape") -> 
         - Network/download issues occur
         - File write operation fails
     """
-    # Load configuration
-    try:
-        config = toml.load("config.toml")
-    except Exception as e:
-        return f"ERROR: Could not load config.toml: {str(e)}"
+    # Check if config was loaded successfully
+    if _config is None or _content_repo_path is None or _current_story is None:
+        return f"ERROR: Could not load config.toml or required config values"
     
     # Create filename from name parameter
     filename_base = _generate_slugified_filename(name)
     
-    # Create images directory path
-    story_name = config["story"]["current_story"]
-    images_dir = Path(config["paths"]["content_dir"]) / story_name / config["paths"]["images_dir"]
+    # Create images directory path using content repository
+    images_dir = _content_repo_path / _current_story / _images_dir_name
     images_dir.mkdir(parents=True, exist_ok=True)
     
     # Check if image with this name already exists
@@ -157,7 +168,7 @@ def create_image(art_prompt: str, name: str, orientation: str = "landscape") -> 
     image_size = _map_orientation_to_size(orientation)
     
     # Get configured image generator
-    generator = config["image"]["generator"].lower()
+    generator = _config["image"]["generator"].lower()
     
     # Generate image based on configured generator
     if generator == "dalle":

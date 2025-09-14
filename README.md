@@ -9,5 +9,5 @@ pip install -r requirements.txt
 ## To Run:
 
 ```bash
-python src/ais/reader_agent.py
+python src/agents/reader_agent.py
 ```

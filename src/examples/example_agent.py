@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import litellm
-from agent.base_agent import BaseAgent
+from base_agent.base_agent import BaseAgent
 
 # Global variable for math operations
 x = 10
@@ -66,20 +66,13 @@ class MathAgent(BaseAgent):
     """
     
     def __init__(self, **kwargs):
-        # Create tools using litellm helper
+        # Create tools using litellm helper with embedded functions
         tools = [
-            {"type": "function", "function": litellm.utils.function_to_dict(add)},
-            {"type": "function", "function": litellm.utils.function_to_dict(mult)},
-            {"type": "function", "function": litellm.utils.function_to_dict(get_x)},
-            {"type": "function", "function": litellm.utils.function_to_dict(reset_x)}
+            {"type": "function", "function": litellm.utils.function_to_dict(add), "_function": add},
+            {"type": "function", "function": litellm.utils.function_to_dict(mult), "_function": mult},
+            {"type": "function", "function": litellm.utils.function_to_dict(get_x), "_function": get_x},
+            {"type": "function", "function": litellm.utils.function_to_dict(reset_x), "_function": reset_x}
         ]
-        
-        available_functions = {
-            "add": add,
-            "mult": mult, 
-            "get_x": get_x,
-            "reset_x": reset_x
-        }
         
         system_prompt = """You are a helpful math assistant. You have access to a global variable 'x' that starts at 10.
 
@@ -98,7 +91,6 @@ Be precise and helpful in your explanations."""
         
         super().__init__(
             tools=tools,
-            available_functions=available_functions,
             system_prompt=system_prompt,
             **kwargs
         )

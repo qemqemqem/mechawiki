@@ -1,62 +1,61 @@
-# Example configurations for different LLM and image providers
-
-# ===== DEFAULT: Anthropic Claude + DALLE =====
 [story]
-chunk_size = 1000
-min_advance = -2000
-max_advance = 2000
+# Which word to start the story on
+story_start = 0
+
+# How many words to advance per chunk
+chunk_size = 5000
+
+# Current story being processed
 current_story = "tales_of_wonder"
 
+# Github branch suffix. If not set, will default to "main"
+# This is combined with the current_story as the branch named '[current_story]/[content_branch]', on the content_repo
+# content_branch = "main"
+
+# Number of recent advance() content blocks to keep fully visible
+active_content_blocks = 2
+
 [context]
+# Number of recently linked articles to keep in context
 max_linked_articles = 15
+
+# Estimated words per article for context calculation
 words_per_article = 500
 
 [agent]
+# LLM provider and model to use
+# Supported providers: anthropic, openai, together, replicate
 llm_provider = "anthropic"
-model = "claude-3-sonnet-20240229"
+model = "claude-3-5-haiku-20241022"
+
+# Temperature for creativity
 temperature = 0.7
 
+# Number of most recent messages to pass to the LLM each turn
+message_window = 12
+
+# Maximum number of agent model turns per run (very high by default)
+max_steps = 1000000
+
 [image]
+# Image generator to use
+# Supported: dalle, replicate, midjourney (planned)
 generator = "dalle"
+
+# Image generation parameters
 size = "1024x1024"
 quality = "standard"
 
 [paths]
-content_dir = "content"
+# Where is the content stored. This must be a local directory, and it must be a git repo
+# TODO(andrew): The user should be able to specify a git repo URL, and have downloading occur automatically
+content_repo = "/home/keenan/Dev/wikicontent"
+
+# Articles subdirectory
 articles_dir = "articles"
+
+# Images subdirectory
 images_dir = "images"
+
+# Songs subdirectory
 songs_dir = "songs"
-
-# ===== EXAMPLE: OpenAI GPT-4 + DALLE =====
-# [agent]
-# llm_provider = "openai"
-# model = "gpt-4"
-# temperature = 0.7
-
-# ===== EXAMPLE: Together AI + DALLE =====
-# [agent]
-# llm_provider = "together"
-# model = "meta-llama/Llama-2-70b-chat-hf"
-# temperature = 0.7
-
-# ===== EXAMPLE: GPT-4 + Replicate (planned) =====
-# [agent]
-# llm_provider = "openai"
-# model = "gpt-4"
-# temperature = 0.7
-#
-# [image]
-# generator = "replicate"
-# size = "1024x1024"
-# quality = "standard"
-
-# ===== EXAMPLE: Claude + Midjourney (planned) =====
-# [agent]
-# llm_provider = "anthropic"
-# model = "claude-3-sonnet-20240229"
-# temperature = 0.7
-#
-# [image]
-# generator = "midjourney"
-# size = "1024x1024"
-# quality = "standard"

@@ -160,24 +160,43 @@ class BaseAgent:
     
     def _generate_tools_description(self) -> str:
         """Generate a description of available tools from their definitions."""
+        import inspect
+        
         if not self.tools:
             return "No tools available."
         
         descriptions = ["Available tools:"]
+        descriptions.append("=" * 50)
         
-        for tool in self.tools:
+        for i, tool in enumerate(self.tools):
             if tool.get("type") == "function":
                 func_def = tool.get("function", {})
                 name = func_def.get("name", "unknown")
-                description = func_def.get("description", "No description available")
+                
+                # Try to get full docstring from the actual function
+                full_description = "No description available"
+                if "_function" in tool:
+                    actual_function = tool["_function"]
+                    docstring = inspect.getdoc(actual_function)
+                    if docstring:
+                        full_description = docstring.strip()
+                else:
+                    # Fallback to the basic description from function_to_dict
+                    full_description = func_def.get("description", "No description available")
                 
                 # Extract parameters for signature
                 parameters = func_def.get("parameters", {}).get("properties", {})
                 param_names = list(parameters.keys())
                 param_str = ", ".join(param_names) if param_names else ""
                 
-                # Format: - function_name(param1, param2): Description
-                descriptions.append(f"- {name}({param_str}): {description}")
+                # Add separator between tools (except before first tool)
+                if i > 0:
+                    descriptions.append("")
+                
+                # Format with clear structure
+                descriptions.append(f"🔧 {name}({param_str})")
+                descriptions.append("-" * (len(name) + len(param_str) + 4))
+                descriptions.append(full_description)
         
         return "\n".join(descriptions)
     
@@ -185,21 +204,21 @@ class BaseAgent:
         """Enhance system prompt with auto-generated tool descriptions."""
         tools_desc = self._generate_tools_description()
         
-        # If the prompt already contains "Available tools:", replace that section
-        if "Available tools:" in base_prompt:
-            # Split on the tools section and replace it
-            parts = base_prompt.split("Available tools:")
-            if len(parts) > 1:
-                # Find the end of the tools section (next paragraph or end)
-                after_tools = parts[1]
-                next_section_start = after_tools.find("\n\n")
-                if next_section_start != -1:
-                    # There's content after the tools section
-                    after_section = after_tools[next_section_start:]
-                    return f"{parts[0]}{tools_desc}{after_section}"
-                else:
-                    # Tools section is at the end
-                    return f"{parts[0]}{tools_desc}"
+        # # If the prompt already contains "Available tools:", replace that section
+        # if "Available tools:" in base_prompt:
+        #     # Split on the tools section and replace it
+        #     parts = base_prompt.split("Available tools:")
+        #     if len(parts) > 1:
+        #         # Find the end of the tools section (next paragraph or end)
+        #         after_tools = parts[1]
+        #         next_section_start = after_tools.find("\n\n")
+        #         if next_section_start != -1:
+        #             # There's content after the tools section
+        #             after_section = after_tools[next_section_start:]
+        #             return f"{parts[0]}{tools_desc}{after_section}"
+        #         else:
+        #             # Tools section is at the end
+        #             return f"{parts[0]}{tools_desc}"
             
         # If no tools section exists, append it
         return f"{base_prompt}\n\n{tools_desc}"

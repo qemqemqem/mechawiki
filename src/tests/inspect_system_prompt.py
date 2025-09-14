@@ -10,7 +10,7 @@ import os
 # Add src to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ais.reader_agent import ReaderAgent
+from agents.reader_agent import ReaderAgent
 
 
 def main():
@@ -26,15 +26,15 @@ def main():
     print(agent.system_prompt)
     print("-" * 40)
     
-    print(f"\n📊 STATISTICS:")
-    print(f"   - System prompt length: {len(agent.system_prompt)} characters")
-    print(f"   - Number of tools: {len(agent.tools)}")
-    print(f"   - Tool names: {[tool['function']['name'] for tool in agent.tools]}")
+    # print(f"\n📊 STATISTICS:")
+    # print(f"   - System prompt length: {len(agent.system_prompt)} characters")
+    # print(f"   - Number of tools: {len(agent.tools)}")
+    # print(f"   - Tool names: {[tool['function']['name'] for tool in agent.tools]}")
     
-    print(f"\n🔧 RAW TOOL DESCRIPTIONS:")
-    print("-" * 40)
-    print(agent._generate_tools_description())
-    print("-" * 40)
+    # print(f"\n🔧 RAW TOOL DESCRIPTIONS:")
+    # print("-" * 40)
+    # print(agent._generate_tools_description())
+    # print("-" * 40)
     
     print("\n✅ System prompt inspection complete!")
 

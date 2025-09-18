@@ -237,7 +237,7 @@ def main():
     # Run a reading session
     print("\n--- Starting Reading Session ---") 
     result = agent.run_forever(
-        "Start reading the story. Use advance() to get the first chunk, then briefly comment on what you read. Use create_image() to create an image if you think the image would be cool (remember to provide a good name for the image).",
+        "Start reading the story. Use advance() to get the first chunk, then search for and open related articles using your tools.",
         max_turns=5
     )
     

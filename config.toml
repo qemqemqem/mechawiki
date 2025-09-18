@@ -49,7 +49,7 @@ quality = "standard"
 [paths]
 # Where is the content stored. This must be a local directory, and it must be a git repo
 # TODO(andrew): The user should be able to specify a git repo URL, and have downloading occur automatically
-content_repo = "/home/keenan/Dev/wikicontent"
+content_repo = "/Users/andrew/dev/wikicontent"
 
 # Articles subdirectory
 articles_dir = "articles"

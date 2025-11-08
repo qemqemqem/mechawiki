@@ -17,6 +17,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from base_agent.base_agent import BaseAgent, EndConversation
 from tools.images import create_image
 from tools.search import find_articles, find_images, find_songs, find_files
+from tools.articles import read_article
 from utils.git import ensure_content_branch
 
 # Load config
@@ -109,6 +110,7 @@ class ReaderAgent(BaseAgent):
             {"type": "function", "function": litellm.utils.function_to_dict(find_images), "_function": find_images},
             {"type": "function", "function": litellm.utils.function_to_dict(find_songs), "_function": find_songs},
             {"type": "function", "function": litellm.utils.function_to_dict(find_files), "_function": find_files},
+            {"type": "function", "function": litellm.utils.function_to_dict(read_article), "_function": read_article},
         ]
         
         # Enhanced system prompt for story reading
@@ -127,6 +129,11 @@ SEARCH CAPABILITIES:
 - Use find_songs(search_term) to find existing audio content
 - Use find_files(search_term) to search across all content types
 - Use "*" as search term to get all files of that type
+
+ARTICLE READING:
+- Use read_article(article_name) to read the full contents of a specific article
+- Article name can be with or without .md extension
+- Search is case-insensitive and supports partial matches
 
 Read systematically through the entire story, advancing the window as you go."""
 
@@ -237,7 +244,7 @@ def main():
     # Run a reading session
     print("\n--- Starting Reading Session ---") 
     result = agent.run_forever(
-        "Start reading the story. Use advance() to get the first chunk, then briefly comment on what you read. Use create_image() to create an image if you think the image would be cool (remember to provide a good name for the image).",
+        "Start reading the story. Use advance() to get the first chunk, then look up relevant articles. Use create_image() to create an image if you think the image would be cool (remember to provide a good name for the image).",
         max_turns=5
     )
     

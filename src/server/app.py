@@ -20,12 +20,12 @@ CORS(app)  # Enable CORS for frontend
 
 # Initialize log manager
 from .log_watcher import init_log_manager
-from .config import LOGS_DIR, agent_config
-log_manager = init_log_manager(LOGS_DIR)
+from .config import session_config
+log_manager = init_log_manager(session_config.logs_dir)
 
 # Start watching existing agents
-for agent in agent_config.list_agents():
-    log_file = LOGS_DIR / f"agent_{agent['id']}.jsonl"
+for agent in session_config.list_agents():
+    log_file = session_config.logs_dir / f"agent_{agent['id']}.jsonl"
     if log_file.exists():
         log_manager.start_watching_agent(agent['id'], str(log_file))
 

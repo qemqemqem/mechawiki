@@ -31,6 +31,11 @@
   padding: 0;
 }
 
+#root {
+  width: 100%;
+  height: 100vh;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -55,20 +60,46 @@ body {
   gap: 0;
 }
 
+.agents-pane-wrapper,
+.files-pane-wrapper {
+  height: 100%;
+  overflow: hidden;
+  min-width: 0; /* Allow shrinking */
+  flex-shrink: 1;
+}
+
 .resize-handle {
-  width: 4px;
+  width: 8px;
   background: var(--light-border);
   cursor: col-resize;
   flex-shrink: 0;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 40px;
+  background: var(--medieval-blue);
+  opacity: 0.3;
 }
 
 .resize-handle:hover {
-  background: var(--medieval-blue);
+  background: rgba(44, 95, 153, 0.1);
+}
+
+.resize-handle:hover::before {
+  opacity: 0.6;
 }
 
 /* Panes */
 .pane {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -100,6 +131,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-md);
+  min-width: 0; /* Allow shrinking below content size */
 }
 
 /* Buttons */

@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './FileViewer.css'
 
-function FileViewer({ filePath, onBack }) {
+function FileViewer({ filePath, onBack, onNavigate }) {
   const [content, setContent] = useState('')
   const [editMode, setEditMode] = useState(false)
   const [editedContent, setEditedContent] = useState('')
@@ -66,9 +66,25 @@ function FileViewer({ filePath, onBack }) {
     const isWikiLink = !href.startsWith('http') && !href.startsWith('mailto:')
     
     if (isWikiLink) {
-      // Normalize wiki link (remove .md extension if present)
-      const targetFile = href.endsWith('.md') ? href : `${href}.md`
-      const fullPath = `articles/${targetFile}`
+      // Normalize wiki link path
+      let targetFile = href
+      
+      // Handle different link formats
+      if (href.startsWith('./')) {
+        targetFile = href.slice(2)
+      } else if (href.startsWith('/')) {
+        targetFile = href.slice(1)
+      }
+      
+      // Ensure .md extension
+      if (!targetFile.endsWith('.md')) {
+        targetFile = `${targetFile}.md`
+      }
+      
+      // Ensure it's in articles/ if not already specified
+      if (!targetFile.startsWith('articles/')) {
+        targetFile = `articles/${targetFile}`
+      }
       
       return (
         <a
@@ -76,8 +92,7 @@ function FileViewer({ filePath, onBack }) {
           className="wiki-link"
           onClick={(e) => {
             e.preventDefault()
-            onBack() // Go back to feed
-            // TODO: Open the linked file instead
+            onNavigate(targetFile) // Navigate to the linked file
           }}
         >
           {children}

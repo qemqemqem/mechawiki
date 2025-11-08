@@ -21,6 +21,7 @@ function FilesPane({ fileChanges, selectedFile, onSelectFile }) {
           <FileViewer
             filePath={selectedFile}
             onBack={handleBackToFeed}
+            onNavigate={onSelectFile}
           />
         ) : (
           <FilesFeed

@@ -7,7 +7,7 @@ import logging
 import queue
 from datetime import datetime
 from flask import Blueprint, jsonify, request, Response
-from .config import agent_config, LOGS_DIR
+from .config import session_config
 from .log_watcher import log_manager
 import json
 
@@ -19,7 +19,7 @@ bp = Blueprint('agents', __name__, url_prefix='/api/agents')
 @bp.route('', methods=['GET'])
 def list_agents():
     """List all agents with their current status."""
-    agents = agent_config.list_agents()
+    agents = session_config.list_agents()
     
     # Enrich with status from logs
     enriched = []
@@ -55,22 +55,21 @@ def create_agent():
         "name": data['name'],
         "type": data['type'],
         "status": "stopped",  # Will be updated when agent starts
-        "config": data.get('config', {}),
-        "log_file": f"logs/agent_{agent_id}.jsonl"
+        "config": data.get('config', {})
     }
     
     try:
-        agent_config.add_agent(agent_data)
+        agent_config = session_config.add_agent(agent_data)
         
         # Create empty log file
-        log_file = LOGS_DIR / f"agent_{agent_id}.jsonl"
+        log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
         log_file.write_text('')
         
         # Start watching this agent's log
         log_manager.start_watching_agent(agent_id, str(log_file))
         
         logger.info(f"✅ Created agent: {agent_id}")
-        return jsonify(agent_data), 201
+        return jsonify(agent_config), 201
     
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -79,7 +78,7 @@ def create_agent():
 @bp.route('/<agent_id>', methods=['GET'])
 def get_agent(agent_id):
     """Get specific agent details."""
-    agent = agent_config.get_agent(agent_id)
+    agent = session_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -94,13 +93,13 @@ def get_agent(agent_id):
 @bp.route('/<agent_id>/pause', methods=['POST'])
 def pause_agent(agent_id):
     """Pause an agent."""
-    agent = agent_config.get_agent(agent_id)
+    agent = session_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
     # Write pause status to log
-    log_file = LOGS_DIR / f"agent_{agent_id}.jsonl"
+    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "status",
@@ -118,13 +117,13 @@ def pause_agent(agent_id):
 @bp.route('/<agent_id>/resume', methods=['POST'])
 def resume_agent(agent_id):
     """Resume a paused agent."""
-    agent = agent_config.get_agent(agent_id)
+    agent = session_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
     # Write resume status to log
-    log_file = LOGS_DIR / f"agent_{agent_id}.jsonl"
+    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "status",
@@ -142,13 +141,13 @@ def resume_agent(agent_id):
 @bp.route('/<agent_id>/archive', methods=['POST'])
 def archive_agent(agent_id):
     """Archive an agent."""
-    agent = agent_config.get_agent(agent_id)
+    agent = session_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
     # Write archive status to log
-    log_file = LOGS_DIR / f"agent_{agent_id}.jsonl"
+    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "status",
@@ -169,7 +168,7 @@ def archive_agent(agent_id):
 @bp.route('/<agent_id>/message', methods=['POST'])
 def send_message(agent_id):
     """Send a message to an agent."""
-    agent = agent_config.get_agent(agent_id)
+    agent = session_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -181,7 +180,7 @@ def send_message(agent_id):
         return jsonify({"error": "Message cannot be empty"}), 400
     
     # Write user message to log
-    log_file = LOGS_DIR / f"agent_{agent_id}.jsonl"
+    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "user_message",
@@ -198,7 +197,7 @@ def send_message(agent_id):
 @bp.route('/<agent_id>/logs', methods=['GET'])
 def get_logs(agent_id):
     """Stream agent logs via SSE."""
-    agent = agent_config.get_agent(agent_id)
+    agent = session_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -209,7 +208,7 @@ def get_logs(agent_id):
         log_queue = log_manager.subscribe_to_agent(agent_id)
         
         # Send existing logs first
-        log_file = LOGS_DIR / f"agent_{agent_id}.jsonl"
+        log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
         if log_file.exists():
             with open(log_file, 'r') as f:
                 for line in f:

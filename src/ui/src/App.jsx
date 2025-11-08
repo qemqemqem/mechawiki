@@ -10,14 +10,46 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [fileChanges, setFileChanges] = useState([])
   const [isConnected, setIsConnected] = useState(false)
+  const [leftPaneWidth, setLeftPaneWidth] = useState(50) // Percentage
+  const [isResizing, setIsResizing] = useState(false)
 
-  // Fetch agents on mount
+  // Fetch agents and initial files on mount
   useEffect(() => {
     fetchAgents()
-    
-    // Connect to file feed
+    fetchInitialFiles()
     connectToFileFeed()
   }, [])
+
+  // Handle resize drag
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return
+      
+      const newWidth = (e.clientX / window.innerWidth) * 100
+      // Constrain between 20% and 80%
+      const constrainedWidth = Math.max(20, Math.min(80, newWidth))
+      setLeftPaneWidth(constrainedWidth)
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+    }
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    } else {
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isResizing])
 
   const fetchAgents = async () => {
     try {
@@ -28,6 +60,34 @@ function App() {
     } catch (error) {
       console.error('Error fetching agents:', error)
       setIsConnected(false)
+    }
+  }
+
+  const fetchInitialFiles = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/files')
+      const data = await response.json()
+      const articleFiles = (data.files || []).filter(f => 
+        f.path.startsWith('articles/') && f.path.endsWith('.md')
+      )
+      
+      // Pick 5 random files
+      const shuffled = articleFiles.sort(() => 0.5 - Math.random())
+      const selected = shuffled.slice(0, 5)
+      
+      // Create initial file change entries
+      const initialChanges = selected.map(file => ({
+        type: 'file_changed',
+        agent_id: 'system',
+        file_path: file.path,
+        action: 'initial',
+        changes: { added: 0, removed: 0 },
+        timestamp: new Date(file.modified * 1000).toISOString()
+      }))
+      
+      setFileChanges(initialChanges)
+    } catch (error) {
+      console.error('Error fetching initial files:', error)
     }
   }
 
@@ -128,24 +188,37 @@ function App() {
       <TopBar isConnected={isConnected} />
       
       <div className="app-content">
-        <AgentsPane
-          agents={agents}
-          selectedAgent={selectedAgent}
-          onSelectAgent={setSelectedAgent}
-          onCreateAgent={handleCreateAgent}
-          onPauseAgent={handlePauseAgent}
-          onResumeAgent={handleResumeAgent}
-          onArchiveAgent={handleArchiveAgent}
-          onSendMessage={handleSendMessage}
+        <div 
+          className="agents-pane-wrapper"
+          style={{ width: `${leftPaneWidth}%` }}
+        >
+          <AgentsPane
+            agents={agents}
+            selectedAgent={selectedAgent}
+            onSelectAgent={setSelectedAgent}
+            onCreateAgent={handleCreateAgent}
+            onPauseAgent={handlePauseAgent}
+            onResumeAgent={handleResumeAgent}
+            onArchiveAgent={handleArchiveAgent}
+            onSendMessage={handleSendMessage}
+          />
+        </div>
+        
+        <div 
+          className="resize-handle"
+          onMouseDown={() => setIsResizing(true)}
         />
         
-        <div className="resize-handle" />
-        
-        <FilesPane
-          fileChanges={fileChanges}
-          selectedFile={selectedFile}
-          onSelectFile={setSelectedFile}
-        />
+        <div 
+          className="files-pane-wrapper"
+          style={{ width: `${100 - leftPaneWidth}%` }}
+        >
+          <FilesPane
+            fileChanges={fileChanges}
+            selectedFile={selectedFile}
+            onSelectFile={setSelectedFile}
+          />
+        </div>
       </div>
     </div>
   )

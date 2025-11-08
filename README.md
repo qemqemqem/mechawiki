@@ -76,12 +76,25 @@ Track file changes as agents create and edit wiki content:
 - **`src/ui/`** - React frontend (Vite)
 - **`src/agents/`** - Agent implementations
 - **`src/tools/`** - Agent tools (read/write articles, search, images)
-- **`data/`** - Agent configs and logs
+- **`data/sessions/dev_session/`** - Active session (agents, logs, config)
 - **`~/Dev/wikicontent/`** - Wiki content repository (git-managed separately)
+
+### Session Structure
+
+Each session tracks its git branch and agents:
+```
+data/sessions/dev_session/
+├── config.yaml      # Session config (git branch, etc)
+├── agents.json      # Agents in this session
+└── logs/            # Agent JSONL logs
+```
+
+See **[Session Management](notes/sessions.md)** for details.
 
 ## Documentation
 
 - **[UI Documentation](src/ui/README.md)** - Frontend setup and architecture
+- **[Session Management](notes/sessions.md)** - How sessions work
 - **[Plan Document](notes/ui_plan.md)** - Full design and implementation plan
 - **[Agent User Stories](notes/agents_user_stories.md)** - Agent types and use cases
 - **[Agent Implementation](notes/agents_tools_and_implementation.md)** - Technical details

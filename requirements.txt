@@ -13,3 +13,4 @@ numpydoc
 flask
 flask-cors
 watchdog
+pyyaml

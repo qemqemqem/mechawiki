@@ -43,7 +43,7 @@ source .venv/bin/activate
 
 if ! pip show flask &> /dev/null; then
     echo "Installing Python dependencies..."
-    pip install -r requirements.txt
+    pip install -q -r requirements.txt
 else
     echo "✓ Python dependencies installed"
 fi
@@ -74,8 +74,8 @@ if [ ! -f "config.toml" ]; then
 fi
 
 # Create data directories
-mkdir -p data/logs
-echo "✓ Created data directories"
+mkdir -p data/sessions/dev_session/logs
+echo "✓ Created session directories"
 echo ""
 
 # Start backend in background

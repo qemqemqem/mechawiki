@@ -67,13 +67,8 @@ def init_test_agents():
             print(f"  ⏭️  Agent {agent_data['id']} already exists")
             continue
         
-        # Add to config
-        session_config.add_agent(
-            agent_id=agent_data["id"],
-            name=agent_data["name"],
-            agent_type=agent_data["type"],
-            config=agent_data["config"]
-        )
+        # Add to config (SessionConfig.add_agent expects a dict)
+        session_config.add_agent(agent_data)
         
         # Create empty log file
         log_file = session_config.logs_dir / f"agent_{agent_data['id']}.jsonl"

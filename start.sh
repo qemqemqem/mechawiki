@@ -2,6 +2,9 @@
 # MechaWiki Startup Script
 # Starts both backend and frontend servers
 
+# Exit on any error
+set -e
+
 echo "🏰 Starting MechaWiki..."
 echo ""
 
@@ -81,25 +84,42 @@ echo ""
 # Start backend in background
 echo "🚀 Starting Flask backend (port 5000)..."
 source .venv/bin/activate
-python3 run_server.py &
+python3 run_server.py > backend.log 2>&1 &
 BACKEND_PID=$!
 echo "Backend PID: $BACKEND_PID"
-echo ""
 
-# Wait a moment for backend to start
+# Wait a moment for backend to start and check if it's still running
 sleep 2
+
+if ! kill -0 $BACKEND_PID 2>/dev/null; then
+    echo "❌ Backend failed to start! Check backend.log for details:"
+    tail -20 backend.log
+    exit 1
+fi
+
+echo "✓ Backend started successfully"
+echo ""
 
 # Start frontend in background
 echo "🚀 Starting Vite frontend (port 5173)..."
 cd src/ui
-npm run dev &
+npm run dev > ../../frontend.log 2>&1 &
 FRONTEND_PID=$!
 echo "Frontend PID: $FRONTEND_PID"
 cd ../..
-echo ""
 
-# Wait a moment for frontend to start
-sleep 3
+# Wait a moment and check if frontend is still running
+sleep 2
+
+if ! kill -0 $FRONTEND_PID 2>/dev/null; then
+    echo "❌ Frontend failed to start! Check frontend.log for details:"
+    tail -20 frontend.log
+    kill $BACKEND_PID 2>/dev/null
+    exit 1
+fi
+
+echo "✓ Frontend started successfully"
+echo ""
 
 echo "✨ MechaWiki is running!"
 echo ""

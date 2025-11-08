@@ -1,3 +1,53 @@
 {
-  "agents": []
+  "agents": [
+    {
+      "id": "reader-001",
+      "name": "Story Reader Alpha",
+      "type": "ReaderAgent",
+      "config": {
+        "description": "Reads stories and creates wiki articles"
+      },
+      "created_at": "2025-11-08T11:21:59.687171",
+      "log_file": "logs/agent_reader-001.jsonl"
+    },
+    {
+      "id": "writer-001",
+      "name": "Tale Weaver Beta",
+      "type": "WriterAgent",
+      "config": {
+        "description": "Writes stories from wiki content"
+      },
+      "created_at": "2025-11-08T11:21:59.687490",
+      "log_file": "logs/agent_writer-001.jsonl"
+    },
+    {
+      "id": "researcher-001",
+      "name": "Lore Keeper Gamma",
+      "type": "ResearcherAgent",
+      "config": {
+        "description": "Researches and organizes wiki information"
+      },
+      "created_at": "2025-11-08T11:21:59.687688",
+      "log_file": "logs/agent_researcher-001.jsonl"
+    },
+    {
+      "id": "interactive-001",
+      "name": "Quest Master Delta",
+      "type": "InteractiveAgent",
+      "config": {
+        "description": "Creates interactive experiences"
+      },
+      "created_at": "2025-11-08T11:21:59.688806",
+      "log_file": "logs/agent_interactive-001.jsonl"
+    },
+    {
+      "id": "readeragent-20251108113041",
+      "name": "Testerson",
+      "type": "ReaderAgent",
+      "status": "stopped",
+      "config": {},
+      "created_at": "2025-11-08T11:30:41.155560",
+      "log_file": "logs/agent_readeragent-20251108113041.jsonl"
+    }
+  ]
 }

@@ -30,3 +30,7 @@ venv.bak/
 .envrc
 
 logs/*
+
+# Start script logs
+backend.log
+frontend.log

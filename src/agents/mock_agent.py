@@ -275,7 +275,7 @@ class MockAgent:
         while self.running:
             try:
                 # Perform random action
-                self._action()
+                self._random_action()
                 
                 # Random delay between actions
                 time.sleep(random.uniform(1, 3))

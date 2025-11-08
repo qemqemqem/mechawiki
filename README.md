@@ -12,6 +12,12 @@ MechaWiki is a project that uses AI agents to read stories, write stories, and c
 
 Visit **http://localhost:5173** to see the UI!
 
+The system automatically starts with **4 test agents** that generate random activity:
+- 🤖 **Story Reader Alpha** (ReaderAgent) - Reads articles and advances through stories
+- ✍️ **Tale Weaver Beta** (WriterAgent) - Writes and edits articles
+- 🔍 **Lore Keeper Gamma** (ResearcherAgent) - Searches and researches content
+- 🎮 **Quest Master Delta** (InteractiveAgent) - Creates interactive experiences (occasionally waits for user input)
+
 ## What Is This?
 
 MechaWiki uses AI agents that read through stories (like *Dracula* or *Tales of Wonder*) and automatically create wiki-style documentation about characters, locations, themes, and plot points. It can also work in reverse - taking wiki content and writing stories from it.
@@ -121,7 +127,13 @@ cd src/ui
 npm run dev
 ```
 
-### Run Mock Agent (for testing)
+### Initialize Test Agents (Standalone)
+```bash
+source .venv/bin/activate
+python src/server/init_agents.py --start
+```
+
+### Run Single Mock Agent (for testing)
 ```bash
 source .venv/bin/activate
 python src/agents/mock_agent.py

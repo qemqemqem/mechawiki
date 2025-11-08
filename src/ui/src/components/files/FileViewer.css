@@ -51,6 +51,11 @@
   font-family: Georgia, serif;
 }
 
+/* Hide duplicate consecutive h1 headings */
+.markdown-preview h1 + h1 {
+  display: none;
+}
+
 .markdown-preview h2 {
   font-size: 1.5rem;
   margin: var(--spacing-lg) 0 var(--spacing-md) 0;

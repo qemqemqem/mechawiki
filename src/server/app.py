@@ -23,6 +23,12 @@ from .log_watcher import init_log_manager
 from .config import session_config
 log_manager = init_log_manager(session_config.logs_dir)
 
+# Initialize and start test agents
+logger.info("🤖 Initializing test agents...")
+from .init_agents import init_test_agents, start_test_agents
+init_test_agents()
+mock_agents = start_test_agents()
+
 # Start watching existing agents
 for agent in session_config.list_agents():
     log_file = session_config.logs_dir / f"agent_{agent['id']}.jsonl"

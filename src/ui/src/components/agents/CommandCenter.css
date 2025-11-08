@@ -1,0 +1,18 @@
+.command-center {
+  /* Styles handled by parent */
+}
+
+.agent-card {
+  transition: all 0.2s;
+}
+
+.agent-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--medieval-blue);
+  box-shadow: 0 4px 12px rgba(44, 95, 153, 0.2);
+}
+
+.agent-card:active {
+  transform: translateY(0);
+}
+

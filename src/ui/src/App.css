@@ -1,0 +1,226 @@
+/* RPG-Inspired Light Mode Theme */
+
+:root {
+  /* Colors */
+  --parchment-bg: #F5F1E8;
+  --medieval-blue: #2C5F99;
+  --gold: #D4AF37;
+  --forest-green: #2D5016;
+  --amber: #FF8C00;
+  --dark-text: #2C2416;
+  --light-border: #D4C5A0;
+  --card-bg: #FEFDFB;
+  
+  /* Status colors */
+  --status-running: #2D5016;
+  --status-waiting: #D4AF37;
+  --status-paused: #FF8C00;
+  --status-stopped: #888;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--parchment-bg);
+  color: var(--dark-text);
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--parchment-bg);
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  gap: 0;
+}
+
+.resize-handle {
+  width: 4px;
+  background: var(--light-border);
+  cursor: col-resize;
+  flex-shrink: 0;
+}
+
+.resize-handle:hover {
+  background: var(--medieval-blue);
+}
+
+/* Panes */
+.pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--light-border);
+}
+
+.pane-header {
+  padding: var(--spacing-md);
+  background: linear-gradient(to bottom, var(--medieval-blue), #234b7a);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--gold);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pane-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.pane-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+}
+
+/* Buttons */
+button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--medieval-blue);
+  background: white;
+  color: var(--medieval-blue);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+button:hover {
+  background: var(--medieval-blue);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button.primary {
+  background: var(--medieval-blue);
+  color: white;
+}
+
+button.primary:hover {
+  background: #234b7a;
+}
+
+button.success {
+  background: var(--forest-green);
+  color: white;
+  border-color: var(--forest-green);
+}
+
+button.danger {
+  background: #c41e3a;
+  color: white;
+  border-color: #c41e3a;
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: var(--spacing-sm);
+}
+
+.status-running {
+  background: var(--status-running);
+  box-shadow: 0 0 8px var(--status-running);
+}
+
+.status-waiting {
+  background: var(--status-waiting);
+  box-shadow: 0 0 8px var(--status-waiting);
+  animation: pulse 2s infinite;
+}
+
+.status-paused {
+  background: var(--status-paused);
+}
+
+.status-stopped {
+  background: var(--status-stopped);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Cards */
+.card {
+  background: var(--card-bg);
+  border: 2px solid var(--light-border);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-color: var(--medieval-blue);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--parchment-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--light-border);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--medieval-blue);
+}

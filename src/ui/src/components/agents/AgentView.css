@@ -1,0 +1,152 @@
+.agent-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.agent-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--light-border);
+}
+
+.back-button {
+  background: white;
+  border: 2px solid var(--medieval-blue);
+  color: var(--medieval-blue);
+}
+
+.agent-info {
+  margin-bottom: var(--spacing-md);
+}
+
+.agent-info h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 1.3rem;
+}
+
+.agent-info p {
+  margin: 0;
+  color: #666;
+}
+
+.agent-tabs {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--light-border);
+}
+
+.agent-tabs button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #666;
+  font-weight: 600;
+  border-radius: 0;
+}
+
+.agent-tabs button:hover {
+  background: rgba(44, 95, 153, 0.1);
+  color: var(--medieval-blue);
+}
+
+.agent-tabs button.active {
+  color: var(--medieval-blue);
+  border-bottom-color: var(--medieval-blue);
+}
+
+.agent-logs {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: var(--parchment-bg);
+  border-radius: 4px;
+}
+
+.log-entry {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: white;
+  border-left: 3px solid #ccc;
+  border-radius: 4px;
+}
+
+.log-icon {
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.log-content {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.log-args {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background: var(--parchment-bg);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+
+.log-status {
+  border-left-color: var(--medieval-blue);
+}
+
+.log-tool-call {
+  border-left-color: var(--amber);
+}
+
+.log-tool-result {
+  border-left-color: var(--forest-green);
+}
+
+.log-message {
+  border-left-color: var(--medieval-blue);
+}
+
+.log-user-message {
+  border-left-color: var(--gold);
+}
+
+.log-thinking {
+  border-left-color: #9ca3af;
+  opacity: 0.8;
+}
+
+.agent-chat-input {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 2px solid var(--light-border);
+}
+
+.agent-chat-input input {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--light-border);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.agent-chat-input input:focus {
+  outline: none;
+  border-color: var(--medieval-blue);
+}
+
+.agent-chat-input button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+}
+

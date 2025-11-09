@@ -17,7 +17,7 @@ from tools.articles import (
     search_articles,
     list_articles_in_directory
 )
-from tools.images import create_image
+# from tools.images import create_image  # Too slow for dev
 import litellm
 
 
@@ -60,7 +60,6 @@ You have access to:
 - File operations (read_file, edit_file) - Read and edit ANY file in wikicontent
 - Story writing (add_to_story) - Append narrative prose to story files
 - Article tools (read_article, search_articles, list_articles) - Search and read articles
-- Image generation (create_image) - Generate artwork
 
 Best practices:
 - Set the scene with vivid description before presenting choices
@@ -170,12 +169,14 @@ Hunt with purpose - create experiences that keep users engaged! 🎮⚔️"""
     
     def _add_image_tools(self):
         """Add image generation tools."""
-        create_image_def = {
-            "type": "function",
-            "function": litellm.utils.function_to_dict(create_image),
-            "_function": create_image
-        }
-        self.tools.append(create_image_def)
+        # Too slow for dev - commenting out for now
+        # create_image_def = {
+        #     "type": "function",
+        #     "function": litellm.utils.function_to_dict(create_image),
+        #     "_function": create_image
+        # }
+        # self.tools.append(create_image_def)
+        pass
     
     def _execute_tool(self, tool_call: dict):
         """

@@ -40,9 +40,10 @@ class TestReadArticle:
         # Test
         result = articles.read_article("wizard")
         
-        assert isinstance(result, str)
-        assert "Wizard" in result
-        assert "Merlin" in result
+        assert isinstance(result, dict)
+        assert "content" in result
+        assert "Wizard" in result["content"]
+        assert "Merlin" in result["content"]
     
     def test_reads_article_with_md_extension(self, tmp_path):
         """Should handle .md extension."""
@@ -66,8 +67,9 @@ class TestReadArticle:
         
         result = articles.read_article("castle.md")
         
-        assert "Castle" in result
-        assert "haunted" in result
+        assert isinstance(result, dict)
+        assert "Castle" in result["content"]
+        assert "haunted" in result["content"]
     
     def test_case_insensitive_search(self, tmp_path):
         """Should be case-insensitive."""
@@ -91,7 +93,8 @@ class TestReadArticle:
         
         result = articles.read_article("london")
         
-        assert "London" in result
+        assert isinstance(result, dict)
+        assert "London" in result["content"]
     
     def test_partial_match(self, tmp_path):
         """Should support partial matching."""
@@ -115,7 +118,8 @@ class TestReadArticle:
         
         result = articles.read_article("wizard")
         
-        assert "Merlin" in result
+        assert isinstance(result, dict)
+        assert "Merlin" in result["content"]
     
     def test_returns_error_for_nonexistent_article(self, tmp_path):
         """Should return error message for missing article."""

@@ -17,6 +17,8 @@ function FilesFeed({ fileChanges, onSelectFile }) {
   const formatChanges = (changes) => {
     if (!changes) return ''
     const { added = 0, removed = 0 } = changes
+    // If both are 0, it's a read operation
+    if (added === 0 && removed === 0) return 'read'
     return `+${added} -${removed}`
   }
 

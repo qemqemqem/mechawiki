@@ -18,7 +18,7 @@ except Exception as e:
     _articles_dir_name = "articles"
 
 
-def read_article(article_name: str) -> str:
+def read_article(article_name: str):
     """Read the contents of an article file.
     
     Searches for an article by name (with or without .md extension) and returns its contents.
@@ -32,20 +32,20 @@ def read_article(article_name: str) -> str:
         
     Returns
     -------
-    str
-        The contents of the article file. Returns an error message if the article
-        is not found or if config could not be loaded.
+    dict or str
+        Dict with file_path, content, and read flag for successful reads.
+        Error message string if the article is not found or if config could not be loaded.
         
     Examples
     --------
     >>> read_article("wizard-merlin")
-    "# Wizard Merlin\n\nMerlin was a powerful wizard..."
+    {"file_path": "articles/wizard-merlin.md", "content": "# Wizard...", "read": True, ...}
     
     >>> read_article("london.md")
-    "# London\n\nLondon is a great city..."
+    {"file_path": "articles/london.md", "content": "# London...", "read": True, ...}
     
     >>> read_article("castle")
-    "# Haunted Castle\n\nThe castle stood on the hill..."
+    {"file_path": "articles/haunted-castle.md", "content": "# Haunted...", "read": True, ...}
     """
     # Check if config was loaded successfully
     if _config is None or _content_repo_path is None:
@@ -89,7 +89,18 @@ def read_article(article_name: str) -> str:
         with open(found_file, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        return content
+        # Get relative path from content repo
+        rel_path = found_file.relative_to(_content_repo_path)
+        
+        # Return structured data for log watcher
+        return {
+            "file_path": str(rel_path),
+            "content": content,
+            "lines_added": 0,
+            "lines_removed": 0,
+            "read": True,
+            "message": f"📖 Read article: {found_file.name}"
+        }
     
     except Exception as e:
         return f"❌ Error reading article '{found_file.name}': {str(e)}"

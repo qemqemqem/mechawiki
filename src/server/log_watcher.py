@@ -216,7 +216,11 @@ class LogManager:
             return False
         
         tool = log_entry.get('tool', '')
-        file_tools = ['read_file', 'edit_file', 'add_to_story', 'read_article', 'create_image']
+        file_tools = [
+            'read_file', 'edit_file', 'add_to_story', 
+            'read_article', 'write_article', 'write_story', 'edit_story',
+            'create_image'
+        ]
         
         return tool in file_tools
     

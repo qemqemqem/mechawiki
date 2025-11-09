@@ -1,7 +1,10 @@
 # Bug Fix: Files Feed Not Showing Agent File Changes
 
-## Problem
+## Problem 1: Files Feed Not Detecting Changes
 The Files Feed UI wasn't detecting file changes made by agents (e.g., `write_article`, `edit_story`, `create_image`).
+
+## Problem 2: Read Operations Not Shown
+The Files Feed didn't show when agents read articles. We wanted read operations to appear with "read" instead of line counts.
 
 ## Root Cause
 The tools were returning **simple strings** instead of **structured dictionaries**. The log watcher expects tool results to contain:
@@ -74,9 +77,51 @@ To verify the fix:
 3. Check Files Feed UI for new entries
 4. Click on file entry to view content
 
+## Read Operations Support (Added Later)
+
+### Problem
+The Files Feed wasn't showing when agents read articles. We wanted read operations to appear with "read" instead of line counts.
+
+### Solution
+
+#### Backend: `read_article` Updated
+`src/tools/articles.py` - Now returns structured data:
+```python
+{
+    "file_path": "articles/example.md",
+    "content": "...",  # The actual article content
+    "lines_added": 0,
+    "lines_removed": 0,
+    "read": True,
+    "message": "📖 Read article: example.md"
+}
+```
+
+#### Log Watcher Updated
+`src/server/log_watcher.py` (line 219-223) - Added `read_article`, `write_article`, `write_story`, `edit_story` to the `file_tools` list.
+
+#### Frontend: Show "read" Label
+`src/ui/src/components/files/FilesFeed.jsx` - Updated `formatChanges`:
+```javascript
+const formatChanges = (changes) => {
+  if (!changes) return ''
+  const { added = 0, removed = 0 } = changes
+  // If both are 0, it's a read operation
+  if (added === 0 && removed === 0) return 'read'
+  return `+${added} -${removed}`
+}
+```
+
+### Test Coverage
+✅ **107 tests passing**
+- 2 new tests for `read_article` structured output
+- 4 existing tests updated for new dict return format
+- All integration tests passing
+
 ## Notes
 - Error cases still return strings (e.g., "❌ Error: ...")
 - The `message` field in success dicts preserves the original human-readable message
 - Agents see the JSON-stringified version in their conversation context
 - Binary files (images) use `lines_added: 1` as a sentinel for "new file"
+- Read operations use `lines_added: 0, lines_removed: 0` to indicate no modification
 

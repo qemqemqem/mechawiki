@@ -15,7 +15,7 @@ from typing import Optional
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from base_agent.base_agent import BaseAgent, EndConversation
-from tools.images import create_image
+# from tools.images import create_image  # Too slow for dev
 from tools.search import find_articles, find_images, find_songs, find_files
 from tools.articles import read_article
 from utils.git import ensure_content_branch
@@ -105,7 +105,7 @@ class ReaderAgent(BaseAgent):
         tools = [
             {"type": "function", "function": litellm.utils.function_to_dict(self.advance), "_function": self.advance},
             {"type": "function", "function": litellm.utils.function_to_dict(self.get_status), "_function": self.get_status},
-            {"type": "function", "function": litellm.utils.function_to_dict(create_image), "_function": create_image},
+            # {"type": "function", "function": litellm.utils.function_to_dict(create_image), "_function": create_image},  # Too slow for dev
             {"type": "function", "function": litellm.utils.function_to_dict(find_articles), "_function": find_articles},
             {"type": "function", "function": litellm.utils.function_to_dict(find_images), "_function": find_images},
             {"type": "function", "function": litellm.utils.function_to_dict(find_songs), "_function": find_songs},

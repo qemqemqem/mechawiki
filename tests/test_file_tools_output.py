@@ -228,6 +228,66 @@ class TestEditStoryOutput:
         assert result["lines_removed"] == 0
 
 
+class TestReadArticleOutput:
+    """Test read_article returns correct structure."""
+    
+    def test_returns_dict_with_required_fields(self, tmp_path):
+        """Must return dict with file_path and read flag."""
+        import toml
+        config_path = tmp_path / "config.toml"
+        config_path.write_text(toml.dumps({
+            "paths": {
+                "content_repo": str(tmp_path / "content"),
+                "articles_dir": "articles"
+            }
+        }))
+        
+        from src.tools import articles
+        articles._config = toml.load(str(config_path))
+        articles._content_repo_path = Path(articles._config["paths"]["content_repo"])
+        articles._articles_dir_name = articles._config["paths"]["articles_dir"]
+        
+        # Create an article to read
+        articles_dir = tmp_path / "content" / "articles"
+        articles_dir.mkdir(parents=True)
+        (articles_dir / "test.md").write_text("# Test\n\nContent\n")
+        
+        result = articles.read_article("test")
+        
+        assert isinstance(result, dict)
+        assert "file_path" in result
+        assert "content" in result
+        assert result["read"] is True
+        assert result["lines_added"] == 0
+        assert result["lines_removed"] == 0
+    
+    def test_read_returns_content(self, tmp_path):
+        """Read should return the file content."""
+        import toml
+        config_path = tmp_path / "config.toml"
+        config_path.write_text(toml.dumps({
+            "paths": {
+                "content_repo": str(tmp_path / "content"),
+                "articles_dir": "articles"
+            }
+        }))
+        
+        from src.tools import articles
+        articles._config = toml.load(str(config_path))
+        articles._content_repo_path = Path(articles._config["paths"]["content_repo"])
+        articles._articles_dir_name = articles._config["paths"]["articles_dir"]
+        
+        # Create an article
+        articles_dir = tmp_path / "content" / "articles"
+        articles_dir.mkdir(parents=True)
+        test_content = "# Test Article\n\nThis is test content.\n"
+        (articles_dir / "test.md").write_text(test_content)
+        
+        result = articles.read_article("test")
+        
+        assert result["content"] == test_content
+
+
 def test_all_tools_have_consistent_error_format():
     """All tools should return strings for errors."""
     from src.tools import articles
@@ -238,6 +298,7 @@ def test_all_tools_have_consistent_error_format():
     articles._config = None
     
     article_error = articles.write_article("test", "content")
+    read_error = articles.read_article("test")
     
     articles._config = original
     
@@ -247,6 +308,7 @@ def test_all_tools_have_consistent_error_format():
     
     # All should be strings or dicts with success=False
     assert isinstance(article_error, str)
+    assert isinstance(read_error, str)
     assert isinstance(edit_error, dict) and edit_error["success"] is False
 
 

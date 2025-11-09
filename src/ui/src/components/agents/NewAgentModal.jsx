@@ -4,6 +4,7 @@ import './NewAgentModal.css'
 function NewAgentModal({ onClose, onCreate }) {
   const [name, setName] = useState('')
   const [type, setType] = useState('ReaderAgent')
+  const [description, setDescription] = useState('')
   const [config, setConfig] = useState({})
 
   const handleSubmit = (e) => {
@@ -17,7 +18,10 @@ function NewAgentModal({ onClose, onCreate }) {
     onCreate({
       name: name.trim(),
       type,
-      config
+      config: {
+        ...config,
+        description: description.trim()
+      }
     })
     
     onClose()
@@ -39,7 +43,7 @@ function NewAgentModal({ onClose, onCreate }) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Story Reader Alpha"
+              placeholder="e.g., Reader Agent 1"
               autoFocus
             />
           </div>
@@ -59,6 +63,20 @@ function NewAgentModal({ onClose, onCreate }) {
               {type === 'ReaderAgent' && 'Reads stories and creates wiki content'}
               {type === 'WriterAgent' && 'Writes stories from wiki content'}
               {type === 'InteractiveAgent' && 'Creates interactive RPG experiences'}
+            </p>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="agent-description">Agent Description</label>
+            <textarea
+              id="agent-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe this agent's purpose, goals, or special instructions..."
+              rows={4}
+            />
+            <p className="help-text">
+              Optional: Add notes about this agent's purpose. These will be included in its system prompt.
             </p>
           </div>
 

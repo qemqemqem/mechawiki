@@ -54,13 +54,14 @@ def main():
     while True:
         print("\n--- LLM Response ---")
         
-        # Stream the response
+        # Stream the response (Haiku 4.5 has built-in thinking)
         response = litellm.completion(
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5-20251001",
             messages=messages,
             tools=tools,
             tool_choice="auto",
-            stream=True
+            stream=True,
+            temperature=1.0
         )
         
         # Collect streamed response

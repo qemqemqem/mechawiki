@@ -31,11 +31,12 @@ class MockAgent:
         self.running = False
         self.paused = False
         self.thread = None
+        self.last_log_check = None
         
         # Agent behavior config
         self.actions = [
             ('read_article', 0.3),
-            ('write_article', 0.25),
+            ('add_to_story', 0.25),
             ('search', 0.15),
             ('advance', 0.15 if agent_type == 'ReaderAgent' else 0),
             ('think', 0.1),
@@ -78,8 +79,8 @@ class MockAgent:
         
         if action == 'read_article':
             self._action_read_article()
-        elif action == 'write_article':
-            self._action_write_article()
+        elif action == 'add_to_story':
+            self._action_add_to_story()
         elif action == 'search':
             self._action_search()
         elif action == 'advance':
@@ -115,13 +116,13 @@ class MockAgent:
             }
         })
     
-    def _action_write_article(self):
+    def _action_add_to_story(self):
         """Simulate writing/editing an article."""
         article = self._get_random_article()
         
         self._log({
             'type': 'tool_call',
-            'tool': 'write_article',
+            'tool': 'add_to_story',
             'args': {
                 'article': article,
                 'content': f'Updated content for {article}...'
@@ -136,7 +137,7 @@ class MockAgent:
         
         self._log({
             'type': 'tool_result',
-            'tool': 'write_article',
+            'tool': 'add_to_story',
             'result': {
                 'file_path': f'articles/{article}.md',
                 'lines_added': lines_added,
@@ -270,10 +271,55 @@ class MockAgent:
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
     
+    def _check_control_signals(self):
+        """Check log file for pause/resume/archive commands."""
+        if not self.log_file.exists():
+            return
+        
+        try:
+            with open(self.log_file, 'r') as f:
+                for line in f:
+                    try:
+                        entry = json.loads(line)
+                        timestamp = entry.get('timestamp', '')
+                        
+                        # Only check entries newer than our last check
+                        if self.last_log_check and timestamp <= self.last_log_check:
+                            continue
+                        
+                        # Look for status changes
+                        if entry.get('type') == 'status':
+                            status = entry.get('status')
+                            
+                            if status == 'paused':
+                                self.paused = True
+                            elif status == 'running' and self.paused:
+                                self.paused = False
+                            elif status == 'archived':
+                                self.running = False
+                                
+                    except json.JSONDecodeError:
+                        continue
+            
+            # Update last check timestamp
+            self.last_log_check = datetime.now().isoformat()
+            
+        except Exception as e:
+            # Silently ignore errors reading log file
+            pass
+    
     def _run_loop(self):
         """Main agent loop."""
         while self.running:
             try:
+                # Check for control signals from log file
+                self._check_control_signals()
+                
+                # If paused, just wait and check again
+                if self.paused:
+                    time.sleep(0.5)  # Check more frequently when paused
+                    continue
+                
                 # Perform random action
                 self._random_action()
                 

@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from '../../utils/time'
 import './CommandCenter.css'
 
-function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onArchiveAgent }) {
+function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onArchiveAgent, onPauseAll, onResumeAll }) {
   
   const getStatusIcon = (status) => {
     switch(status) {
@@ -63,6 +63,25 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
 
   return (
     <div className="command-center">
+      {agents.length > 0 && (
+        <div className="command-center-actions">
+          <button 
+            className="action-button pause-all"
+            onClick={onPauseAll}
+            title="Pause all agents"
+          >
+            ⏸ Pause All
+          </button>
+          <button 
+            className="action-button resume-all"
+            onClick={onResumeAll}
+            title="Resume all agents"
+          >
+            ▶ Start All
+          </button>
+        </div>
+      )}
+      
       <div className="agents-list">
         {agents.map(agent => (
           <div
@@ -103,7 +122,14 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
             </div>
 
             <div className="agent-meta">
-              {agent.type} • {getStatusLabel(agent.status)}
+              <span className="agent-id" title={`ID: ${agent.id}`}>{agent.id}</span> • {agent.type}
+              {agent.created_at && (
+                <span> • Created {formatDistanceToNow(agent.created_at)}</span>
+              )}
+            </div>
+            
+            <div className="agent-status-detail">
+              {getStatusLabel(agent.status)}
             </div>
 
             {agent.last_action && (

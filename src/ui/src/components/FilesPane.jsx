@@ -12,7 +12,7 @@ function FilesPane({ fileChanges, selectedFile, onSelectFile }) {
     <div className="pane files-pane">
       <div className="pane-header">
         <h2>
-          {selectedFile ? '📄 File Viewer' : '📚 Files Feed'}
+          {selectedFile ? 'Archive' : '📚 Files Feed'}
         </h2>
       </div>
 

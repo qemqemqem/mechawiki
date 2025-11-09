@@ -4,8 +4,10 @@ import './AgentView.css'
 function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage }) {
   const [logs, setLogs] = useState([])
   const [message, setMessage] = useState('')
-  const [activeTab, setActiveTab] = useState('all')
+  const [showTimestamps, setShowTimestamps] = useState(false)
+  const [expandedTools, setExpandedTools] = useState({}) // Track which tools are expanded
   const logsEndRef = useRef(null)
+  const logsContainerRef = useRef(null)
 
   useEffect(() => {
     // Connect to agent logs SSE
@@ -14,7 +16,40 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
     eventSource.onmessage = (event) => {
       try {
         const logEntry = JSON.parse(event.data)
-        setLogs(prev => [...prev, logEntry])
+        
+        // Handle message accumulation - if the last log is also a message, append to it
+        setLogs(prev => {
+          if (prev.length === 0) {
+            return [logEntry]
+          }
+          
+          const lastLog = prev[prev.length - 1]
+          
+          // Accumulate consecutive messages into one bubble
+          if (logEntry.type === 'message' && lastLog.type === 'message') {
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastLog,
+                content: lastLog.content + logEntry.content
+              }
+            ]
+          }
+          
+          // Accumulate consecutive thinking entries
+          if (logEntry.type === 'thinking' && lastLog.type === 'thinking') {
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastLog,
+                content: lastLog.content + logEntry.content
+              }
+            ]
+          }
+          
+          // Otherwise, append as new entry
+          return [...prev, logEntry]
+        })
       } catch (error) {
         // Ignore parse errors
       }
@@ -29,8 +64,16 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
   }, [agent.id])
 
   useEffect(() => {
-    // Auto-scroll to bottom
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    // Auto-scroll to bottom only if user is already at or near the bottom
+    const container = logsContainerRef.current
+    if (!container) return
+    
+    const threshold = 100 // pixels from bottom to consider "at bottom"
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold
+    
+    if (isNearBottom) {
+      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [logs])
 
   const handleSendMessage = (e) => {
@@ -41,82 +84,166 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
     }
   }
 
-  const filterLogs = () => {
-    if (activeTab === 'all') return logs
-    if (activeTab === 'messages') return logs.filter(l => l.type === 'message' || l.type === 'user_message')
-    if (activeTab === 'tools') return logs.filter(l => l.type === 'tool_call' || l.type === 'tool_result')
-    if (activeTab === 'thinking') return logs.filter(l => l.type === 'thinking')
-    return logs
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return ''
+    const date = new Date(timestamp)
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+      hour12: false 
+    })
+  }
+
+  const formatToolName = (toolName, toolArgs) => {
+    // Convert snake_case to Title Case
+    const displayName = toolName
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+    
+    // Add inline details for common tools
+    if (!toolArgs) return displayName
+    
+    // read_article uses "article_name" field
+    if (toolName === 'read_article' && toolArgs.article_name) {
+      return `${displayName}: ${toolArgs.article_name}`
+    }
+    if (toolName === 'search_articles' && toolArgs.query) {
+      return `${displayName}: "${toolArgs.query}"`
+    }
+    // edit_article might use article_name or title
+    if (toolName === 'edit_article' && (toolArgs.article_name || toolArgs.title)) {
+      return `${displayName}: ${toolArgs.article_name || toolArgs.title}`
+    }
+    if (toolName === 'list_articles_in_directory' && toolArgs.directory) {
+      return `${displayName}: ${toolArgs.directory}`
+    }
+    if ((toolName === 'read_file' || toolName === 'edit_file') && toolArgs.filepath) {
+      return `${displayName}: ${toolArgs.filepath}`
+    }
+    if (toolName === 'add_to_story' && toolArgs.filepath) {
+      return `${displayName}: ${toolArgs.filepath}`
+    }
+    
+    return displayName
   }
 
   const renderLogEntry = (log, index) => {
     const { type } = log
+    const timestamp = showTimestamps && log.timestamp ? (
+      <span className="log-timestamp">{formatTimestamp(log.timestamp)}</span>
+    ) : null
     
-    if (type === 'status') {
-      return (
-        <div key={index} className="log-entry log-status">
-          <span className="log-icon">ℹ️</span>
-          <span className="log-content">
-            Status: <strong>{log.status}</strong> - {log.message}
-          </span>
-        </div>
-      )
-    }
+    const isToolExpanded = expandedTools[index] || false
     
-    if (type === 'tool_call') {
-      return (
-        <div key={index} className="log-entry log-tool-call">
-          <span className="log-icon">🔧</span>
-          <span className="log-content">
-            <strong>{log.tool}()</strong>
-            {log.args && <div className="log-args">{JSON.stringify(log.args, null, 2)}</div>}
-          </span>
-        </div>
-      )
-    }
-    
-    if (type === 'tool_result') {
-      return (
-        <div key={index} className="log-entry log-tool-result">
-          <span className="log-icon">✓</span>
-          <span className="log-content">
-            Result: {JSON.stringify(log.result)}
-          </span>
-        </div>
-      )
-    }
-    
-    if (type === 'message') {
-      return (
-        <div key={index} className="log-entry log-message">
-          <span className="log-icon">🤖</span>
-          <span className="log-content">{log.content}</span>
-        </div>
-      )
-    }
-    
-    if (type === 'user_message') {
-      return (
-        <div key={index} className="log-entry log-user-message">
-          <span className="log-icon">👤</span>
-          <span className="log-content">{log.content}</span>
-        </div>
-      )
-    }
-    
+    // Thinking - italics, grey, no bubble
     if (type === 'thinking') {
       return (
-        <div key={index} className="log-entry log-thinking">
-          <span className="log-icon">🧠</span>
-          <span className="log-content">{log.content}</span>
+        <div key={index} className="log-thinking">
+          🤔 {log.content}
+          {timestamp}
+        </div>
+      )
+    }
+    
+    // Tool call - collapsed by default
+    if (type === 'tool_call') {
+      // Find the matching tool_result in the next few log entries
+      let toolResult = null
+      for (let i = index + 1; i < Math.min(index + 5, logs.length); i++) {
+        if (logs[i].type === 'tool_result' && logs[i].tool === log.tool) {
+          toolResult = logs[i].result
+          break
+        }
+      }
+      
+      return (
+        <div key={index} className="log-tool">
+          <div 
+            className="tool-call-header"
+            onClick={() => setExpandedTools(prev => ({ ...prev, [index]: !prev[index] }))}
+          >
+            <span className="tool-name">Tool: {formatToolName(log.tool, log.args)}</span>
+            <span className="tool-expand">{isToolExpanded ? '▼' : '▶'}</span>
+          </div>
+          {isToolExpanded && (
+            <div className="tool-details">
+              {log.args && Object.keys(log.args).length > 0 && (
+                <div className="tool-section">
+                  <div className="tool-section-label">Arguments:</div>
+                  <pre className="tool-args">{JSON.stringify(log.args, null, 2)}</pre>
+                </div>
+              )}
+              {toolResult && (
+                <div className="tool-section">
+                  <div className="tool-section-label">Response:</div>
+                  <pre className="tool-result">{typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2)}</pre>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )
+    }
+    
+    // Tool result - hide since we show it inline with tool_call
+    if (type === 'tool_result') {
+      return null
+    }
+    
+    // Status messages - small and subtle
+    if (type === 'status') {
+      return (
+        <div key={index} className="log-status">
+          Status: <strong>{log.status}</strong> - {log.message}
+          {timestamp}
+        </div>
+      )
+    }
+    
+    // Agent messages - chat bubble style (no robot emoji)
+    if (type === 'message') {
+      return (
+        <div key={index} className="log-message-bubble">
+          <div className="log-content">{log.content}</div>
+          {timestamp}
+        </div>
+      )
+    }
+    
+    // User messages - chat bubble style (right aligned)
+    if (type === 'user_message') {
+      return (
+        <div key={index} className="log-user-bubble">
+          <div className="log-content">{log.content}</div>
+          {timestamp}
+        </div>
+      )
+    }
+    
+    // Error messages - prominent red display
+    if (type === 'error') {
+      return (
+        <div key={index} className="log-error">
+          <div className="error-header">
+            <span className="error-icon">⚠️</span>
+            <span className="error-title">Error</span>
+          </div>
+          <div className="error-message">{log.error}</div>
+          {log.traceback && (
+            <details className="error-traceback">
+              <summary>Traceback</summary>
+              <pre>{log.traceback}</pre>
+            </details>
+          )}
+          {timestamp}
         </div>
       )
     }
     
     return null
   }
-
-  const filteredLogs = filterLogs()
 
   return (
     <div className="agent-view">
@@ -141,40 +268,24 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
         <p>{agent.type} • {agent.status}</p>
       </div>
 
-      <div className="agent-tabs">
-        <button
-          className={activeTab === 'all' ? 'active' : ''}
-          onClick={() => setActiveTab('all')}
-        >
-          All
-        </button>
-        <button
-          className={activeTab === 'messages' ? 'active' : ''}
-          onClick={() => setActiveTab('messages')}
-        >
-          Messages
-        </button>
-        <button
-          className={activeTab === 'tools' ? 'active' : ''}
-          onClick={() => setActiveTab('tools')}
-        >
-          Tools
-        </button>
-        <button
-          className={activeTab === 'thinking' ? 'active' : ''}
-          onClick={() => setActiveTab('thinking')}
-        >
-          Thinking
-        </button>
+      <div className="agent-view-options">
+        <label className="timestamp-checkbox">
+          <input
+            type="checkbox"
+            checked={showTimestamps}
+            onChange={(e) => setShowTimestamps(e.target.checked)}
+          />
+          Show Timestamps
+        </label>
       </div>
 
-      <div className="agent-logs">
-        {filteredLogs.length === 0 ? (
+      <div className="agent-logs" ref={logsContainerRef}>
+        {logs.length === 0 ? (
           <div className="empty-state">
             <p>No activity yet...</p>
           </div>
         ) : (
-          filteredLogs.map((log, index) => renderLogEntry(log, index))
+          logs.map((log, index) => renderLogEntry(log, index))
         )}
         <div ref={logsEndRef} />
       </div>

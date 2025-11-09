@@ -6,15 +6,22 @@ import NewAgentModal from './agents/NewAgentModal'
 
 function AgentsPane({
   agents,
-  selectedAgent,
+  selectedAgentId,
   onSelectAgent,
   onCreateAgent,
   onPauseAgent,
   onResumeAgent,
   onArchiveAgent,
+  onPauseAll,
+  onResumeAll,
   onSendMessage
 }) {
   const [showNewAgentModal, setShowNewAgentModal] = useState(false)
+
+  // Look up the selected agent from the agents array
+  const selectedAgent = selectedAgentId 
+    ? agents.find(agent => agent.id === selectedAgentId)
+    : null
 
   const handleBackToCommandCenter = () => {
     onSelectAgent(null)
@@ -24,7 +31,7 @@ function AgentsPane({
     <div className="pane agents-pane">
       <div className="pane-header">
         <h2>
-          {selectedAgent ? '⚔️ Agent View' : '🏰 Agents Command Center'}
+          {selectedAgent ? '⚔️ Agent View' : 'Command Center'}
         </h2>
         {!selectedAgent && (
           <button 
@@ -53,6 +60,8 @@ function AgentsPane({
             onPauseAgent={onPauseAgent}
             onResumeAgent={onResumeAgent}
             onArchiveAgent={onArchiveAgent}
+            onPauseAll={onPauseAll}
+            onResumeAll={onResumeAll}
           />
         )}
       </div>

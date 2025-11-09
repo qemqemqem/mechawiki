@@ -3,6 +3,7 @@ Configuration management for MechaWiki server.
 
 Handles session management and agent configurations.
 """
+import os
 import json
 import logging
 from pathlib import Path
@@ -17,8 +18,8 @@ DATA_DIR = PROJECT_ROOT / "data"
 SESSIONS_DIR = DATA_DIR / "sessions"
 WIKICONTENT_PATH = Path.home() / "Dev" / "wikicontent"
 
-# Default session
-DEFAULT_SESSION = "dev_session"
+# Default session (can be overridden by SESSION_NAME environment variable)
+DEFAULT_SESSION = os.environ.get("SESSION_NAME", "dev_session")
 
 # Ensure directories exist
 DATA_DIR.mkdir(exist_ok=True)

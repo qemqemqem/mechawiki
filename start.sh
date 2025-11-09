@@ -5,8 +5,41 @@
 # Exit on any error
 set -e
 
+# Session configuration
+export SESSION_NAME="${SESSION_NAME:-dev_session}"
+
+# Use mock agents for testing (set to 'true' to disable real LLM-powered agents)
+export USE_MOCK_AGENTS=${USE_MOCK_AGENTS:-false}
+
 echo "🏰 Starting MechaWiki..."
 echo ""
+echo "Session: $SESSION_NAME"
+echo "Agent Mode: $([ "$USE_MOCK_AGENTS" = "true" ] && echo "🎭 MOCK AGENTS (testing)" || echo "⚡ REAL AGENTS (LLM-powered)")"
+echo ""
+
+# Clean dev_session on every start (WARNING!)
+if [ "$SESSION_NAME" = "dev_session" ]; then
+    echo "⚠️  ═══════════════════════════════════════════════════════════"
+    echo "⚠️  WARNING: Cleaning dev_session - SESSION DATA IS BEING DELETED!"
+    echo "⚠️  ═══════════════════════════════════════════════════════════"
+    echo "⚠️  "
+    echo "⚠️  Deleting: data/sessions/dev_session/"
+    echo "⚠️  This includes:"
+    echo "⚠️    - All agent configurations in agents.json"
+    echo "⚠️    - All agent logs in logs/"
+    echo "⚠️    - Session config in config.yaml"
+    echo "⚠️  ═══════════════════════════════════════════════════════════"
+    echo ""
+    
+    # Delete the dev_session directory
+    if [ -d "data/sessions/dev_session" ]; then
+        rm -rf data/sessions/dev_session
+        echo "✓ Cleaned dev_session"
+    else
+        echo "✓ dev_session doesn't exist yet (first run)"
+    fi
+    echo ""
+fi
 
 # Check for Python
 if ! command -v python3 &> /dev/null; then
@@ -76,9 +109,9 @@ if [ ! -f "config.toml" ]; then
     echo ""
 fi
 
-# Create data directories
-mkdir -p data/sessions/dev_session/logs
-echo "✓ Created session directories"
+# Create session directories
+mkdir -p "data/sessions/$SESSION_NAME/logs"
+echo "✓ Created session directories for: $SESSION_NAME"
 echo ""
 
 # Start backend in background
@@ -120,11 +153,18 @@ fi
 
 echo "✓ Frontend started successfully"
 echo ""
+if [ "$USE_MOCK_AGENTS" = "true" ]; then
+    echo "🎭 Mock agents active - no API keys needed"
+else
+    echo "⚡ Real agents active - ensure config.toml has valid API keys!"
+fi
+echo ""
 
 echo "✨ MechaWiki is running!"
 echo ""
-echo "📍 Frontend: http://localhost:5173"
 echo "📍 Backend:  http://localhost:5000"
+echo ""
+echo "📍 Frontend: http://localhost:5173 << Click here to open the UI"
 echo ""
 echo "Press Ctrl+C to stop all servers"
 echo ""

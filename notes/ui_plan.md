@@ -130,7 +130,7 @@ GET  /api/status             # Overall system status
   "agents": [
     {
       "id": "reader-001",
-      "name": "Story Reader Alpha",
+      "name": "Reader Agent 1",
       "type": "ReaderAgent",
       "status": "running",  // "running", "paused", "waiting_for_input", "stopped", "archived"
       "created_at": "2025-11-08T10:30:00Z",
@@ -237,7 +237,7 @@ This lets us test:
 │ 🏰 Agents Command Center                │
 │                              [+ New]     │
 ├─────────────────────────────────────────┤
-│ ● Story Reader Alpha        [⏸][□][📦]  │
+│ ● Reader Agent 1            [⏸][□][📦]  │
 │   ReaderAgent • word 2500/10000          │
 │   Last: Read chunk 5 of story            │
 │   2m ago                                 │
@@ -269,7 +269,7 @@ Legend:
 ```
 ┌─────────────────────────────────────────┐
 │ ← Back to Command Center                │
-│ ● Story Reader Alpha                     │
+│ ● Reader Agent 1                          │
 │   ReaderAgent • Running                  │
 ├─────────────────────────────────────────┤
 │ [Messages] [Tools] [Thoughts] [Config]  │
@@ -304,16 +304,16 @@ Legend:
 │ [All Agents ▼] [Search...]              │
 ├─────────────────────────────────────────┤
 │ 📄 london.md                +17 -5      │
-│    Story Reader Alpha • 2m ago          │
+│    Reader Agent 1 • 2m ago               │
 │                                          │
 │ 🖼️ dreamy-london.png        +1 (new)   │
-│    Story Reader Alpha • 5m ago          │
+│    Reader Agent 1 • 5m ago               │
 │                                          │
 │ 📄 hasheesh-eater.md        +8 -2       │
 │    Wiki Builder Beta • 10m ago          │
 │                                          │
 │ 📄 tales-of-wonder.md       +3 -0       │
-│    Story Reader Alpha • 15m ago         │
+│    Reader Agent 1 • 15m ago              │
 └─────────────────────────────────────────┘
 ```
 

@@ -6,7 +6,7 @@ import FilesPane from './components/FilesPane'
 
 function App() {
   const [agents, setAgents] = useState([])
-  const [selectedAgent, setSelectedAgent] = useState(null)
+  const [selectedAgentId, setSelectedAgentId] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
   const [fileChanges, setFileChanges] = useState([])
   const [isConnected, setIsConnected] = useState(false)
@@ -171,6 +171,28 @@ function App() {
     }
   }
 
+  const handlePauseAll = async () => {
+    try {
+      await fetch('http://localhost:5000/api/agents/pause-all', {
+        method: 'POST'
+      })
+      await fetchAgents()
+    } catch (error) {
+      console.error('Error pausing all agents:', error)
+    }
+  }
+
+  const handleResumeAll = async () => {
+    try {
+      await fetch('http://localhost:5000/api/agents/resume-all', {
+        method: 'POST'
+      })
+      await fetchAgents()
+    } catch (error) {
+      console.error('Error resuming all agents:', error)
+    }
+  }
+
   const handleSendMessage = async (agentId, message) => {
     try {
       await fetch(`http://localhost:5000/api/agents/${agentId}/message`, {
@@ -194,12 +216,14 @@ function App() {
         >
           <AgentsPane
             agents={agents}
-            selectedAgent={selectedAgent}
-            onSelectAgent={setSelectedAgent}
+            selectedAgentId={selectedAgentId}
+            onSelectAgent={(agent) => setSelectedAgentId(agent?.id || null)}
             onCreateAgent={handleCreateAgent}
             onPauseAgent={handlePauseAgent}
             onResumeAgent={handleResumeAgent}
             onArchiveAgent={handleArchiveAgent}
+            onPauseAll={handlePauseAll}
+            onResumeAll={handleResumeAll}
             onSendMessage={handleSendMessage}
           />
         </div>
@@ -218,7 +242,7 @@ function App() {
             selectedFile={selectedFile}
             onSelectFile={setSelectedFile}
           />
-        </div>
+      </div>
       </div>
     </div>
   )

@@ -6,7 +6,7 @@ The MechaWiki system now automatically initializes and starts **4 dumb test agen
 
 ## Test Agents
 
-### 1. Story Reader Alpha (`reader-001`)
+### 1. Reader Agent 1 (`reader-001`)
 - **Type**: ReaderAgent
 - **Behavior**: 
   - Reads random articles from wikicontent
@@ -14,7 +14,7 @@ The MechaWiki system now automatically initializes and starts **4 dumb test agen
   - Creates tool calls for `advance()` and `read_article()`
   - Generates occasional thinking messages
 
-### 2. Tale Weaver Beta (`writer-001`)
+### 2. Writer Agent 1 (`writer-001`)
 - **Type**: WriterAgent
 - **Behavior**:
   - Writes/edits random articles
@@ -22,7 +22,7 @@ The MechaWiki system now automatically initializes and starts **4 dumb test agen
   - Logs tool calls for `write_article()` and `edit_story()`
   - Occasional search operations
 
-### 3. Lore Keeper Gamma (`researcher-001`)
+### 3. Researcher Agent 1 (`researcher-001`)
 - **Type**: ResearcherAgent
 - **Behavior**:
   - Searches for articles and content
@@ -30,7 +30,7 @@ The MechaWiki system now automatically initializes and starts **4 dumb test agen
   - Generates research-related tool calls
   - Creates thinking logs about connections
 
-### 4. Quest Master Delta (`interactive-001`)
+### 4. Interactive Agent 1 (`interactive-001`)
 - **Type**: InteractiveAgent  
 - **Behavior**:
   - Sends prose messages to the UI

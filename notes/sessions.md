@@ -37,7 +37,7 @@ created_at: '2025-01-08T12:00:00'
   "agents": [
     {
       "id": "reader-20250108120000",
-      "name": "Story Reader Alpha",
+      "name": "Reader Agent 1",
       "type": "ReaderAgent",
       "status": "stopped",
       "created_at": "2025-01-08T12:00:00",

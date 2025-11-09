@@ -138,8 +138,10 @@ ARTICLE READING:
 Read systematically through the entire story, advancing the window as you go."""
 
         # Initialize base agent
+        # Use model from kwargs if provided, otherwise use config
+        model = kwargs.pop('model', config["agent"]["model"])
         super().__init__(
-            model=config["agent"]["model"],
+            model=model,
             system_prompt=system_prompt,
             tools=tools,
             **kwargs

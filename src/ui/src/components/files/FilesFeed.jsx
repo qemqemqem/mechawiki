@@ -5,8 +5,9 @@ import './FilesFeed.css'
 function FilesFeed({ fileChanges, onSelectFile }) {
   const [filterAgent, setFilterAgent] = useState('all')
   
-  // Get unique agents
-  const agents = ['all', ...new Set(fileChanges.map(fc => fc.agent_id || 'unknown'))]
+  // Get unique agents and sort alphabetically
+  const agentSet = new Set(fileChanges.map(fc => fc.agent_id || 'unknown'))
+  const agents = ['all', ...Array.from(agentSet).sort()]
   
   // Filter file changes
   const filteredChanges = filterAgent === 'all'

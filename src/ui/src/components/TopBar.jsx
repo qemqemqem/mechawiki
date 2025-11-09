@@ -5,8 +5,7 @@ function TopBar({ isConnected }) {
     <div className="top-bar">
       <div className="top-bar-left">
         <h1 className="app-title">
-          <span className="title-icon">🏰</span>
-          MechaWiki
+          Strange Secrets of the Dreaming Machine God
         </h1>
       </div>
       

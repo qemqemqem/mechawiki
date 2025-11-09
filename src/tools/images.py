@@ -112,7 +112,7 @@ def _find_unique_filename(filename_base: str, images_dir: Path, extension: str =
         counter += 1
 
 
-def create_image(art_prompt: str, name: str, orientation: str = "landscape") -> str:
+def create_image(art_prompt: str, name: str, orientation: str = "landscape"):
     """Generate artwork for wiki articles using AI image generation (DALLE, etc).
     
     Use this tool to create visual representations of characters, locations, objects, or scenes
@@ -141,8 +141,8 @@ def create_image(art_prompt: str, name: str, orientation: str = "landscape") -> 
         
     Returns
     -------
-    str
-        Success message with generated filename and save location, or ERROR message if:
+    dict or str
+        Success dict with file_path and metadata, or ERROR message string if:
         - Image generation API fails
         - Unsupported generator configured
         - Network/download issues occur
@@ -219,12 +219,24 @@ def create_image(art_prompt: str, name: str, orientation: str = "landscape") -> 
     except Exception as e:
         return f"ERROR: Failed to save image to disk: {str(e)}"
     
-    return (
-        f"Successfully created image using {generator}: {image_path.name}\n"
-        f"Orientation: {orientation} ({image_size})\n"
-        f"Prompt: {art_prompt}\n"
-        f"Saved to: {image_path}"
-    )
+    # Get relative path from content repo
+    rel_path = image_path.relative_to(_content_repo_path)
+    
+    # Return structured data for log watcher
+    return {
+        "file_path": str(rel_path),
+        "lines_added": 1,  # Represent new image as 1 "line"
+        "lines_removed": 0,
+        "message": (
+            f"Successfully created image using {generator}: {image_path.name}\n"
+            f"Orientation: {orientation} ({image_size})\n"
+            f"Prompt: {art_prompt}\n"
+            f"Saved to: {image_path}"
+        ),
+        "orientation": orientation,
+        "size": image_size,
+        "generator": generator
+    }
 
 
 if __name__ == "__main__":

@@ -23,38 +23,36 @@ def init_test_agents():
     
     print("🤖 Initializing test agents...")
     
-    # Define test agents
+    # Define test agents - one of each type
     test_agents = [
         {
             "id": "reader-001",
-            "name": "Story Reader Alpha",
+            "name": "Reader Agent 1",
             "type": "ReaderAgent",
             "config": {
-                "description": "Reads stories and creates wiki articles"
+                "description": "Reads stories and creates wiki articles",
+                "initial_prompt": "Start by listing some articles in the articles directory. Then advance through the story and comment on what you find interesting.",
+                "model": "claude-haiku-4-5-20251001"
             }
         },
         {
             "id": "writer-001",
-            "name": "Tale Weaver Beta",
+            "name": "Writer Agent 1",
             "type": "WriterAgent",
             "config": {
-                "description": "Writes stories from wiki content"
-            }
-        },
-        {
-            "id": "researcher-001",
-            "name": "Lore Keeper Gamma",
-            "type": "ResearcherAgent",
-            "config": {
-                "description": "Researches and organizes wiki information"
+                "description": "Writes stories from wiki content",
+                "initial_prompt": "Search for some articles to get inspiration, then write a short story based on wiki content.",
+                "model": "claude-haiku-4-5-20251001"
             }
         },
         {
             "id": "interactive-001",
-            "name": "Quest Master Delta",
+            "name": "Interactive Agent 1",
             "type": "InteractiveAgent",
             "config": {
-                "description": "Creates interactive experiences"
+                "description": "Creates interactive experiences",
+                "initial_prompt": "Create an interactive adventure. Set the scene and ask the user what they want to do using wait_for_user().",
+                "model": "claude-haiku-4-5-20251001"
             }
         }
     ]
@@ -81,9 +79,9 @@ def init_test_agents():
     print(f"📁 Logs: {session_config.logs_dir}")
 
 
-def start_test_agents():
-    """Start all test agents in background threads."""
-    print("\n🚀 Starting test agents...")
+def start_test_agents(agent_manager=None):
+    """Start all test agents in background threads (paused initially)."""
+    print("\n🚀 Starting test agents (paused)...")
     
     # Get wikicontent path
     wikicontent_path = Path.home() / "Dev" / "wikicontent"
@@ -96,22 +94,36 @@ def start_test_agents():
     for agent_data in session_config.list_agents():
         agent_id = agent_data["id"]
         agent_type = agent_data["type"]
+        agent_config = agent_data.get("config", {})
         log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
         
-        # Create and start mock agent
-        agent = MockAgent(
-            agent_id=agent_id,
-            agent_type=agent_type,
-            log_file=log_file,
-            wikicontent_path=wikicontent_path
-        )
-        agent.start()
-        agents.append(agent)
+        # Use agent manager if available
+        if agent_manager:
+            agent = agent_manager.start_agent(
+                agent_id=agent_id,
+                agent_type=agent_type,
+                log_file=log_file,
+                wikicontent_path=wikicontent_path,
+                agent_config=agent_config,
+                start_paused=True  # Start in paused state (no race condition!)
+            )
+            print(f"  ⏸️  Started (paused): {agent_id} ({agent_type})")
+        else:
+            # Fallback for standalone usage
+            agent = MockAgent(
+                agent_id=agent_id,
+                agent_type=agent_type,
+                log_file=log_file,
+                wikicontent_path=wikicontent_path
+            )
+            agent.start()
+            agent.pause()
+            print(f"  ⏸️  Started (paused): {agent_id} ({agent_type})")
         
-        print(f"  🟢 Started {agent_id} ({agent_type})")
+        agents.append(agent)
     
-    print(f"\n✅ {len(agents)} agents running in background")
-    print("💡 Agents will continue running while the server is active")
+    print(f"\n✅ {len(agents)} agents ready (paused)")
+    print("💡 Resume agents via UI or API to begin activity")
     
     return agents
 

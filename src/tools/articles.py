@@ -95,6 +95,131 @@ def read_article(article_name: str) -> str:
         return f"❌ Error reading article '{found_file.name}': {str(e)}"
 
 
+def write_article(article_name: str, content: str):
+    """
+    Write content to an article file.
+    
+    Parameters
+    ----------
+    article_name : str
+        Name of the article (with or without .md extension)
+    content : str
+        Content to write to the article
+    
+    Returns
+    -------
+    dict or str
+        Success dict with file_path and line counts, or error message string
+    """
+    if _config is None or _content_repo_path is None:
+        return "❌ Error: Could not load config.toml"
+    
+    if not article_name.strip():
+        return "❌ Error: Article name cannot be empty"
+    
+    articles_dir = _content_repo_path / _articles_dir_name
+    articles_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Add .md extension if not present
+    if not article_name.endswith('.md'):
+        article_name += '.md'
+    
+    file_path = articles_dir / article_name
+    
+    # Check if file exists to calculate diff
+    lines_removed = 0
+    if file_path.exists():
+        with open(file_path, 'r', encoding='utf-8') as f:
+            old_content = f.read()
+        lines_removed = old_content.count('\n') + 1
+    
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        lines_added = content.count('\n') + 1
+        
+        # Return structured data for log watcher
+        return {
+            "file_path": f"{_articles_dir_name}/{article_name}",
+            "lines_added": lines_added,
+            "lines_removed": lines_removed,
+            "message": f"✅ Successfully wrote to {article_name}"
+        }
+    except Exception as e:
+        return f"❌ Error writing article: {str(e)}"
+
+
+def search_articles(query: str) -> str:
+    """
+    Search for articles by name containing the query string.
+    
+    Parameters
+    ----------
+    query : str
+        Search term (case-insensitive)
+    
+    Returns
+    -------
+    str
+        List of matching article names
+    """
+    if _config is None or _content_repo_path is None:
+        return "❌ Error: Could not load config.toml"
+    
+    articles_dir = _content_repo_path / _articles_dir_name
+    
+    if not articles_dir.exists():
+        return f"❌ Error: Articles directory not found: {articles_dir}"
+    
+    query = query.lower()
+    matches = []
+    
+    for file_path in articles_dir.iterdir():
+        if file_path.is_file() and query in file_path.name.lower():
+            matches.append(file_path.name)
+    
+    if not matches:
+        return f"No articles found matching '{query}'"
+    
+    return "Matching articles:\n" + "\n".join(f"- {name}" for name in sorted(matches))
+
+
+def list_articles_in_directory(directory: Optional[str] = None) -> str:
+    """
+    List all article files in the articles directory.
+    
+    Parameters
+    ----------
+    directory : str, optional
+        Subdirectory within articles to list (if articles are organized in folders)
+    
+    Returns
+    -------
+    str
+        List of article names
+    """
+    if _config is None or _content_repo_path is None:
+        return "❌ Error: Could not load config.toml"
+    
+    articles_dir = _content_repo_path / _articles_dir_name
+    if directory:
+        articles_dir = articles_dir / directory
+    
+    if not articles_dir.exists():
+        return f"❌ Error: Directory not found: {articles_dir}"
+    
+    articles = []
+    for file_path in articles_dir.iterdir():
+        if file_path.is_file() and file_path.name.endswith('.md'):
+            articles.append(file_path.name)
+    
+    if not articles:
+        return f"No articles found in {articles_dir}"
+    
+    return f"Articles in {articles_dir.name}:\n" + "\n".join(f"- {name}" for name in sorted(articles))
+
+
 if __name__ == "__main__":
     # Test the article reading functionality
     print("🧪 Testing article reading functions...")

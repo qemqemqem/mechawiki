@@ -6,9 +6,11 @@ Handles creating, listing, and controlling agents.
 import logging
 import queue
 from datetime import datetime
+from pathlib import Path
 from flask import Blueprint, jsonify, request, Response
 from .config import session_config
 from .log_watcher import log_manager
+from .agent_manager import agent_manager
 import json
 
 logger = logging.getLogger(__name__)
@@ -68,7 +70,17 @@ def create_agent():
         # Start watching this agent's log
         log_manager.start_watching_agent(agent_id, str(log_file))
         
-        logger.info(f"✅ Created agent: {agent_id}")
+        # Start the agent instance (unpaused by default)
+        wikicontent_path = Path.home() / "Dev" / "wikicontent"
+        agent_manager.start_agent(
+            agent_id=agent_id,
+            agent_type=data['type'],
+            log_file=log_file,
+            wikicontent_path=wikicontent_path,
+            agent_config=agent_config.get('config', {})
+        )
+        
+        logger.info(f"✅ Created and started agent (running): {agent_id}")
         return jsonify(agent_config), 201
     
     except ValueError as e:
@@ -98,17 +110,8 @@ def pause_agent(agent_id):
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
-    # Write pause status to log
-    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
-    log_entry = {
-        "timestamp": datetime.now().isoformat(),
-        "type": "status",
-        "status": "paused",
-        "message": "Paused by user"
-    }
-    
-    with open(log_file, 'a') as f:
-        f.write(json.dumps(log_entry) + '\n')
+    # Pause the agent instance (it will write to its own log)
+    agent_manager.pause_agent(agent_id)
     
     logger.info(f"⏸️ Paused agent: {agent_id}")
     return jsonify({"status": "paused"})
@@ -122,17 +125,8 @@ def resume_agent(agent_id):
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
-    # Write resume status to log
-    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
-    log_entry = {
-        "timestamp": datetime.now().isoformat(),
-        "type": "status",
-        "status": "running",
-        "message": "Resumed by user"
-    }
-    
-    with open(log_file, 'a') as f:
-        f.write(json.dumps(log_entry) + '\n')
+    # Resume the agent instance (it will write to its own log)
+    agent_manager.resume_agent(agent_id)
     
     logger.info(f"▶️ Resumed agent: {agent_id}")
     return jsonify({"status": "running"})
@@ -161,8 +155,33 @@ def archive_agent(agent_id):
     # Stop watching this agent
     log_manager.stop_watching_agent(agent_id)
     
+    # Stop the agent instance
+    agent_manager.stop_agent(agent_id)
+    
     logger.info(f"📦 Archived agent: {agent_id}")
     return jsonify({"status": "archived"})
+
+
+@bp.route('/pause-all', methods=['POST'])
+def pause_all_agents():
+    """Pause all running agents."""
+    # Pause all agents in agent manager (they will write to their own logs)
+    agent_manager.pause_all()
+    
+    paused_count = len(session_config.list_agents())
+    logger.info(f"⏸️ Paused all agents ({paused_count})")
+    return jsonify({"status": "paused", "count": paused_count})
+
+
+@bp.route('/resume-all', methods=['POST'])
+def resume_all_agents():
+    """Resume all paused agents."""
+    # Resume all agents in agent manager (they will write to their own logs)
+    agent_manager.resume_all()
+    
+    resumed_count = len(session_config.list_agents())
+    logger.info(f"▶️ Resumed all agents ({resumed_count})")
+    return jsonify({"status": "running", "count": resumed_count})
 
 
 @bp.route('/<agent_id>/message', methods=['POST'])

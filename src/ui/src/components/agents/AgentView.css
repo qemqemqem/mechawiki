@@ -33,31 +33,32 @@
   color: #666;
 }
 
-.agent-tabs {
+.agent-view-options {
   display: flex;
-  gap: var(--spacing-xs);
+  justify-content: flex-end;
+  align-items: center;
   margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--light-border);
 }
 
-.agent-tabs button {
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
+.timestamp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.9rem;
   color: #666;
-  font-weight: 600;
-  border-radius: 0;
+  cursor: pointer;
+  user-select: none;
 }
 
-.agent-tabs button:hover {
-  background: rgba(44, 95, 153, 0.1);
-  color: var(--medieval-blue);
+.timestamp-checkbox input[type="checkbox"] {
+  cursor: pointer;
 }
 
-.agent-tabs button.active {
+.timestamp-checkbox:hover {
   color: var(--medieval-blue);
-  border-bottom-color: var(--medieval-blue);
 }
 
 .agent-logs {
@@ -65,66 +66,172 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
-  padding: var(--spacing-sm);
-  background: var(--parchment-bg);
-  border-radius: 4px;
+  padding: var(--spacing-md);
 }
 
-.log-entry {
+/* Thinking - subtle, italicized, grey text */
+.log-thinking {
+  font-style: italic;
+  color: #888;
+  font-size: 0.85rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  max-width: 90%;
+  opacity: 0.7;
+}
+
+/* Tool calls - collapsed by default, minimalist */
+.log-tool {
+  max-width: 90%;
+}
+
+.tool-call-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+  color: #888;
+  transition: color 0.15s ease;
+}
+
+.tool-call-header:hover {
+  color: #555;
+}
+
+.tool-name {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  color: #666;
+}
+
+.tool-expand {
+  font-size: 0.7rem;
+  color: #aaa;
+  margin-left: 4px;
+}
+
+.tool-details {
+  margin-top: 8px;
+  margin-left: 8px;
+  padding: var(--spacing-sm);
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   display: flex;
-  gap: var(--spacing-sm);
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.tool-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tool-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tool-args {
   padding: var(--spacing-sm);
   background: white;
-  border-left: 3px solid #ccc;
-  border-radius: 4px;
-}
-
-.log-icon {
-  flex-shrink: 0;
-  font-size: 1.2rem;
-}
-
-.log-content {
-  flex: 1;
-  font-size: 0.95rem;
-}
-
-.log-args {
-  margin-top: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  background: var(--parchment-bg);
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 0.85rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
   overflow-x: auto;
+  color: #555;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
+.tool-result {
+  padding: var(--spacing-sm);
+  background: #f9f9f9;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  color: #333;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Status messages - small and subtle */
 .log-status {
-  border-left-color: var(--medieval-blue);
+  font-size: 0.8rem;
+  color: #888;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  max-width: 90%;
 }
 
-.log-tool-call {
-  border-left-color: var(--amber);
+/* Agent messages - chat bubble style */
+.log-message-bubble {
+  align-self: flex-start;
+  max-width: 75%;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.3s ease-out;
 }
 
-.log-tool-result {
-  border-left-color: var(--forest-green);
+.log-message-bubble .log-content {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
 }
 
-.log-message {
-  border-left-color: var(--medieval-blue);
+/* User messages - chat bubble style (right aligned) */
+.log-user-bubble {
+  align-self: flex-end;
+  max-width: 75%;
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.3s ease-out;
 }
 
-.log-user-message {
-  border-left-color: var(--gold);
+.log-user-bubble .log-content {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
 }
 
-.log-thinking {
-  border-left-color: #9ca3af;
-  opacity: 0.8;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
+.log-timestamp {
+  font-size: 0.7rem;
+  color: #aaa;
+  margin-left: var(--spacing-sm);
+}
+
 
 .agent-chat-input {
   display: flex;
@@ -148,5 +255,79 @@
 
 .agent-chat-input button {
   padding: var(--spacing-sm) var(--spacing-lg);
+}
+
+/* Error messages - prominent red display */
+.log-error {
+  max-width: 90%;
+  background: #fff5f5;
+  border: 2px solid #ff4444;
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  animation: slideIn 0.3s ease-out;
+}
+
+.error-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.error-icon {
+  font-size: 1.2rem;
+}
+
+.error-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #cc0000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.error-message {
+  font-size: 0.9rem;
+  color: #cc0000;
+  line-height: 1.5;
+  margin-bottom: var(--spacing-sm);
+  word-break: break-word;
+}
+
+.error-traceback {
+  margin-top: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.error-traceback summary {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #888;
+  padding: var(--spacing-xs);
+  user-select: none;
+}
+
+.error-traceback summary:hover {
+  color: #666;
+}
+
+.error-traceback pre {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: white;
+  border: 1px solid #ffcccc;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  color: #666;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.log-error .log-timestamp {
+  display: block;
+  margin-top: var(--spacing-xs);
 }
 

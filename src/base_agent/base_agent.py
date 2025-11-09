@@ -1,9 +1,11 @@
 """
-Base Agent class for litellm tool use based agents
+Base Agent class for litellm tool use based agents.
+
+Agents are generators that yield events instead of printing.
 """
 import json
 import litellm
-from typing import Dict, List, Callable, Any, Optional
+from typing import Dict, List, Callable, Any, Optional, Generator
 
 
 class ToolError(Exception):
@@ -12,6 +14,10 @@ class ToolError(Exception):
 
 class EndConversation():
     """Simple object for ending the conversation."""
+    pass
+
+class ContextLengthExceeded(Exception):
+    """Raised when conversation context exceeds 300,000 characters."""
     pass
 
 
@@ -29,7 +35,7 @@ class BaseAgent:
     
     def __init__(
         self, 
-        model: str = "claude-3-5-haiku-20241022",
+        model: str = "claude-haiku-4-5-20251001",
         system_prompt: str = "You love good stories.",
         tools: Optional[List[Dict]] = None,
         memory: Optional[Dict[str, Any]] = None,
@@ -100,6 +106,20 @@ class BaseAgent:
     def add_user_message(self, content: str):
         """Add a user message to the conversation."""
         self.messages.append({"role": "user", "content": content})
+    
+    def _get_context_length(self) -> int:
+        """Calculate total characters in conversation history."""
+        total_chars = 0
+        for msg in self.messages:
+            # Count content
+            if 'content' in msg:
+                total_chars += len(str(msg['content']))
+            # Count tool call arguments if present
+            if 'tool_calls' in msg:
+                for tc in msg['tool_calls']:
+                    if 'function' in tc and 'arguments' in tc['function']:
+                        total_chars += len(tc['function']['arguments'])
+        return total_chars
     
     
     def advance_content(self, content: str, start_word: int):
@@ -223,15 +243,19 @@ class BaseAgent:
         # If no tools section exists, append it
         return f"{base_prompt}\n\n{tools_desc}"
     
-    def _execute_tool(self, tool_call: Dict) -> str:
+    def _execute_tool(self, tool_call: Dict) -> Any:
         """
         Execute a single tool call. Override in subclasses for custom logic.
+        
+        Tool errors are caught and returned as error results (not exceptions),
+        so the agent can handle them gracefully.
         
         Args:
             tool_call: Tool call dict with id, function name, and arguments
             
         Returns:
-            Result string to add to conversation
+            Result (can be any type, including EndConversation signal)
+            or dict with 'error' and 'success' fields for tool errors
         """
         function_name = tool_call["function"]["name"]
         function_args = json.loads(tool_call["function"]["arguments"])
@@ -244,7 +268,11 @@ class BaseAgent:
                 break
         
         if function_to_call is None:
-            return f"Error: Tool {function_name} not available"
+            # Tool not found - return error result
+            return {
+                "error": f"Tool {function_name} not available",
+                "success": False
+            }
         
         try:
             result = function_to_call(**function_args)
@@ -253,29 +281,55 @@ class BaseAgent:
             if isinstance(result, EndConversation):
                 return result  # Return the signal directly
             
+            return result  # Return the result directly
             
-            return result # Return the result directly
         except Exception as e:
-            return ToolError(f"Error executing {function_name}: {str(e)}")
+            # Tool error - return as error result (not exception)
+            # This allows the agent to see and respond to errors
+            return {
+                "error": str(e),
+                "success": False,
+                "tool": function_name
+            }
     
-    def _handle_streaming_response(self, response) -> tuple[str, List[Dict]]:
+    def _handle_streaming_response(self, response) -> Generator[Dict, None, tuple[str, str, List[Dict]]]:
         """
-        Handle streaming response from litellm.
+        Handle streaming response from litellm - yields events.
         
+        Yields:
+            Events: text_token, thinking_token, thinking_start, thinking_end
+            
         Returns:
-            Tuple of (collected_content, tool_calls)
+            Tuple of (collected_content, collected_thinking, tool_calls)
         """
         collected_content = ""
+        collected_thinking = ""
         tool_calls = []
+        thinking_active = False
         
         for chunk in response:
-            # Handle content
+            # Try to extract thinking (Claude extended thinking)
+            thinking_content = self._extract_thinking_from_chunk(chunk)
+            if thinking_content:
+                if not thinking_active:
+                    yield {'type': 'thinking_start'}
+                    thinking_active = True
+                yield {'type': 'thinking_token', 'content': thinking_content}
+                collected_thinking += thinking_content
+                continue  # Don't process as regular content
+            
+            # Regular content
             if chunk.choices[0].delta.content:
+                # If we were thinking and now have content, end thinking
+                if thinking_active:
+                    yield {'type': 'thinking_end'}
+                    thinking_active = False
+                
                 content = chunk.choices[0].delta.content
-                print(content, end="", flush=True)
+                yield {'type': 'text_token', 'content': content}
                 collected_content += content
             
-            # Handle tool calls
+            # Handle tool calls (fully formed from litellm)
             if hasattr(chunk.choices[0].delta, 'tool_calls') and chunk.choices[0].delta.tool_calls:
                 for delta_tool_call in chunk.choices[0].delta.tool_calls:
                     # Extend tool_calls list if needed
@@ -298,28 +352,70 @@ class BaseAgent:
             if chunk.choices[0].finish_reason:
                 break
         
-        print()  # New line after streaming
-        return collected_content, tool_calls
+        # End thinking if still active
+        if thinking_active:
+            yield {'type': 'thinking_end'}
+        
+        return collected_content, collected_thinking, tool_calls
     
-    def _handle_non_streaming_response(self, response) -> tuple[str, List[Dict]]:
+    def _extract_thinking_from_chunk(self, chunk) -> Optional[str]:
+        """
+        Extract thinking/reasoning content from LLM response chunk.
+        
+        Supports Claude extended thinking via reasoning_content field.
+        """
+        delta = chunk.choices[0].delta
+        
+        # Check for Claude extended thinking
+        if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
+            return delta.reasoning_content
+        
+        # Future: Could parse <thinking> tags if needed
+        
+        return None
+    
+    def _handle_non_streaming_response(self, response) -> tuple[str, str, List[Dict]]:
         """
         Handle non-streaming response from litellm.
         
         Returns:
-            Tuple of (content, tool_calls)
+            Tuple of (content, thinking, tool_calls)
         """
-        raise NotImplementedError("Non-streaming response handling not implemented")
+        # For non-streaming, we don't have thinking extraction yet
+        # Just return the content and empty thinking
+        choice = response.choices[0]
+        content = choice.message.content or ""
+        tool_calls = []
+        
+        if hasattr(choice.message, 'tool_calls') and choice.message.tool_calls:
+            for tc in choice.message.tool_calls:
+                tool_calls.append({
+                    "id": tc.id,
+                    "type": "function",
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments
+                    }
+                })
+        
+        return content, "", tool_calls
     
-    def run_forever(self, initial_message: str, max_turns: int = 3) -> str:
+    def run_forever(self, initial_message: str, max_turns: int = 3) -> Generator[Dict, None, None]:
         """
-        Run a conversation with the agent.
+        Run a conversation with the agent - yields events.
+        
+        This is a generator that yields events for streaming tokens, tool calls,
+        and tool results. AgentRunner consumes these events and logs them.
         
         Args:
             initial_message: First user message
             max_turns: Maximum turns (None = run forever, int = limit turns)
             
-        Returns:
-            Final response from the agent (or never returns if max_turns=None)
+        Yields:
+            Events: text_token, thinking_token, tool_call, tool_result, status
+            
+        Raises:
+            ContextLengthExceeded: If conversation exceeds 300,000 characters
         """
         # Add initial message
         self.add_user_message(initial_message)
@@ -330,36 +426,59 @@ class BaseAgent:
             
             # Check turn limit
             if max_turns is not None and turn > max_turns:
-                return "Max turns reached"
+                return  # Generator exits
             
-            print(f"\n--- Agent Turn {turn} ---")
+            # Check context length BEFORE making LLM call
+            context_length = self._get_context_length()
+            if context_length > 300000:
+                raise ContextLengthExceeded(
+                    f"Context length is {context_length} characters (limit: 300,000)"
+                )
             
-            # Make LLM call
+            # Make LLM call (Haiku 4.5 has built-in thinking)
             response = litellm.completion(
                 model=self.model,
                 messages=self.messages,
                 tools=self.tools if self.tools else None,
                 tool_choice="auto" if self.tools else None,
-                stream=self.stream
+                stream=self.stream,
+                temperature=1.0
             )
             
-            # Handle response based on streaming mode
+            # Handle response - yields events from streaming
             if self.stream:
-                collected_content, tool_calls = self._handle_streaming_response(response)
+                # _handle_streaming_response is now a generator
+                stream_gen = self._handle_streaming_response(response)
+                collected_content = ""
+                collected_thinking = ""
+                tool_calls = []
+                
+                try:
+                    while True:
+                        event = next(stream_gen)
+                        yield event  # Forward events to caller
+                except StopIteration as e:
+                    # Generator returned final values
+                    collected_content, collected_thinking, tool_calls = e.value
             else:
-                collected_content, tool_calls = self._handle_non_streaming_response(response)
+                collected_content, collected_thinking, tool_calls = self._handle_non_streaming_response(response)
+            
+            # Build assistant message for conversation history
+            assistant_message = {
+                "role": "assistant",
+                "content": collected_content if collected_content else None
+            }
+            
+            # Add thinking if present
+            if collected_thinking:
+                assistant_message["thinking"] = collected_thinking
             
             # Check for tool calls
             if tool_calls and any(tc.get("id") for tc in tool_calls):
                 valid_tool_calls = [tc for tc in tool_calls if tc.get("id")]
-                print(f"\n--- Executing {len(valid_tool_calls)} tool calls ---")
                 
-                # Add assistant message
-                assistant_message = {
-                    "role": "assistant",
-                    "content": collected_content if collected_content else None,
-                    "tool_calls": valid_tool_calls
-                }
+                # Add tool_calls to assistant message
+                assistant_message["tool_calls"] = valid_tool_calls
                 self.messages.append(assistant_message)
                 
                 # Execute each tool call
@@ -367,21 +486,64 @@ class BaseAgent:
                     function_name = tool_call["function"]["name"]
                     function_args = json.loads(tool_call["function"]["arguments"])
                     
-                    print(f"Calling {function_name} with args: {function_args}")
+                    # Yield tool_call event
+                    yield {
+                        'type': 'tool_call',
+                        'tool': function_name,
+                        'args': function_args
+                    }
                     
-                    # Execute tool (can be overridden by subclasses)
+                    # Execute tool (errors become error results)
                     raw_result = self._execute_tool(tool_call)
                     
                     # Check if tool returned EndConversation signal
                     if isinstance(raw_result, EndConversation):
-                        print(f"Agent called end() - terminating conversation")
-                        return "Conversation ended by agent"
+                        yield {
+                            'type': 'status',
+                            'status': 'ended',
+                            'reason': 'Agent called end()'
+                        }
+                        return  # Exit generator
                     
-                    # Regular result
-                    result_content = str(raw_result)
-                    print(f"Result: {raw_result}")
+                    # Check if tool returned WaitingForInput signal
+                    if isinstance(raw_result, dict) and raw_result.get('_waiting_for_input'):
+                        # Yield status event for waiting
+                        yield {
+                            'type': 'status',
+                            'status': 'waiting_for_input',
+                            'message': raw_result.get('prompt', 'Waiting for user input')
+                        }
+                        # Also yield the tool_result
+                        yield {
+                            'type': 'tool_result',
+                            'tool': function_name,
+                            'result': raw_result
+                        }
+                        # Add to conversation
+                        result_content = json.dumps(raw_result)
+                        self.messages.append({
+                            "tool_call_id": tool_call["id"],
+                            "role": "tool",
+                            "name": function_name,
+                            "content": result_content
+                        })
+                        # Break this turn - wait for user input
+                        return
+                    
+                    # Yield tool_result event
+                    yield {
+                        'type': 'tool_result',
+                        'tool': function_name,
+                        'result': raw_result
+                    }
                     
                     # Add function result to conversation
+                    # Convert result to string for conversation (but event has full result)
+                    if isinstance(raw_result, dict):
+                        result_content = json.dumps(raw_result)
+                    else:
+                        result_content = str(raw_result)
+                    
                     self.messages.append({
                         "tool_call_id": tool_call["id"],
                         "role": "tool", 
@@ -400,11 +562,6 @@ class BaseAgent:
                 self._post_tool_execution_hook()
             else:
                 # No tool calls - add assistant message and continue
-                if collected_content:
-                    self.messages.append({
-                        "role": "assistant", 
-                        "content": collected_content
-                    })
-                
-                # Continue loop regardless - only exit on turn limit
+                if collected_content or collected_thinking:
+                    self.messages.append(assistant_message)
     

@@ -12,11 +12,35 @@ MechaWiki is a project that uses AI agents to read stories, write stories, and c
 
 Visit **http://localhost:5173** to see the UI!
 
-The system automatically starts with **4 test agents** that generate random activity:
-- 🤖 **Story Reader Alpha** (ReaderAgent) - Reads articles and advances through stories
-- ✍️ **Tale Weaver Beta** (WriterAgent) - Writes and edits articles
-- 🔍 **Lore Keeper Gamma** (ResearcherAgent) - Searches and researches content
-- 🎮 **Quest Master Delta** (InteractiveAgent) - Creates interactive experiences (occasionally waits for user input)
+The system starts with **3 demo agents** (one of each type), **truly paused from the start** (no race conditions!):
+- 🤖 **Reader Agent 1** (ReaderAgent) - Reads articles and advances through stories
+- ✍️ **Writer Agent 1** (WriterAgent) - Writes stories from wiki content
+- 🎮 **Interactive Agent 1** (InteractiveAgent) - Creates interactive experiences
+
+**To activate:** Click the ▶️ resume button in the UI for each agent you want to run.
+
+**Create new agents:** Use the "New Agent" button - these start running immediately.
+
+### ⚡ Real Agents Enabled by Default!
+
+MechaWiki now uses **real LLM-powered agents** by default:
+- Event-based generators that yield events instead of printing
+- AgentRunner consumes events and writes to JSONL logs
+- Line-at-a-time buffering for responsive streaming
+- 300k context limit with automatic archiving
+- All 3 agent types: ReaderAgent, WriterAgent, InteractiveAgent
+
+**Requirements:** Add your Claude API key to `config.toml`
+
+**Switch to mock agents:** Run with `USE_REAL_AGENTS=false ./start.sh`
+
+**Use different session:** Run with `SESSION_NAME=my_session ./start.sh`
+
+**Note:** `dev_session` is wiped clean on every start! Use a different session name to preserve state.
+
+**Test without UI:** `python test_real_agents.py`
+
+See `notes/IMPLEMENTATION_COMPLETE.md` for full details!
 
 ## What Is This?
 
@@ -127,7 +151,19 @@ cd src/ui
 npm run dev
 ```
 
-### Initialize Test Agents (Standalone)
+### Test Real Agents
+```bash
+source .venv/bin/activate
+python test_real_agents.py
+```
+
+This tests:
+- Event streaming from BaseAgent
+- AgentRunner event consumption
+- All 3 agent types (Reader, Writer, Interactive)
+- JSONL logging
+
+### Initialize Mock Test Agents (Default)
 ```bash
 source .venv/bin/activate
 python src/server/init_agents.py --start

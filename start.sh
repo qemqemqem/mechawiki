@@ -185,6 +185,22 @@ if [ ! -d "$AGENTS_DIR" ]; then
     echo "✓ Created $AGENTS_DIR"
 fi
 
+# Clear debug logs on startup
+DEBUG_LOGS_DIR="$AGENTS_DIR/debug_logs"
+if [ -d "$DEBUG_LOGS_DIR" ]; then
+    echo "🧹 Clearing debug logs..."
+    rm -f "$DEBUG_LOGS_DIR"/*.log
+    echo "✓ Debug logs cleared"
+else
+    echo "📁 Creating debug_logs directory..."
+    mkdir -p "$DEBUG_LOGS_DIR"
+    echo "✓ Created $DEBUG_LOGS_DIR"
+fi
+
+echo ""
+echo "📋 Debug logs will be written to:"
+echo "   Server:  $DEBUG_LOGS_DIR/server.log"
+echo "   Agents:  $DEBUG_LOGS_DIR/{agent-id}.log"
 echo ""
 
 # Start backend in background

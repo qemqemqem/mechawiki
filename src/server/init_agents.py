@@ -11,8 +11,39 @@ from pathlib import Path
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from server.config import agent_config, WIKICONTENT_PATH
+from server.config import agent_config, WIKICONTENT_PATH, AGENTS_DIR
 from agents.mock_agent import MockAgent
+
+
+def _ensure_agent_directories(agent_id: str, agent_type: str):
+    """
+    Ensure agent-specific directory structure exists.
+    
+    Called during initialization to ensure existing agents have their directories.
+    """
+    agent_dir = AGENTS_DIR / agent_id
+    
+    # Create base agent directory
+    agent_dir.mkdir(parents=True, exist_ok=True)
+    
+    # All agents get a scratchpad
+    scratchpad_dir = agent_dir / "scratchpad"
+    scratchpad_dir.mkdir(exist_ok=True)
+    
+    # Writer and Interactive agents get stories directory
+    if agent_type in ['WriterAgent', 'InteractiveAgent']:
+        stories_dir = agent_dir / "stories"
+        stories_dir.mkdir(exist_ok=True)
+        
+        # Create initial story.md file if it doesn't exist
+        story_file = stories_dir / "story.md"
+        if not story_file.exists():
+            story_file.write_text(f"# {agent_id} Story\n\nYour story begins here...\n")
+    
+    # Writer agents get subplots directory
+    if agent_type == 'WriterAgent':
+        subplots_dir = agent_dir / "subplots"
+        subplots_dir.mkdir(exist_ok=True)
 
 
 def start_agents(agent_manager=None):
@@ -30,6 +61,9 @@ def start_agents(agent_manager=None):
         agent_type = agent_data["type"]
         agent_cfg = agent_data.get("config", {})
         log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+        
+        # Ensure agent's directory structure exists
+        _ensure_agent_directories(agent_id, agent_type)
         
         # Use agent manager if available
         if agent_manager:

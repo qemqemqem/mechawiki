@@ -5,6 +5,7 @@ import os
 import toml
 from pathlib import Path
 from typing import Optional
+from .git_helper import commit_file_change
 
 # Load config once at module level
 try:
@@ -104,62 +105,6 @@ def read_article(article_name: str):
     
     except Exception as e:
         return {"error": f"Error reading article '{found_file.name}': {str(e)}"}
-
-
-def write_article(article_name: str, content: str):
-    """
-    Write content to an article file.
-    
-    Parameters
-    ----------
-    article_name : str
-        Name of the article (with or without .md extension)
-    content : str
-        Content to write to the article
-    
-    Returns
-    -------
-    dict or str
-        Success dict with file_path and line counts, or error message string
-    """
-    if _config is None or _content_repo_path is None:
-        return "❌ Error: Could not load config.toml"
-    
-    if not article_name.strip():
-        return "❌ Error: Article name cannot be empty"
-    
-    articles_dir = _content_repo_path / _articles_dir_name
-    articles_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Add .md extension if not present
-    if not article_name.endswith('.md'):
-        article_name += '.md'
-    
-    file_path = articles_dir / article_name
-    
-    # Check if file exists to calculate diff
-    lines_removed = 0
-    if file_path.exists():
-        with open(file_path, 'r', encoding='utf-8') as f:
-            old_content = f.read()
-        lines_removed = old_content.count('\n') + 1
-    
-    try:
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(content)
-        
-        lines_added = content.count('\n') + 1
-        
-        # Return structured data for log watcher
-        return {
-            "file_path": f"{_articles_dir_name}/{article_name}",
-            "lines_added": lines_added,
-            "lines_removed": lines_removed,
-            "message": f"✅ Successfully wrote to {article_name}"
-        }
-    except Exception as e:
-        return f"❌ Error writing article: {str(e)}"
-
 
 def search_articles(query: str) -> str:
     """

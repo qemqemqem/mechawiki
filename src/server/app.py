@@ -8,7 +8,7 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 
-# Set up logging
+# Set up logging - will be enhanced with file handlers after config loads
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -23,6 +23,22 @@ CORS(app)  # Enable CORS for frontend
 from .log_watcher import init_log_manager
 from .config import agent_config, WIKICONTENT_PATH
 log_manager = init_log_manager(agent_config.logs_dir)
+
+# Set up file-based debug logging for server
+def setup_server_debug_logging():
+    """Add file handler to root logger for server-wide debug logging."""
+    server_debug_file = agent_config.debug_logs_dir / "server.log"
+    file_handler = logging.FileHandler(server_debug_file, mode='a')
+    file_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    file_handler.setFormatter(formatter)
+    logging.getLogger().addHandler(file_handler)
+    logger.info(f"🔍 Server debug logging enabled: {server_debug_file}")
+
+setup_server_debug_logging()
 
 # Initialize cost tracker
 from .cost_tracker import init_cost_tracker

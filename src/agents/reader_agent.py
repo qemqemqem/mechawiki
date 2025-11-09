@@ -19,6 +19,7 @@ from base_agent.base_agent import BaseAgent, EndConversation
 # from tools.images import create_image  # Too slow for dev
 from tools.search import find_articles, find_images, find_songs, find_files
 from tools.articles import read_article
+from tools.files import edit_file
 from agents.prompts.loader import build_agent_prompt
 from utils.git import ensure_content_branch
 
@@ -185,6 +186,7 @@ class ReaderAgent(BaseAgent):
             {"type": "function", "function": litellm.utils.function_to_dict(find_songs), "_function": find_songs},
             {"type": "function", "function": litellm.utils.function_to_dict(find_files), "_function": find_files},
             {"type": "function", "function": litellm.utils.function_to_dict(read_article), "_function": read_article},
+            {"type": "function", "function": litellm.utils.function_to_dict(edit_file), "_function": edit_file},
         ]
         
         # Load base system prompt from files and add story-specific context

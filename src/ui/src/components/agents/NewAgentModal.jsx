@@ -153,9 +153,6 @@ function NewAgentModal({ onClose, onCreate, agents = [] }) {
               onChange={handleSlugChange}
               placeholder="e.g., reader-agent-001"
             />
-            <p className="help-text">
-              Auto-generated from name. This will be the agent's unique identifier.
-            </p>
           </div>
 
           <div className="form-group">

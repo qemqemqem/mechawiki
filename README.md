@@ -59,6 +59,116 @@ MechaWiki uses AI agents that read through stories (like *Dracula* or *Tales of 
 - **Writer Agent** - Takes wiki content and writes compelling prose
 - **Interactive Agent** - Creates RPG-like experiences where users become part of the story
 
+## Content Repository (Wikicontent)
+
+MechaWiki stores all wiki content and agent data in a **separate git repository** called "wikicontent". This separation allows you to:
+- Version control your content independently from the application code
+- Share content repos between team members
+- Work on multiple projects by switching branches
+- Back up and sync content using git
+
+### Repository Location
+
+By default, wikicontent is expected at `~/Dev/wikicontent` but you can configure any location in `config.toml`:
+
+```toml
+[paths]
+content_repo = "/home/keenan/Dev/wikicontent"  # Your wikicontent location
+content_branch = "tales_of_wonder/main"        # Which branch to use
+```
+
+**Note:** The `start.sh` script validates this location and branch before starting. If not found, it provides clear instructions on how to set it up.
+
+### Repository Structure
+
+Your wikicontent repository should have this structure:
+
+```
+wikicontent/                    # Root of content repository (separate git repo)
+├── .git/                       # Git tracking
+│
+├── articles/                   # Wiki articles (markdown)
+│   ├── lord-dunsany.md
+│   ├── tales-of-wonder.md
+│   └── ...
+│
+├── stories/                    # Story files
+│   ├── the-sultans-dreamer.md
+│   ├── the-mist-keeper.md
+│   └── ...
+│
+├── images/                     # Generated or uploaded images
+│   ├── dunsany-london-dream.png
+│   └── ...
+│
+├── songs/                      # Song/poem content (optional)
+│
+├── story.txt                   # Main source story (if using ReaderAgent)
+│
+└── agents/                     # Agent data (per branch, git-tracked)
+    ├── agents.json             # Agent configurations
+    ├── costs.log               # LLM cost tracking
+    └── logs/                   # Agent activity logs (JSONL)
+        ├── agent_reader-001.jsonl
+        ├── agent_writer-001.jsonl
+        └── agent_interactive-001.jsonl
+```
+
+### Setting Up Wikicontent
+
+**Option 1: Create a new repository**
+```bash
+mkdir -p ~/Dev/wikicontent
+cd ~/Dev/wikicontent
+git init
+mkdir -p articles stories images agents/logs
+echo "# My Wiki Content" > README.md
+git add .
+git commit -m "Initial commit"
+```
+
+**Option 2: Clone an existing repository**
+```bash
+git clone <your-repo-url> ~/Dev/wikicontent
+```
+
+**Option 3: Use a different location**
+```bash
+# Create anywhere
+mkdir -p /path/to/my/content && cd /path/to/my/content
+git init
+
+# Update config.toml to point to it
+[paths]
+content_repo = "/path/to/my/content"
+```
+
+### Branch Strategy
+
+Use git branches to isolate different projects:
+
+```bash
+# Working on Tales of Wonder
+cd ~/Dev/wikicontent
+git checkout -b tales_of_wonder/main
+
+# Working on Dracula analysis  
+git checkout -b dracula/main
+
+# Experimental features
+git checkout -b tales_of_wonder/experimental
+```
+
+Update `config.toml` to match your active branch, and MechaWiki will use that branch's content and agents.
+
+### Why Separate Repositories?
+
+1. **Version Control**: Content changes are tracked independently from code changes
+2. **Portability**: Share or backup content without the application
+3. **Collaboration**: Multiple people can work on content using git workflows
+4. **Branch Isolation**: Different projects/stories on different branches
+5. **Size Management**: Large content repos don't bloat the main codebase
+
 ## Features
 
 ### 🎮 Real-Time Agent Monitoring
@@ -109,27 +219,16 @@ Track file changes as agents create and edit wiki content:
 
 ## Project Structure
 
+This repository (MechaWiki) contains only the application code:
+
 - **`src/server/`** - Flask backend (Python)
 - **`src/ui/`** - React frontend (Vite)
-- **`src/agents/`** - Agent implementations
-- **`src/tools/`** - Agent tools (read/write articles, search, images)
-- **`~/Dev/wikicontent/`** - Wiki content repository (git-managed, contains agent data)
+- **`src/agents/`** - Agent implementations (ReaderAgent, WriterAgent, InteractiveAgent)
+- **`src/tools/`** - Agent tools (read/write articles, search, images, git operations)
+- **`config.toml`** - Configuration (API keys, paths, settings)
+- **`start.sh`** - Startup script (validates config and launches servers)
 
-### Content Repository Structure
-
-Your wikicontent repository contains both wiki content and agent data:
-```
-wikicontent/
-├── articles/        # Wiki articles
-├── stories/         # Story content
-├── images/          # Generated images
-└── agents/          # Agent data (tracked per branch)
-    ├── agents.json  # Agent configurations
-    ├── costs.log    # Cost tracking
-    └── logs/        # Agent JSONL logs
-```
-
-All agent data is stored in the content repository on the current branch, so different branches can have different agents working on different content.
+**All content lives in a separate git repository** (see [Content Repository](#content-repository-wikicontent) section above).
 
 ## Documentation
 
@@ -143,8 +242,11 @@ All agent data is stored in the content repository on the current branch, so dif
 - **Python 3.8+** with pip
 - **Node.js 18+** with npm
 - **Git** (for wikicontent management)
+- **Wikicontent Repository** - A separate git repository for content (see [Content Repository](#content-repository-wikicontent))
 
-All dependencies are auto-installed by `start.sh`.
+All Python and Node dependencies are auto-installed by `start.sh`.
+
+The wikicontent repository must be set up before first run - `start.sh` will validate its location and provide setup instructions if needed.
 
 ## Development
 

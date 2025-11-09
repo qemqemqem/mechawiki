@@ -229,7 +229,7 @@ class LogManager:
         tool = log_entry.get('tool', '')
         file_tools = [
             'read_file', 'edit_file', 'add_to_story', 'add_to_my_story',
-            'read_article', 'write_article', 'write_story', 'edit_story',
+            'read_article', 'write_story', 'edit_story',
             'create_image', 'rename_my_story'
         ]
         

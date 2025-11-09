@@ -60,6 +60,9 @@ class BaseAgent:
         self.stream = stream
         self.messages = []
         
+        # Log path for git commits (set by AgentRunner)
+        self.log_path = None
+        
         # Cost tracking
         self.total_cost = 0.0
         self.total_prompt_tokens = 0
@@ -68,6 +71,9 @@ class BaseAgent:
         
         # Add the built-in end() tool
         self._add_end_tool()
+        
+        # Add the built-in report_issue() tool
+        self._add_report_issue_tool()
         
         # Enhance system prompt with auto-generated tool descriptions
         self.system_prompt = self._enhance_system_prompt(system_prompt)
@@ -124,8 +130,28 @@ class BaseAgent:
             return EndConversation()
         
         # Create tool definition using litellm helper
-        end_tool = {"type": "function", "function": litellm.utils.function_to_dict(end)}
+        end_tool = {"type": "function", "function": litellm.utils.function_to_dict(end), "_function": end}
         self.tools.append(end_tool)
+    
+    def _add_report_issue_tool(self):
+        """Add the built-in report_issue() tool for reporting bugs or impossible tasks."""
+        def report_issue(issue_str: str):
+            """Report a bug or issue encountered during operation.
+            
+            Call this tool when you believe you have encountered a bug in the system,
+            or when the system prompt has instructed you to do something that is 
+            impossible or cannot be completed with the available tools.
+            
+            Parameters
+            ----------
+            issue_str : str
+                Description of the issue, bug, or impossible task encountered
+            """
+            return "Issue logged successfully. The developer will review this report. Please carry on as best as possible despite this issue."
+        
+        # Create tool definition using litellm helper
+        report_issue_tool = {"type": "function", "function": litellm.utils.function_to_dict(report_issue), "_function": report_issue}
+        self.tools.append(report_issue_tool)
     
     def reset_conversation(self):
         """Clear the conversation history."""
@@ -205,6 +231,65 @@ class BaseAgent:
         custom behavior like content processing, state updates, etc.
         """
         pass
+    
+    def _create_helpful_json_error(self, function_name: str, raw_args: str, json_error: json.JSONDecodeError) -> str:
+        """
+        Create a helpful, succinct error message for JSON parsing failures in tool calls.
+        
+        Args:
+            function_name: Name of the tool that was called
+            raw_args: The raw argument string that failed to parse
+            json_error: The JSONDecodeError that was raised
+            
+        Returns:
+            A clear, actionable error message
+        """
+        # Check if JSON is incomplete (missing closing brace/bracket)
+        stripped = raw_args.strip()
+        is_incomplete = False
+        
+        if stripped and not stripped.endswith('}') and not stripped.endswith(']'):
+            is_incomplete = True
+        elif stripped.count('{') > stripped.count('}'):
+            is_incomplete = True
+        elif stripped.count('[') > stripped.count(']'):
+            is_incomplete = True
+        
+        # Try to find the tool schema to identify required parameters
+        tool_schema = None
+        for tool in self.tools:
+            if tool.get("type") == "function" and tool.get("function", {}).get("name") == function_name:
+                tool_schema = tool.get("function", {})
+                break
+        
+        # Build error message
+        if is_incomplete:
+            msg = f"ERROR: Incomplete JSON arguments for tool '{function_name}'.\n"
+            msg += f"The arguments appear to be cut off or missing closing braces.\n"
+            
+            # Show what was received (truncated)
+            preview = raw_args[:150] + "..." if len(raw_args) > 150 else raw_args
+            msg += f"Received: {preview}\n"
+            
+            # If we have the schema, show required parameters
+            if tool_schema:
+                params = tool_schema.get("parameters", {})
+                required = params.get("required", [])
+                if required:
+                    msg += f"Required parameters: {', '.join(required)}\n"
+            
+            msg += "Please retry the tool call with complete JSON arguments."
+        else:
+            # Other JSON error (malformed syntax, etc.)
+            msg = f"ERROR: Malformed JSON arguments for tool '{function_name}'.\n"
+            msg += f"JSON parse error: {str(json_error)}\n"
+            
+            # Show what was received (truncated)
+            preview = raw_args[:150] + "..." if len(raw_args) > 150 else raw_args
+            msg += f"Received: {preview}\n"
+            msg += "Please retry the tool call with valid JSON syntax."
+        
+        return msg
     
     def _generate_tools_description(self) -> str:
         """Generate a description of available tools from their definitions."""
@@ -416,99 +501,112 @@ class BaseAgent:
         Anthropic requires that every assistant message with tool_calls (tool_use) 
         must be immediately followed by tool messages (tool_result) with matching IDs.
         
-        This method modifies self.messages in-place to add missing tool_results.
+        This method modifies self.messages in-place to:
+        1. Collect all tool_results and map them to their tool_calls
+        2. Reconstruct history with tool_results in correct positions
+        3. Add dummy tool_results for any orphaned tool_calls
+        4. Validate tool_result content format
         """
         if not self.messages:
             return
         
-        repaired_history = []
-        i = 0
         repairs_made = 0
+        results_rearranged = 0
+        orphaned_results_removed = 0
         
-        while i < len(self.messages):
-            msg = self.messages[i].copy()  # Work with a copy
-            
-            # Validate tool message content
+        # FIRST PASS: Collect all tool_results and validate their content
+        tool_results_by_id = {}  # Map tool_call_id -> tool_result message
+        for msg in self.messages:
             if msg.get("role") == "tool":
-                content = msg.get("content", "")
+                msg_copy = msg.copy()
+                content = msg_copy.get("content", "")
                 
                 # Check if content is a string
                 if not isinstance(content, str):
                     logger.warning(f"⚠️ Tool result content is not a string: {type(content)}. Converting to string.")
-                    msg["content"] = str(content)
+                    msg_copy["content"] = str(content)
                     repairs_made += 1
                 
                 # Check if content is valid (not empty, not too large)
-                content = msg.get("content", "")
+                content = msg_copy.get("content", "")
                 if not content or len(content) < 2:
                     logger.warning(f"⚠️ Tool result has empty or invalid content. Adding error message.")
-                    msg["content"] = json.dumps({"error": "Tool result content was empty or invalid"})
+                    msg_copy["content"] = json.dumps({"error": "Tool result content was empty or invalid"})
                     repairs_made += 1
                 
                 # Truncate if too large (> 100KB)
                 max_content_size = 100000
                 if len(content) > max_content_size:
                     logger.warning(f"⚠️ Tool result content too large ({len(content)} chars). Truncating to {max_content_size} chars.")
-                    msg["content"] = content[:max_content_size] + "\n... [truncated]"
+                    msg_copy["content"] = content[:max_content_size] + "\n... [truncated]"
                     repairs_made += 1
                 
                 # Verify it's valid JSON (Anthropic expects JSON in tool results)
+                content = msg_copy.get("content", "")
                 try:
-                    json.loads(msg["content"])
+                    json.loads(content)
                 except json.JSONDecodeError:
                     logger.warning(f"⚠️ Tool result content is not valid JSON. Wrapping in JSON object.")
-                    msg["content"] = json.dumps({"result": msg["content"]})
+                    msg_copy["content"] = json.dumps({"result": content})
                     repairs_made += 1
+                
+                # Store the validated tool_result
+                tool_call_id = msg_copy.get("tool_call_id")
+                if tool_call_id:
+                    tool_results_by_id[tool_call_id] = msg_copy
+        
+        # SECOND PASS: Build a map of which tool_call_ids exist
+        valid_tool_call_ids = set()
+        for msg in self.messages:
+            if msg.get("role") == "assistant" and msg.get("tool_calls"):
+                for tc in msg.get("tool_calls", []):
+                    if tc.get("id"):
+                        valid_tool_call_ids.add(tc.get("id"))
+        
+        # THIRD PASS: Reconstruct history with tool_results in correct positions
+        repaired_history = []
+        i = 0
+        
+        while i < len(self.messages):
+            msg = self.messages[i]
+            
+            # Skip tool messages - they'll be reinserted in correct positions
+            if msg.get("role") == "tool":
+                i += 1
+                continue
             
             # Check if this is an assistant message with tool_calls
             if msg.get("role") == "assistant" and msg.get("tool_calls"):
-                # Add the assistant message with tool_calls
+                # Add the assistant message
                 repaired_history.append(msg)
                 
                 tool_calls = msg.get("tool_calls", [])
                 tool_call_ids = [tc.get("id") for tc in tool_calls if tc.get("id")]
                 
-                # Check if the next message(s) contain tool results for these IDs
-                found_ids = set()
-                j = i + 1
-                
-                # Look ahead for tool results (must be immediately after)
-                while j < len(self.messages):
-                    next_msg = self.messages[j]
-                    if next_msg.get("role") == "tool":
-                        tool_call_id = next_msg.get("tool_call_id")
-                        if tool_call_id and tool_call_id in tool_call_ids:
-                            found_ids.add(tool_call_id)
-                            repaired_history.append(next_msg)
-                            j += 1
-                        else:
-                            # This is a tool result for a different tool call - stop here
-                            break
+                # Add tool_results immediately after, in the correct order
+                for tool_call_id in tool_call_ids:
+                    if tool_call_id in tool_results_by_id:
+                        # Found the tool_result - add it in correct position
+                        repaired_history.append(tool_results_by_id[tool_call_id])
+                        # Mark this result as used
+                        del tool_results_by_id[tool_call_id]
                     else:
-                        # Hit a non-tool message - stop looking for tool results
-                        break
-                
-                # Check for orphaned tool calls (tool_calls without matching tool results)
-                missing_ids = set(tool_call_ids) - found_ids
-                if missing_ids:
-                    logger.warning(
-                        f"⚠️ Found {len(missing_ids)} orphaned tool_call(s) without tool_result: {list(missing_ids)}. "
-                        "Adding dummy tool_result(s) to satisfy API requirements."
-                    )
-                    repairs_made += len(missing_ids)
-                    
-                    # Add dummy tool results for missing IDs
-                    for missing_id in missing_ids:
-                        # Find the tool name for better error messages
+                        # Missing tool_result - add dummy
                         tool_name = "unknown"
                         for tc in tool_calls:
-                            if tc.get("id") == missing_id:
+                            if tc.get("id") == tool_call_id:
                                 tool_name = tc.get("function", {}).get("name", "unknown")
                                 break
                         
+                        logger.warning(
+                            f"⚠️ Found orphaned tool_call without tool_result: {tool_call_id} ({tool_name}). "
+                            "Adding dummy tool_result to satisfy API requirements."
+                        )
+                        repairs_made += 1
+                        
                         repaired_history.append({
                             "role": "tool",
-                            "tool_call_id": missing_id,
+                            "tool_call_id": tool_call_id,
                             "name": tool_name,
                             "content": json.dumps({
                                 "error": "Tool result was lost during history loading. This is a repair operation.",
@@ -516,18 +614,34 @@ class BaseAgent:
                                 "tool_name": tool_name
                             })
                         })
-                
-                # Move past the messages we processed
-                i = j
             else:
-                # Regular message - just add it
+                # Regular message (user, assistant without tool_calls, etc.)
                 repaired_history.append(msg)
-                i += 1
+            
+            i += 1
+        
+        # Count how many tool_results we rearranged
+        # (Original position count minus results still in tool_results_by_id)
+        original_tool_result_count = sum(1 for msg in self.messages if msg.get("role") == "tool")
+        results_rearranged = original_tool_result_count - len(tool_results_by_id)
+        
+        # Any tool_results left in tool_results_by_id are truly orphaned (no matching tool_call)
+        for tool_call_id, orphaned_result in tool_results_by_id.items():
+            if tool_call_id not in valid_tool_call_ids:
+                logger.warning(
+                    f"⚠️ Found orphaned tool_result with tool_call_id={tool_call_id}. "
+                    "No matching tool_call found anywhere. Removing."
+                )
+                orphaned_results_removed += 1
         
         # Log if we made any repairs
-        if repairs_made > 0:
+        total_changes = repairs_made + orphaned_results_removed
+        if total_changes > 0 or results_rearranged > 0:
             logger.info(
-                f"🔧 Repaired conversation history: added {repairs_made} dummy tool_result(s) "
+                f"🔧 Repaired conversation history: "
+                f"rearranged {results_rearranged} tool_result(s), "
+                f"added {repairs_made} dummy tool_result(s), "
+                f"removed {orphaned_results_removed} orphaned tool_result(s) "
                 f"({len(self.messages)} -> {len(repaired_history)} messages)"
             )
         
@@ -700,8 +814,12 @@ class BaseAgent:
                     try:
                         function_args = json.loads(tool_call["function"]["arguments"])
                     except json.JSONDecodeError as e:
-                        # Malformed JSON from LLM - report the error
-                        error_msg = f"Invalid JSON in tool call arguments: {str(e)}\nArguments received: {tool_call['function']['arguments'][:100]}..."
+                        # Malformed JSON from LLM - provide a helpful error message
+                        error_msg = self._create_helpful_json_error(
+                            function_name, 
+                            tool_call["function"]["arguments"],
+                            e
+                        )
                         
                         # Yield tool_call event with error
                         yield {

@@ -32,6 +32,7 @@ CONTENT_BRANCH = config["paths"].get("content_branch", "main")
 AGENTS_DIR = WIKICONTENT_PATH / config["paths"].get("agents_dir", "agents")
 AGENTS_FILE = AGENTS_DIR / "agents.json"
 LOGS_DIR = AGENTS_DIR / "logs"
+DEBUG_LOGS_DIR = AGENTS_DIR / "debug_logs"
 COSTS_LOG = AGENTS_DIR / "costs.log"
 
 # Extract other settings
@@ -44,6 +45,7 @@ class AgentConfig:
     def __init__(self):
         self.agents_file = AGENTS_FILE
         self.logs_dir = LOGS_DIR
+        self.debug_logs_dir = DEBUG_LOGS_DIR
         self.costs_log = COSTS_LOG
         
         self._ensure_structure_exists()
@@ -52,6 +54,7 @@ class AgentConfig:
         """Create agents directory structure if needed."""
         AGENTS_DIR.mkdir(parents=True, exist_ok=True)
         self.logs_dir.mkdir(exist_ok=True)
+        self.debug_logs_dir.mkdir(exist_ok=True)
         
         # Create agents.json if missing
         if not self.agents_file.exists():

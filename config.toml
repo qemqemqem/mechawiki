@@ -3,7 +3,7 @@
 story_start = 0
 
 # How many words to advance per chunk
-chunk_size = 5000
+chunk_size = 20000
 
 # Current story being processed
 current_story = "tales_of_wonder"

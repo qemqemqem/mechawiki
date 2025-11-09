@@ -6,8 +6,22 @@ in the wikicontent repository when files are edited by agents.
 """
 import os
 import subprocess
+import threading
 from pathlib import Path
 from typing import Optional, Dict, Any
+
+# Thread-local storage for agent log paths
+_thread_locals = threading.local()
+
+
+def set_agent_log_path(log_path: Optional[Path]):
+    """Set the current agent's log path in thread-local storage."""
+    _thread_locals.agent_log_path = log_path
+
+
+def get_agent_log_path() -> Optional[Path]:
+    """Get the current agent's log path from thread-local storage."""
+    return getattr(_thread_locals, 'agent_log_path', None)
 
 
 def commit_file_change(
@@ -82,6 +96,46 @@ def commit_file_change(
                 "commit_hash": None
             }
         
+        # Also stage agent log file and agent subdirectory if available
+        agent_log_path = get_agent_log_path()
+        agent_log_relative = None
+        agent_subdir_relative = None
+        if agent_log_path:
+            try:
+                # Convert to Path and get relative path from wikicontent_path
+                agent_log_path = Path(agent_log_path)
+                if agent_log_path.is_relative_to(wikicontent_path):
+                    agent_log_relative = str(agent_log_path.relative_to(wikicontent_path))
+                    # Stage the agent log
+                    subprocess.run(
+                        ["git", "add", agent_log_relative],
+                        cwd=wikicontent_path,
+                        capture_output=True,
+                        text=True
+                    )
+                    
+                    # Extract agent ID from log path (e.g., "agent_reader-agent-005.jsonl" -> "reader-agent-005")
+                    log_filename = agent_log_path.name
+                    if log_filename.startswith("agent_"):
+                        agent_id = log_filename[6:].replace(".jsonl", "")  # Remove "agent_" prefix and ".jsonl" suffix
+                        
+                        # Stage the agent's subdirectory (e.g., agents/reader-agent-005/)
+                        agent_subdir = wikicontent_path / "agents" / agent_id
+                        if agent_subdir.exists() and agent_subdir.is_dir():
+                            agent_subdir_relative = f"agents/{agent_id}/"
+                            subprocess.run(
+                                ["git", "add", agent_subdir_relative],
+                                cwd=wikicontent_path,
+                                capture_output=True,
+                                text=True
+                            )
+                    
+                    # Don't fail if staging log/subdir fails - it's optional
+            except (ValueError, OSError):
+                # Log path not relative to wikicontent or other error - skip it
+                agent_log_relative = None
+                agent_subdir_relative = None
+        
         # Generate commit message based on operation
         commit_messages = {
             "edit": f"Edit {filepath}",
@@ -91,6 +145,16 @@ def commit_file_change(
             "delete": f"Delete {filepath}"
         }
         commit_msg = commit_messages.get(operation, f"Update {filepath}")
+        
+        # Add agent context to commit message if included
+        agent_context_parts = []
+        if agent_log_relative:
+            agent_context_parts.append(f"log: {agent_log_relative}")
+        if agent_subdir_relative:
+            agent_context_parts.append(f"agent dir: {agent_subdir_relative}")
+        
+        if agent_context_parts:
+            commit_msg += f" (with {', '.join(agent_context_parts)})"
         
         # Create commit
         result = subprocess.run(

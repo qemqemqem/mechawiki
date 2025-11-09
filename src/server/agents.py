@@ -8,7 +8,7 @@ import queue
 from datetime import datetime
 from pathlib import Path
 from flask import Blueprint, jsonify, request, Response
-from .config import agent_config, WIKICONTENT_PATH
+from .config import agent_config, WIKICONTENT_PATH, AGENTS_DIR
 from .log_watcher import log_manager
 from .agent_manager import agent_manager
 import json
@@ -16,6 +16,51 @@ import json
 logger = logging.getLogger(__name__)
 
 bp = Blueprint('agents', __name__, url_prefix='/api/agents')
+
+
+def _setup_agent_directories(agent_id: str, agent_type: str):
+    """
+    Create agent-specific directory structure based on agent type.
+    
+    All agents get:
+    - agents/{agent_id}/
+    - agents/{agent_id}/scratchpad/
+    
+    WriterAgent and InteractiveAgent get:
+    - agents/{agent_id}/stories/
+    - agents/{agent_id}/stories/story.md
+    
+    WriterAgent gets:
+    - agents/{agent_id}/subplots/
+    """
+    agent_dir = AGENTS_DIR / agent_id
+    
+    # Create base agent directory
+    agent_dir.mkdir(parents=True, exist_ok=True)
+    logger.info(f"📁 Created agent directory: {agent_dir}")
+    
+    # All agents get a scratchpad
+    scratchpad_dir = agent_dir / "scratchpad"
+    scratchpad_dir.mkdir(exist_ok=True)
+    logger.info(f"📝 Created scratchpad: {scratchpad_dir}")
+    
+    # Writer and Interactive agents get stories directory
+    if agent_type in ['WriterAgent', 'InteractiveAgent']:
+        stories_dir = agent_dir / "stories"
+        stories_dir.mkdir(exist_ok=True)
+        
+        # Create initial story.md file
+        story_file = stories_dir / "story.md"
+        if not story_file.exists():
+            story_file.write_text(f"# {agent_id} Story\n\nYour story begins here...\n")
+        
+        logger.info(f"📖 Created stories directory with story.md: {stories_dir}")
+    
+    # Writer agents get subplots directory
+    if agent_type == 'WriterAgent':
+        subplots_dir = agent_dir / "subplots"
+        subplots_dir.mkdir(exist_ok=True)
+        logger.info(f"📚 Created subplots directory: {subplots_dir}")
 
 
 @bp.route('', methods=['GET'])
@@ -69,6 +114,9 @@ def create_agent():
     
     try:
         agent_data_saved = agent_config.add_agent(agent_data)
+        
+        # Set up agent's directory structure
+        _setup_agent_directories(agent_id, data['type'])
         
         # Create empty log file
         log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"

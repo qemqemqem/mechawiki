@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
 from base_agent.base_agent import BaseAgent, ContextLengthExceeded
+from tools.git_helper import set_agent_log_path
 
 
 class AgentRunner:
@@ -58,6 +59,9 @@ class AgentRunner:
         self.agent_config = agent_config or {}
         self.cost_tracker = cost_tracker
         
+        # Set log path on agent for git commit tracking
+        self.agent.log_path = self.log_file
+        
         # Control state
         self.running = False
         self.paused = start_paused  # Can start paused!
@@ -71,8 +75,53 @@ class AgentRunner:
         # Track last reported cost for incremental reporting
         self.last_reported_cost = 0.0
         
+        # Track if user message was injected (so we don't add another prompt)
+        self.user_message_injected = False
+        
+        # Set up debug logging for this agent
+        self.debug_logger = self._setup_debug_logging()
+        
         # Load existing conversation history from log file
         self._load_history_from_log()
+    
+    def _setup_debug_logging(self):
+        """Set up per-agent debug log file handler.
+        
+        Creates a dedicated debug log file at agents/debug_logs/{agent_id}.log
+        for capturing all Python logging output for this specific agent.
+        
+        Returns:
+            logging.Logger: Configured logger for this agent
+        """
+        # Import config here to avoid circular imports
+        from server.config import agent_config
+        
+        # Create a logger specific to this agent
+        debug_logger = logging.getLogger(f"agent.{self.agent_id}")
+        debug_logger.setLevel(logging.DEBUG)
+        
+        # Create file handler for debug logs
+        debug_log_file = agent_config.debug_logs_dir / f"{self.agent_id}.log"
+        file_handler = logging.FileHandler(debug_log_file, mode='a')
+        file_handler.setLevel(logging.DEBUG)
+        
+        # Create detailed formatter for debug logs
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+        file_handler.setFormatter(formatter)
+        
+        # Add handler to this agent's logger
+        debug_logger.addHandler(file_handler)
+        
+        # Log the initialization
+        debug_logger.info("=" * 80)
+        debug_logger.info(f"🔍 Debug logging initialized for agent: {self.agent_id}")
+        debug_logger.info(f"📁 Log file: {debug_log_file}")
+        debug_logger.info("=" * 80)
+        
+        return debug_logger
     
     def _load_history_from_log(self):
         """Load conversation history from existing log file.
@@ -278,6 +327,15 @@ class AgentRunner:
             # Log event immediately
             self._log(event)
             
+            # Debug log for tool calls and status changes
+            if event_type == 'tool_call':
+                self.debug_logger.debug(f"🔧 Tool call: {event.get('tool')}({event.get('args', {})})")
+            elif event_type == 'tool_result':
+                result_preview = str(event.get('result', ''))[:100]
+                self.debug_logger.debug(f"📦 Tool result: {result_preview}...")
+            elif event_type == 'status':
+                self.debug_logger.info(f"🔄 Status change: {event.get('status')} - {event.get('message', '')}")
+            
             # Special handling for waiting_for_input
             if event_type == 'status' and event.get('status') == 'waiting_for_input':
                 return 'wait_for_input'  # Signal to break turn
@@ -289,7 +347,7 @@ class AgentRunner:
         return None
     
     def _check_control_signals(self):
-        """Check log file for pause/resume/archive commands."""
+        """Check log file for pause/resume/archive commands AND user messages."""
         if not self.log_file.exists():
             return
         
@@ -310,10 +368,24 @@ class AgentRunner:
                             
                             if status == 'paused':
                                 self.paused = True
+                                self.debug_logger.info("⏸️ Received PAUSE signal from control log")
                             elif status == 'running' and self.paused:
                                 self.paused = False
+                                self.debug_logger.info("▶️ Received RESUME signal from control log")
                             elif status == 'archived':
                                 self.running = False
+                                self.debug_logger.info("📦 Received ARCHIVE signal - shutting down")
+                        
+                        # Look for user messages and inject them into conversation
+                        elif entry.get('type') == 'user_message':
+                            user_content = entry.get('content', '')
+                            if user_content:
+                                # Add to agent's conversation history
+                                self.agent.add_user_message(user_content)
+                                # Set flag so we don't add another prompt
+                                self.user_message_injected = True
+                                logger.info(f"💬 Injected user message into {self.agent_id}: {user_content[:50]}...")
+                                self.debug_logger.info(f"💬 User message injected: {user_content[:100]}...")
                     
                     except json.JSONDecodeError:
                         continue
@@ -376,11 +448,16 @@ class AgentRunner:
     
     def _run_loop(self):
         """Main agent loop - consume events and log them."""
+        # Set thread-local agent log path for git commits
+        set_agent_log_path(self.log_file)
+        
         # Log initial status based on paused state
         if self.paused:
             self._log({'type': 'status', 'status': 'paused', 'message': 'Agent started (paused)', 'source': 'agent_runner._run_loop.initial_paused'})
+            self.debug_logger.info("🟡 Agent starting in PAUSED state")
         else:
             self._log({'type': 'status', 'status': 'running', 'message': 'Agent started', 'source': 'agent_runner._run_loop.initial_running'})
+            self.debug_logger.info("🟢 Agent starting in RUNNING state")
         
         initial_prompt = self.agent_config.get(
             'initial_prompt',
@@ -388,12 +465,17 @@ class AgentRunner:
         )
         
         while self.running:
-            # Check for control signals
+            # Check for control signals and user messages
             self._check_control_signals()
             
             if self.paused:
                 time.sleep(0.5)
                 continue
+            
+            # If user message was injected, don't add another prompt
+            if self.user_message_injected:
+                initial_prompt = None
+                self.user_message_injected = False
             
             try:
                 # Consume events from agent generator

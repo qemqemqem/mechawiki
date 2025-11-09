@@ -7,6 +7,7 @@ import toml
 import requests
 from pathlib import Path
 from typing import Optional
+from .git_helper import commit_file_change
 
 # Load config once at module level
 try:
@@ -222,8 +223,11 @@ def create_image(art_prompt: str, name: str, orientation: str = "landscape"):
     # Get relative path from content repo
     rel_path = image_path.relative_to(_content_repo_path)
     
+    # Commit the new image to git
+    git_result = commit_file_change(str(rel_path), operation="create", wikicontent_path=_content_repo_path)
+    
     # Return structured data for log watcher
-    return {
+    result = {
         "file_path": str(rel_path),
         "lines_added": 1,  # Represent new image as 1 "line"
         "lines_removed": 0,
@@ -237,6 +241,13 @@ def create_image(art_prompt: str, name: str, orientation: str = "landscape"):
         "size": image_size,
         "generator": generator
     }
+    
+    # Add git commit info to result
+    if git_result["committed"]:
+        result["git_commit"] = git_result["commit_hash"]
+        result["git_message"] = git_result["message"]
+    
+    return result
 
 
 if __name__ == "__main__":

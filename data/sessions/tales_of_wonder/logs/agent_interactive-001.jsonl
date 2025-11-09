@@ -145,3 +145,5 @@
 {"type": "tool_result", "tool": "wait_for_user", "result": {"_waiting_for_input": true, "message": "Waiting for user input"}, "timestamp": "2025-11-09T10:15:00.512712"}
 {"timestamp": "2025-11-09T10:15:31.752526", "type": "status", "status": "archived", "message": "Archived by user"}
 {"type": "status", "status": "stopped", "message": "Agent stopped", "source": "agent_runner._run_loop.final_stop", "timestamp": "2025-11-09T10:15:33.154764"}
+{"type": "status", "status": "paused", "message": "Agent started (paused)", "source": "agent_runner._run_loop.initial_paused", "timestamp": "2025-11-09T10:23:11.841393"}
+{"type": "status", "status": "stopped", "message": "Agent stopped", "source": "agent_runner._run_loop.final_stop", "timestamp": "2025-11-09T10:23:12.349132"}

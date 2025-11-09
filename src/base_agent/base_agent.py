@@ -663,7 +663,45 @@ class BaseAgent:
                 # Execute each tool call
                 for tool_call in valid_tool_calls:
                     function_name = tool_call["function"]["name"]
-                    function_args = json.loads(tool_call["function"]["arguments"])
+                    
+                    # Parse tool call arguments with error handling
+                    try:
+                        function_args = json.loads(tool_call["function"]["arguments"])
+                    except json.JSONDecodeError as e:
+                        # Malformed JSON from LLM - report the error
+                        error_msg = f"Invalid JSON in tool call arguments: {str(e)}\nArguments received: {tool_call['function']['arguments'][:100]}..."
+                        
+                        # Yield tool_call event with error
+                        yield {
+                            'type': 'tool_call',
+                            'tool': function_name,
+                            'args': None,
+                            'error': error_msg
+                        }
+                        
+                        # Create error result to send back to LLM
+                        raw_result = {
+                            'error': error_msg,
+                            'success': False
+                        }
+                        
+                        # Add tool result to messages
+                        tool_result_message = {
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "content": json.dumps(raw_result)
+                        }
+                        self.messages.append(tool_result_message)
+                        
+                        # Yield tool_result event
+                        yield {
+                            'type': 'tool_result',
+                            'tool': function_name,
+                            'result': raw_result
+                        }
+                        
+                        # Skip to next tool call
+                        continue
                     
                     # Yield tool_call event
                     yield {

@@ -17,6 +17,7 @@
   --status-running: #8FB8A0;
   --status-waiting: #F5C518;
   --status-paused: #C8B6E2;
+  --status-finished: #10B981;
   --status-stopped: #B0B0C0;
   
   /* Spacing */

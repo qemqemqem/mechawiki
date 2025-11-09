@@ -10,6 +10,8 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [fileChanges, setFileChanges] = useState([])
   const [isConnected, setIsConnected] = useState(false)
+  const [sessionCost, setSessionCost] = useState(null)
+  const [exactCost, setExactCost] = useState(null)
   const [leftPaneWidth, setLeftPaneWidth] = useState(50) // Percentage
   const [isResizing, setIsResizing] = useState(false)
 
@@ -18,6 +20,22 @@ function App() {
     fetchAgents()
     fetchInitialFiles()
     connectToFileFeed()
+    fetchSessionCost() // Initial fetch
+    
+    // Poll for agent status updates every 2 seconds
+    const pollInterval = setInterval(() => {
+      fetchAgents()
+    }, 2000)
+    
+    // Poll for session cost every 10 seconds
+    const costPollInterval = setInterval(() => {
+      fetchSessionCost()
+    }, 10000)
+    
+    return () => {
+      clearInterval(pollInterval)
+      clearInterval(costPollInterval)
+    }
   }, [])
 
   // Handle resize drag
@@ -60,6 +78,21 @@ function App() {
     } catch (error) {
       console.error('Error fetching agents:', error)
       setIsConnected(false)
+    }
+  }
+
+  const fetchSessionCost = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/agents/session/cost')
+      const data = await response.json()
+      // Store both formatted and exact values
+      if (data.total_cost_dollars) {
+        setSessionCost(data.total_cost_dollars)
+        setExactCost(data.total_cost)
+      }
+    } catch (error) {
+      console.error('Error fetching session cost:', error)
+      // Don't show cost if fetch fails
     }
   }
 
@@ -222,7 +255,7 @@ function App() {
 
   return (
     <div className="app">
-      <TopBar isConnected={isConnected} />
+      <TopBar isConnected={isConnected} sessionCost={sessionCost} exactCost={exactCost} />
       
       <div className="app-content">
         <div 
@@ -240,6 +273,7 @@ function App() {
             onPauseAll={handlePauseAll}
             onResumeAll={handleResumeAll}
             onSendMessage={handleSendMessage}
+            onOpenFile={setSelectedFile}
           />
         </div>
         

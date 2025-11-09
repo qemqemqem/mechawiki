@@ -18,6 +18,7 @@ from base_agent.base_agent import BaseAgent, EndConversation
 # from tools.images import create_image  # Too slow for dev
 from tools.search import find_articles, find_images, find_songs, find_files
 from tools.articles import read_article
+from agents.prompts.loader import build_agent_prompt
 from utils.git import ensure_content_branch
 
 # Load config
@@ -91,12 +92,17 @@ class ReaderAgent(BaseAgent):
     Manages story content via HighlightContent system to prevent context bloat.
     """
     
-    def __init__(self, **kwargs):
-        """Initialize the ReaderAgent with story reading tools."""
+    def __init__(self, story_file: str = "story.txt", **kwargs):
+        """Initialize the ReaderAgent with story reading tools.
         
-        # Load the configured story
-        story_name = config["story"]["current_story"]
-        story_path = Path(config["paths"]["content_repo"]) / "story.txt"
+        Args:
+            story_file: Path to story file relative to content repo (default: "story.txt")
+            **kwargs: Additional arguments passed to BaseAgent
+        """
+        
+        # Load the story file
+        story_path = Path(config["paths"]["content_repo"]) / story_file
+        story_name = story_file  # Use filename as story name
         
         # Initialize story window
         self.story_window = StoryWindow(story_path)
@@ -113,28 +119,17 @@ class ReaderAgent(BaseAgent):
             {"type": "function", "function": litellm.utils.function_to_dict(read_article), "_function": read_article},
         ]
         
-        # Enhanced system prompt for story reading
-        system_prompt = f"""You are a story reader agent processing "{story_name}".
+        # Load base system prompt from files and add story-specific context
+        base_prompt = build_agent_prompt("reader", include_tools=True)
+        system_prompt = f"""{base_prompt}
 
-Your mission: Read through the story chunk by chunk, briefly commenting on the content.
+---
 
-The current story section will be provided via the advance() tool using highlighted content.
-Focus on understanding the narrative, characters, settings, and notable story elements.
+## Current Story Context
 
-When you advance, the story content becomes available for analysis. Briefly tell me your favorite part of the story so far. Create an image if you think the image would be cool.
+You are currently reading: **{story_name}**
 
-SEARCH CAPABILITIES:
-- Use find_articles(search_term) to search for existing articles about story elements
-- Use find_images(search_term) to find existing images related to characters/locations
-- Use find_songs(search_term) to find existing audio content
-- Use find_files(search_term) to search across all content types
-- Use "*" as search term to get all files of that type
-
-ARTICLE READING:
-- Use read_article(article_name) to read the full contents of a specific article
-- Article name can be with or without .md extension
-- Search is case-insensitive and supports partial matches
-
+The story content will be provided via the advance() tool using highlighted content.
 Read systematically through the entire story, advancing the window as you go."""
 
         # Initialize base agent

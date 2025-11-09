@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.tools.interactive import wait_for_user, get_session_state, WaitingForInput
+from src.tools.interactive import wait_for_user, get_session_state, done, WaitingForInput, Finished
 
 
 class TestWaitForUser:
@@ -19,25 +19,21 @@ class TestWaitForUser:
         
         assert isinstance(result, WaitingForInput)
     
-    def test_includes_custom_prompt(self):
-        """Should include custom prompt in sentinel."""
-        custom_prompt = "What do you want to do next?"
-        result = wait_for_user(custom_prompt)
-        
-        assert result.prompt == custom_prompt
-    
-    def test_has_default_prompt(self):
-        """Should have default prompt."""
+    def test_accepts_no_arguments(self):
+        """Should not require any arguments."""
+        # Should not raise an exception
         result = wait_for_user()
         
-        assert result.prompt == "What would you like to do?"
+        assert isinstance(result, WaitingForInput)
     
-    def test_different_prompts_create_different_objects(self):
-        """Should create distinct objects for different prompts."""
-        result1 = wait_for_user("Prompt 1")
-        result2 = wait_for_user("Prompt 2")
+    def test_returns_simple_sentinel(self):
+        """Should return a simple sentinel without attributes."""
+        result = wait_for_user()
         
-        assert result1.prompt != result2.prompt
+        # Should be a WaitingForInput instance
+        assert isinstance(result, WaitingForInput)
+        # Should not have a prompt attribute
+        assert not hasattr(result, 'prompt')
 
 
 class TestGetSessionState:
@@ -72,17 +68,18 @@ class TestGetSessionState:
 class TestWaitingForInputSentinel:
     """Test the WaitingForInput sentinel class."""
     
-    def test_can_create_with_custom_prompt(self):
-        """Should create sentinel with custom prompt."""
-        sentinel = WaitingForInput("Custom prompt")
-        
-        assert sentinel.prompt == "Custom prompt"
-    
-    def test_has_default_prompt(self):
-        """Should have default prompt."""
+    def test_can_create_instance(self):
+        """Should create sentinel instance."""
         sentinel = WaitingForInput()
         
-        assert "Waiting" in sentinel.prompt or "waiting" in sentinel.prompt
+        assert isinstance(sentinel, WaitingForInput)
+    
+    def test_is_simple_sentinel(self):
+        """Should be a simple sentinel without data."""
+        sentinel = WaitingForInput()
+        
+        # Should not have a prompt attribute
+        assert not hasattr(sentinel, 'prompt')
     
     def test_is_distinct_type(self):
         """Should be distinguishable from other types."""
@@ -91,6 +88,57 @@ class TestWaitingForInputSentinel:
         assert not isinstance(sentinel, dict)
         assert not isinstance(sentinel, str)
         assert isinstance(sentinel, WaitingForInput)
+
+
+class TestDone:
+    """Test done functionality."""
+    
+    def test_returns_finished_sentinel(self):
+        """Should return Finished sentinel object."""
+        result = done()
+        
+        assert isinstance(result, Finished)
+    
+    def test_accepts_no_arguments(self):
+        """Should not require any arguments."""
+        # Should not raise an exception
+        result = done()
+        
+        assert isinstance(result, Finished)
+    
+    def test_returns_simple_sentinel(self):
+        """Should return a simple sentinel without attributes."""
+        result = done()
+        
+        # Should be a Finished instance
+        assert isinstance(result, Finished)
+
+
+class TestFinishedSentinel:
+    """Test the Finished sentinel class."""
+    
+    def test_can_create_instance(self):
+        """Should create sentinel instance."""
+        sentinel = Finished()
+        
+        assert isinstance(sentinel, Finished)
+    
+    def test_is_simple_sentinel(self):
+        """Should be a simple sentinel without data."""
+        sentinel = Finished()
+        
+        # Should not have extra attributes
+        # (just checking it's a simple class)
+        assert isinstance(sentinel, Finished)
+    
+    def test_is_distinct_type(self):
+        """Should be distinguishable from other types."""
+        sentinel = Finished()
+        
+        assert not isinstance(sentinel, dict)
+        assert not isinstance(sentinel, str)
+        assert not isinstance(sentinel, WaitingForInput)
+        assert isinstance(sentinel, Finished)
 
 
 if __name__ == "__main__":

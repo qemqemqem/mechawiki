@@ -1,19 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './FileViewer.css'
 
-function FileViewer({ filePath, onBack, onNavigate, onTitleExtracted }) {
+function FileViewer({ filePath, fileChanges, onBack, onNavigate, onTitleExtracted }) {
   const [content, setContent] = useState('')
   const [editMode, setEditMode] = useState(false)
   const [editedContent, setEditedContent] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const lastChangeTimestamp = useRef(null)
 
   useEffect(() => {
+    // Reset the timestamp tracker when switching files
+    lastChangeTimestamp.current = null
     fetchFile()
   }, [filePath])
+
+  // Watch for changes to the current file and auto-reload
+  useEffect(() => {
+    if (!filePath || !fileChanges || editMode) return
+
+    // Find the most recent change for the current file
+    const currentFileChanges = fileChanges.filter(change => change.file_path === filePath)
+    
+    if (currentFileChanges.length === 0) return
+
+    // Get the most recent change
+    const latestChange = currentFileChanges[0]
+    
+    // Only reload if this is a new change we haven't seen before
+    if (lastChangeTimestamp.current !== latestChange.timestamp) {
+      const wasInitialLoad = lastChangeTimestamp.current === null
+      lastChangeTimestamp.current = latestChange.timestamp
+      
+      // Skip the first load, but reload on all subsequent changes
+      if (!wasInitialLoad) {
+        console.log(`🔄 Auto-reloading ${filePath} due to file system change`)
+        fetchFile()
+      }
+    }
+  }, [fileChanges, filePath, editMode])
 
   // Extract title from markdown content (first H1)
   const extractTitle = (markdown) => {

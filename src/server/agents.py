@@ -68,7 +68,7 @@ def create_agent():
         log_file.write_text('')
         
         # Start watching this agent's log
-        log_manager.start_watching_agent(agent_id, str(log_file))
+        log_manager.start_watching_agent(agent_id, str(log_file), agent_config.get('config', {}))
         
         # Start the agent instance (unpaused by default)
         wikicontent_path = Path.home() / "Dev" / "wikicontent"
@@ -211,6 +211,34 @@ def send_message(agent_id):
     
     logger.info(f"💬 Sent message to agent {agent_id}: {message[:50]}...")
     return jsonify({"status": "sent"})
+
+
+@bp.route('/<agent_id>/reload', methods=['POST'])
+def reload_agent(agent_id):
+    """Reload agent status from logs."""
+    agent = session_config.get_agent(agent_id)
+    
+    if not agent:
+        return jsonify({"error": "Agent not found"}), 404
+    
+    # Force re-read of log file
+    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_manager.start_watching_agent(agent_id, str(log_file), agent.get('config'))
+    
+    logger.info(f"🔄 Reloaded agent: {agent_id}")
+    return jsonify({"status": "reloaded"})
+
+
+@bp.route('/session/cost', methods=['GET'])
+def get_session_cost():
+    """Get session-wide cost statistics."""
+    from .cost_tracker import get_cost_tracker
+    tracker = get_cost_tracker()
+    
+    if not tracker:
+        return jsonify({"error": "Cost tracker not initialized"}), 500
+    
+    return jsonify(tracker.get_stats())
 
 
 @bp.route('/<agent_id>/logs', methods=['GET'])

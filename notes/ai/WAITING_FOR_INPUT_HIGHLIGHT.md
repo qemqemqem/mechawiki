@@ -25,15 +25,20 @@ When an agent logs a "waiting_for_input" status, the UI now prominently displays
 
 ### Backend
 1. Agent calls "waiting for input" and logs: `{"type": "status", "status": "waiting_for_input", ...}`
-2. `LogManager._update_agent_status()` reads this from the log file
-3. Status is cached and returned via `/api/agents` endpoint
+2. `LogFileHandler` detects the log file change and reads new entries
+3. `LogManager._update_agent_status()` updates the cached status
+4. Status is returned via `/api/agents` endpoint
 
-### Frontend
-1. `App.jsx` fetches agents every cycle (or through polling)
+### Frontend  
+1. `App.jsx` polls `/api/agents` every 2 seconds for status updates
 2. `CommandCenter` receives agent with `status: "waiting_for_input"`
 3. Status indicator bubble gets `.status-waiting` class (yellow pulsing)
 4. Agent card gets `.agent-waiting` class (yellow glow)
 5. Status label shows "Waiting for input"
+
+## Fix Applied
+**Issue**: Frontend was only fetching agents on mount, not polling for updates.  
+**Solution**: Added 2-second polling interval in `App.jsx` to continuously fetch latest agent status.
 
 ## Visual Result
 - **Status Bubble**: Bright yellow with urgent pulsing animation (1.5s cycle)

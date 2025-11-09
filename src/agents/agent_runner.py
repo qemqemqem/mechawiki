@@ -61,6 +61,9 @@ class AgentRunner:
         # Message accumulation (line-at-a-time buffering)
         self.accumulated_text = ""
         self.accumulated_thinking = ""
+        
+        # Track last reported cost for incremental reporting
+        self.last_reported_cost = 0.0
     
     def _log(self, log_entry: Dict):
         """Write JSONL log entry with timestamp."""
@@ -86,6 +89,27 @@ class AgentRunner:
                 'content': self.accumulated_thinking
             })
             self.accumulated_thinking = ""
+    
+    def _report_cost_to_tracker(self):
+        """Report incremental cost to session tracker."""
+        # Get current total cost from agent
+        current_cost = self.agent.total_cost
+        
+        # Calculate incremental cost since last report
+        incremental_cost = current_cost - self.last_reported_cost
+        
+        if incremental_cost > 0:
+            # Report to session tracker
+            try:
+                # Import here to avoid circular imports
+                from ..server.cost_tracker import get_cost_tracker
+                tracker = get_cost_tracker()
+                if tracker:
+                    tracker.add_cost(self.agent_id, incremental_cost)
+                    self.last_reported_cost = current_cost
+            except Exception:
+                # If tracker not available (e.g., running standalone), skip
+                pass
     
     def _handle_event(self, event: Dict) -> Optional[str]:
         """
@@ -126,6 +150,10 @@ class AgentRunner:
             # Special handling for waiting_for_input
             if event_type == 'status' and event.get('status') == 'waiting_for_input':
                 return 'wait_for_input'  # Signal to break turn
+            
+            # Special handling for finished
+            if event_type == 'status' and event.get('status') == 'finished':
+                return 'finished'  # Signal to finish agent
         
         return None
     
@@ -239,6 +267,7 @@ class AgentRunner:
             try:
                 # Consume events from agent generator
                 waiting_for_user = False
+                agent_finished = False
                 for event in self.agent.run_forever(initial_prompt, max_turns=1):
                     signal = self._handle_event(event)
                     
@@ -246,10 +275,23 @@ class AgentRunner:
                         # Mark that we'll wait, but DON'T break yet
                         # We need to consume remaining events (like tool_result)
                         waiting_for_user = True
+                    
+                    if signal == 'finished':
+                        # Mark that agent is finished, but DON'T break yet
+                        # We need to consume remaining events (like tool_result)
+                        agent_finished = True
                 
                 # Flush any remaining content at turn end
                 self._flush_text()
                 self._flush_thinking()
+                
+                # Report cost to session tracker
+                self._report_cost_to_tracker()
+                
+                # If agent marked as finished, stop running
+                if agent_finished:
+                    self.running = False
+                    break
                 
                 # If waiting for user input, poll for user_message in log
                 if waiting_for_user:

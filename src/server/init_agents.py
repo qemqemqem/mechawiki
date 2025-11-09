@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Initialize dumb test agents for the dev session.
+Initialize test agents for the dev session.
 
-Creates several mock agents (reader, writer, researcher) that run in the background
-and generate random activity for testing the UI.
+This creates a clean dev_session with proper agents.json and config.yaml,
+then lets the normal initialization flow take over.
 """
 import sys
 import os
@@ -19,11 +19,28 @@ from agents.mock_agent import MockAgent
 
 
 def init_test_agents():
-    """Initialize test agents in the dev session."""
+    """Initialize test agents in the dev session.
+    
+    This function:
+    1. Cleans up the dev_session directory (removes old logs)
+    2. Writes a proper agents.json with full configs including story files
+    3. Writes config.yaml if needed
+    4. Normal startup then reads from these files
+    """
     
     print("🤖 Initializing test agents...")
+    print("🧹 Cleaning dev_session directory...")
     
-    # Define test agents - one of each type
+    # Clean up logs directory
+    logs_dir = session_config.logs_dir
+    if logs_dir.exists():
+        for log_file in logs_dir.glob("*.jsonl"):
+            log_file.unlink()
+            print(f"  🗑️  Deleted: {log_file.name}")
+    else:
+        logs_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Define test agents with full configs including story files
     test_agents = [
         {
             "id": "reader-001",
@@ -32,8 +49,11 @@ def init_test_agents():
             "config": {
                 "description": "Reads stories and creates wiki articles",
                 "initial_prompt": "Start by listing some articles in the articles directory. Then advance through the story and comment on what you find interesting.",
-                "model": "claude-haiku-4-5-20251001"
-            }
+                "model": "claude-haiku-4-5-20251001",
+                "story_file": "story.txt"  # The full Tales of Wonder story
+            },
+            "created_at": datetime.now().isoformat(),
+            "log_file": "logs/agent_reader-001.jsonl"
         },
         {
             "id": "writer-001",
@@ -42,8 +62,11 @@ def init_test_agents():
             "config": {
                 "description": "Writes stories from wiki content",
                 "initial_prompt": "Search for some articles to get inspiration, then write a short story based on wiki content.",
-                "model": "claude-haiku-4-5-20251001"
-            }
+                "model": "claude-haiku-4-5-20251001",
+                "story_file": "stories/writer_story.md"  # Writer's output file
+            },
+            "created_at": datetime.now().isoformat(),
+            "log_file": "logs/agent_writer-001.jsonl"
         },
         {
             "id": "interactive-001",
@@ -52,31 +75,36 @@ def init_test_agents():
             "config": {
                 "description": "Creates interactive experiences",
                 "initial_prompt": "Create an interactive adventure. Set the scene and ask the user what they want to do using wait_for_user().",
-                "model": "claude-haiku-4-5-20251001"
-            }
+                "model": "claude-haiku-4-5-20251001",
+                "story_file": "stories/interactive_adventure.md"  # Interactive story output
+            },
+            "created_at": datetime.now().isoformat(),
+            "log_file": "logs/agent_interactive-001.jsonl"
         }
     ]
     
-    # Add agents to session config
-    for agent_data in test_agents:
-        # Check if agent already exists
-        existing = session_config.get_agent(agent_data["id"])
-        if existing:
-            print(f"  ⏭️  Agent {agent_data['id']} already exists")
-            continue
-        
-        # Add to config (SessionConfig.add_agent expects a dict)
-        session_config.add_agent(agent_data)
-        
-        # Create empty log file
-        log_file = session_config.logs_dir / f"agent_{agent_data['id']}.jsonl"
-        log_file.touch()
-        
-        print(f"  ✅ Created agent {agent_data['id']} ({agent_data['name']})")
+    # Write agents.json directly
+    agents_file = session_config.agents_file
+    agents_data = {"agents": test_agents}
     
+    with open(agents_file, 'w') as f:
+        json.dump(agents_data, f, indent=2)
+    
+    print(f"  ✅ Wrote: agents.json with {len(test_agents)} agents")
+    
+    # Write config.yaml (if it doesn't exist or needs updating)
+    config_file = session_config.session_dir / "config.yaml"
+    config_data = f"""created_at: '{datetime.now().isoformat()}'
+session_name: dev_session
+wikicontent_branch: tales_of_wonder/main
+"""
+    with open(config_file, 'w') as f:
+        f.write(config_data)
+    
+    print(f"  ✅ Wrote: config.yaml")
     print(f"\n✨ Test agents initialized in session '{session_config.session_name}'")
-    print(f"📝 Config: {session_config.agents_file}")
-    print(f"📁 Logs: {session_config.logs_dir}")
+    print(f"📝 Config: {agents_file}")
+    print(f"📁 Logs: {logs_dir}")
 
 
 def start_test_agents(agent_manager=None):

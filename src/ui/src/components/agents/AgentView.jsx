@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './AgentView.css'
 
-function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage }) {
+function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage, onOpenFile }) {
   const [logs, setLogs] = useState([])
   const [message, setMessage] = useState('')
   const [showTimestamps, setShowTimestamps] = useState(false)
@@ -118,8 +118,8 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
     if (toolName === 'edit_article' && (toolArgs.article_name || toolArgs.title)) {
       return `${displayName}: ${toolArgs.article_name || toolArgs.title}`
     }
-    if (toolName === 'list_articles_in_directory' && toolArgs.directory) {
-      return `${displayName}: ${toolArgs.directory}`
+    if (toolName === 'list_articles_in_directory') {
+      return `${displayName}: ${toolArgs.directory || 'articles'}`
     }
     if ((toolName === 'read_file' || toolName === 'edit_file') && toolArgs.filepath) {
       return `${displayName}: ${toolArgs.filepath}`
@@ -291,6 +291,18 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
       <div className="agent-view-options">
         <div className="agent-info-compact">
           {agent.type} • {agent.status}
+          {agent.story_file && (
+            <>
+              {' • '}
+              <button 
+                className="story-link" 
+                onClick={() => onOpenFile(agent.story_file)}
+                title={`Open ${agent.story_file}`}
+              >
+                📖 Story
+              </button>
+            </>
+          )}
         </div>
         <label className="timestamp-checkbox">
           <input

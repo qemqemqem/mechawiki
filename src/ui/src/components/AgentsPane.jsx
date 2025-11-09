@@ -14,7 +14,8 @@ function AgentsPane({
   onArchiveAgent,
   onPauseAll,
   onResumeAll,
-  onSendMessage
+  onSendMessage,
+  onOpenFile
 }) {
   const [showNewAgentModal, setShowNewAgentModal] = useState(false)
 
@@ -52,6 +53,7 @@ function AgentsPane({
             onResume={() => onResumeAgent(selectedAgent.id)}
             onArchive={() => onArchiveAgent(selectedAgent.id)}
             onSendMessage={(message) => onSendMessage(selectedAgent.id, message)}
+            onOpenFile={onOpenFile}
           />
         ) : (
           <CommandCenter

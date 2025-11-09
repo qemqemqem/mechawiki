@@ -24,6 +24,10 @@ from .log_watcher import init_log_manager
 from .config import session_config
 log_manager = init_log_manager(session_config.logs_dir)
 
+# Initialize cost tracker
+from .cost_tracker import init_cost_tracker
+cost_tracker = init_cost_tracker(session_config.session_dir)
+
 # Initialize agent manager
 from .agent_manager import agent_manager
 
@@ -39,7 +43,7 @@ def init_and_start_agents():
     for agent in session_config.list_agents():
         log_file = session_config.logs_dir / f"agent_{agent['id']}.jsonl"
         if log_file.exists():
-            log_manager.start_watching_agent(agent['id'], str(log_file))
+            log_manager.start_watching_agent(agent['id'], str(log_file), agent.get('config'))
 
 # Import routes (after app creation to avoid circular imports)
 from . import agents, files, health

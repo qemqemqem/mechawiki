@@ -34,6 +34,25 @@
   font-weight: 500;
 }
 
+.story-link {
+  display: inline;
+  padding: 2px 8px;
+  font-size: 0.9rem;
+  background: rgba(123, 146, 212, 0.15);
+  border: 1px solid rgba(123, 146, 212, 0.3);
+  border-radius: 12px;
+  color: var(--medieval-blue);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.story-link:hover {
+  background: rgba(123, 146, 212, 0.25);
+  border-color: rgba(123, 146, 212, 0.5);
+  transform: translateY(-1px);
+}
+
 .timestamp-checkbox {
   display: flex;
   align-items: center;

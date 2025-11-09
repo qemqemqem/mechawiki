@@ -94,11 +94,20 @@ class AgentManager:
                 use_real_agent = False
             else:
                 # Create real agent instance
-                # TODO: Pass proper config from agent_config
-                agent_instance = agent_class(
-                    model=agent_config.get('model', 'claude-haiku-4-5-20251001'),
-                    # Add more config as needed
-                )
+                # Pass story_file and other configs
+                init_params = {
+                    'model': agent_config.get('model', 'claude-haiku-4-5-20251001'),
+                }
+                
+                # Add story_file if specified in config
+                if 'story_file' in agent_config:
+                    init_params['story_file'] = agent_config['story_file']
+                
+                # Add agent_id for WriterAgent (needed for rename tool)
+                if agent_type == 'WriterAgent':
+                    init_params['agent_id'] = agent_id
+                
+                agent_instance = agent_class(**init_params)
                 
                 # Wrap in AgentRunner
                 runner = AgentRunner(

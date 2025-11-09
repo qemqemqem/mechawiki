@@ -97,14 +97,25 @@ class LogManager:
         
         logger.info(f"📁 Started watching agent logs in {logs_dir}")
     
-    def start_watching_agent(self, agent_id: str, log_file: str):
-        """Start watching a specific agent's log."""
+    def start_watching_agent(self, agent_id: str, log_file: str, agent_config: dict = None):
+        """Start watching a specific agent's log.
+        
+        Args:
+            agent_id: ID of the agent
+            log_file: Path to agent's log file
+            agent_config: Agent configuration dict (should contain 'story_file' key)
+        """
         # Initialize status
         self.agent_status[agent_id] = {
             "status": "stopped",
             "last_action": None,
-            "last_action_time": None
+            "last_action_time": None,
+            "story_file": None
         }
+        
+        # Get story file from agent config
+        if agent_config and 'story_file' in agent_config:
+            self.agent_status[agent_id]["story_file"] = agent_config['story_file']
         
         # Read existing log to build initial status
         log_path = Path(log_file)

@@ -48,6 +48,7 @@ function FilesPane({ fileChanges, selectedFile, onSelectFile }) {
         {selectedFile ? (
           <FileViewer
             filePath={selectedFile}
+            fileChanges={fileChanges}
             onBack={handleBackToFeed}
             onNavigate={onSelectFile}
             onTitleExtracted={handleTitleExtracted}

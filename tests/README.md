@@ -46,6 +46,16 @@ Tests for BaseAgent event generation and tool execution.
 ### `test_agent_runner.py`
 Tests for AgentRunner's event consumption and JSONL logging.
 
+### `test_rename_story.py`
+Tests for WriterAgent's `rename_my_story()` tool and the underlying `rename_story_file()` utility:
+- File renaming and content preservation
+- Directory creation for target paths
+- Agent attribute and system prompt updates
+- Integration with `add_to_story()` after rename
+- Error handling for missing/duplicate files
+
+**Coverage:** 13 tests covering utility function, agent tool behavior, and integration scenarios.
+
 ## Writing Tests
 
 ### Test Structure

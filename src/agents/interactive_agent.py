@@ -17,6 +17,7 @@ from tools.articles import (
     search_articles,
     list_articles_in_directory
 )
+from agents.prompts.loader import build_agent_prompt
 # from tools.images import create_image  # Too slow for dev
 import litellm
 
@@ -31,6 +32,7 @@ class InteractiveAgent(BaseAgent):
     def __init__(
         self,
         model: str = "claude-haiku-4-5-20251001",
+        story_file: str = "stories/interactive_adventure.md",
         system_prompt: str = None,
         memory: dict = None,
         stream: bool = True
@@ -40,41 +42,15 @@ class InteractiveAgent(BaseAgent):
         
         Args:
             model: LLM model to use
+            story_file: Default story file for interactive adventures (default: "stories/interactive_adventure.md")
             system_prompt: Optional custom system prompt
             memory: Optional initial memory dict
             stream: Whether to stream responses
         """
-        # Default system prompt for InteractiveAgent
+        self.story_file = story_file
+        # Load system prompt from files if not provided
         if system_prompt is None:
-            system_prompt = """You are an InteractiveAgent for collaborative storytelling.
-
-Your role is to:
-- Create engaging, interactive narrative experiences
-- Present choices to the user at key story moments
-- Respond to user input and branch the story accordingly
-- Reference wiki articles to maintain world consistency
-- Create memorable characters, scenes, and decisions
-
-You have access to:
-- Interactive tools (wait_for_user, get_session_state)
-- File operations (read_file, edit_file) - Read and edit ANY file in wikicontent
-- Story writing (add_to_story) - Append narrative prose to story files
-- Article tools (read_article, search_articles, list_articles) - Search and read articles
-
-Best practices:
-- Set the scene with vivid description before presenting choices
-- Use wait_for_user() when you want the user to make a decision
-- Acknowledge and incorporate user input into the narrative
-- Maintain narrative coherence across user interactions
-- Use add_to_story() to record the interactive session as a narrative
-- Use edit_file() to create or update wiki articles for story developments
-
-When you use wait_for_user(), the system will:
-1. Pause your turn
-2. Wait for the user to send a message
-3. Resume with their input in the conversation
-
-Hunt with purpose - create experiences that keep users engaged! 🎮⚔️"""
+            system_prompt = build_agent_prompt("interactive", include_tools=True)
         
         # Initialize base agent
         super().__init__(
@@ -193,8 +169,7 @@ Hunt with purpose - create experiences that keep users engaged! 🎮⚔️"""
             # But also yield the status event from BaseAgent
             return {
                 "_waiting_for_input": True,
-                "prompt": result.prompt,
-                "message": result.prompt
+                "message": "Waiting for user input"
             }
         
         return result

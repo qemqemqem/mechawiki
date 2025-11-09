@@ -60,6 +60,12 @@ class BaseAgent:
         self.stream = stream
         self.messages = []
         
+        # Cost tracking
+        self.total_cost = 0.0
+        self.total_prompt_tokens = 0
+        self.total_completion_tokens = 0
+        self.turn_count = 0
+        
         # Add the built-in end() tool
         self._add_end_tool()
         
@@ -85,6 +91,25 @@ class BaseAgent:
     def update_memory(self, updates: Dict[str, Any]):
         """Update multiple memory values."""
         self.memory.update(updates)
+    
+    def get_cost_stats(self) -> Dict[str, Any]:
+        """Get cost and usage statistics for this agent.
+        
+        Returns:
+            Dict with total_cost, total_prompt_tokens, total_completion_tokens, 
+            total_tokens, turn_count, and average_cost_per_turn
+        """
+        total_tokens = self.total_prompt_tokens + self.total_completion_tokens
+        avg_cost = self.total_cost / self.turn_count if self.turn_count > 0 else 0.0
+        
+        return {
+            "total_cost": round(self.total_cost, 6),
+            "total_prompt_tokens": self.total_prompt_tokens,
+            "total_completion_tokens": self.total_completion_tokens,
+            "total_tokens": total_tokens,
+            "turn_count": self.turn_count,
+            "average_cost_per_turn": round(avg_cost, 6)
+        }
     
     def _add_end_tool(self):
         """Add the built-in end() tool to terminate conversations."""
@@ -295,7 +320,7 @@ class BaseAgent:
                 "tool": function_name
             }
     
-    def _handle_streaming_response(self, response) -> Generator[Dict, None, tuple[str, str, List[Dict]]]:
+    def _handle_streaming_response(self, response) -> Generator[Dict, None, tuple[str, str, List[Dict], Dict]]:
         """
         Handle streaming response from litellm - yields events.
         
@@ -303,12 +328,13 @@ class BaseAgent:
             Events: text_token, thinking_token, thinking_start, thinking_end
             
         Returns:
-            Tuple of (collected_content, collected_thinking, tool_calls)
+            Tuple of (collected_content, collected_thinking, tool_calls, usage_info)
         """
         collected_content = ""
         collected_thinking = ""
         tool_calls = []
         thinking_active = False
+        usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         
         for chunk in response:
             # Try to extract thinking (Claude extended thinking)
@@ -351,6 +377,12 @@ class BaseAgent:
                     if delta_tool_call.function.arguments:
                         tool_calls[delta_tool_call.index]["function"]["arguments"] += delta_tool_call.function.arguments
             
+            # Capture usage info from chunks (usually in final chunk)
+            if hasattr(chunk, 'usage') and chunk.usage:
+                usage_info["prompt_tokens"] = getattr(chunk.usage, 'prompt_tokens', 0)
+                usage_info["completion_tokens"] = getattr(chunk.usage, 'completion_tokens', 0)
+                usage_info["total_tokens"] = getattr(chunk.usage, 'total_tokens', 0)
+            
             # Check if streaming is complete
             if chunk.choices[0].finish_reason:
                 break
@@ -359,7 +391,7 @@ class BaseAgent:
         if thinking_active:
             yield {'type': 'thinking_end'}
         
-        return collected_content, collected_thinking, tool_calls
+        return collected_content, collected_thinking, tool_calls, usage_info
     
     def _extract_thinking_from_chunk(self, chunk) -> Optional[str]:
         """
@@ -470,12 +502,12 @@ class BaseAgent:
         # Update conversation history in-place
         self.messages = repaired_history
     
-    def _handle_non_streaming_response(self, response) -> tuple[str, str, List[Dict]]:
+    def _handle_non_streaming_response(self, response) -> tuple[str, str, List[Dict], Dict]:
         """
         Handle non-streaming response from litellm.
         
         Returns:
-            Tuple of (content, thinking, tool_calls)
+            Tuple of (content, thinking, tool_calls, usage_info)
         """
         # For non-streaming, we don't have thinking extraction yet
         # Just return the content and empty thinking
@@ -494,7 +526,14 @@ class BaseAgent:
                     }
                 })
         
-        return content, "", tool_calls
+        # Extract usage info
+        usage_info = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        if hasattr(response, 'usage') and response.usage:
+            usage_info["prompt_tokens"] = getattr(response.usage, 'prompt_tokens', 0)
+            usage_info["completion_tokens"] = getattr(response.usage, 'completion_tokens', 0)
+            usage_info["total_tokens"] = getattr(response.usage, 'total_tokens', 0)
+        
+        return content, "", tool_calls, usage_info
     
     def run_forever(self, initial_message: Optional[str] = None, max_turns: int = 3) -> Generator[Dict, None, None]:
         """
@@ -545,6 +584,12 @@ class BaseAgent:
                 temperature=1.0
             )
             
+            # Track cost (for streaming, we'll get the complete response at the end)
+            # For non-streaming, we get it immediately
+            turn_cost = 0.0
+            turn_prompt_tokens = 0
+            turn_completion_tokens = 0
+            
             # Handle response - yields events from streaming
             if self.stream:
                 # _handle_streaming_response is now a generator
@@ -552,6 +597,7 @@ class BaseAgent:
                 collected_content = ""
                 collected_thinking = ""
                 tool_calls = []
+                usage_info = {}
                 
                 try:
                     while True:
@@ -559,9 +605,39 @@ class BaseAgent:
                         yield event  # Forward events to caller
                 except StopIteration as e:
                     # Generator returned final values
-                    collected_content, collected_thinking, tool_calls = e.value
+                    collected_content, collected_thinking, tool_calls, usage_info = e.value
             else:
-                collected_content, collected_thinking, tool_calls = self._handle_non_streaming_response(response)
+                collected_content, collected_thinking, tool_calls, usage_info = self._handle_non_streaming_response(response)
+            
+            # Track cost and token usage
+            turn_prompt_tokens = usage_info.get("prompt_tokens", 0)
+            turn_completion_tokens = usage_info.get("completion_tokens", 0)
+            
+            # Calculate cost using litellm utility (handles model-specific pricing)
+            try:
+                # Create a mock response object with usage info for cost calculation
+                # litellm.completion_cost() can work with just model name and token counts
+                turn_cost = litellm.completion_cost(
+                    model=self.model,
+                    prompt_tokens=turn_prompt_tokens,
+                    completion_tokens=turn_completion_tokens
+                )
+            except Exception as e:
+                logger.warning(f"Could not calculate cost: {e}")
+                turn_cost = 0.0
+            
+            # Update cumulative tracking
+            self.total_cost += turn_cost
+            self.total_prompt_tokens += turn_prompt_tokens
+            self.total_completion_tokens += turn_completion_tokens
+            self.turn_count += 1
+            
+            # Log cost information
+            logger.info(
+                f"💰 Turn {self.turn_count} | Cost: ${turn_cost:.6f} | "
+                f"Tokens: {turn_prompt_tokens}p + {turn_completion_tokens}c = {turn_prompt_tokens + turn_completion_tokens}t | "
+                f"Total: ${self.total_cost:.6f}"
+            )
             
             # Build assistant message for conversation history
             assistant_message = {
@@ -630,6 +706,32 @@ class BaseAgent:
                             "content": result_content
                         })
                         # Break this turn - wait for user input
+                        return
+                    
+                    # Check if tool returned Finished signal
+                    if isinstance(raw_result, dict) and raw_result.get('_finished'):
+                        # Yield status event for finished
+                        yield {
+                            'type': 'status',
+                            'status': 'finished',
+                            'message': raw_result.get('message', 'Task completed'),
+                            'source': 'base_agent.run_forever.finished'
+                        }
+                        # Also yield the tool_result
+                        yield {
+                            'type': 'tool_result',
+                            'tool': function_name,
+                            'result': raw_result
+                        }
+                        # Add to conversation
+                        result_content = json.dumps(raw_result)
+                        self.messages.append({
+                            "tool_call_id": tool_call["id"],
+                            "role": "tool",
+                            "name": function_name,
+                            "content": result_content
+                        })
+                        # Break this turn - agent is finished
                         return
                     
                     # Yield tool_result event

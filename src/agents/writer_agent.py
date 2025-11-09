@@ -10,14 +10,17 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from base_agent.base_agent import BaseAgent
-from tools.files import read_file, edit_file, add_to_story
+from tools.files import read_file, edit_file, add_to_story, rename_story_file
 from tools.articles import (
     read_article,
     search_articles,
     list_articles_in_directory
 )
+from tools.interactive import done, Finished
+from agents.prompts.loader import build_agent_prompt
 # from tools.images import create_image  # Too slow for dev
 import litellm
+import os
 
 
 class WriterAgent(BaseAgent):
@@ -31,45 +34,43 @@ class WriterAgent(BaseAgent):
     def __init__(
         self,
         model: str = "claude-haiku-4-5-20251001",
+        story_file: str = "stories/writer_story.md",
         system_prompt: str = None,
         memory: dict = None,
-        stream: bool = True
+        stream: bool = True,
+        agent_id: str = None
     ):
         """
         Initialize WriterAgent.
         
         Args:
             model: LLM model to use
+            story_file: Default story file for writing (default: "stories/writer_story.md")
             system_prompt: Optional custom system prompt
             memory: Optional initial memory dict
             stream: Whether to stream responses
+            agent_id: Optional agent ID for updating config when renaming story
         """
-        # Default system prompt for WriterAgent
+        self.story_file = story_file
+        self.agent_id = agent_id  # Store agent ID for config updates
+        # Load system prompt from files if not provided
         if system_prompt is None:
-            system_prompt = """You are a creative WriterAgent for a collaborative storytelling wiki.
+            base_prompt = build_agent_prompt("writer", include_tools=True)
+            # Add story file context
+            system_prompt = f"""{base_prompt}
 
-Your role is to:
-- Write engaging stories and narrative prose
-- Edit existing story and article content for coherence and quality
-- Reference wiki articles to maintain consistency with established lore
-- Create new wiki articles as needed for characters, locations, and concepts
-- Weave together narrative and reference material
+---
 
-You have access to:
-- File operations (read_file, edit_file) - Read and edit ANY file in wikicontent
-- Story writing (add_to_story) - Append narrative prose to story files
-- Article tools (read_article, search_articles, list_articles) - Search and read articles
+## Your Story File
 
-Best practices:
-- Use add_to_story() for writing new narrative content that flows sequentially
-- Use edit_file() with search/replace blocks for surgical edits to existing content
-- Use read_file() to check file contents before editing
-- Check existing articles before writing to maintain consistency
-- Write story content in a narrative, flowing style
-- Create supporting wiki articles for important story elements
-- Use markdown formatting appropriately
+**Your designated output file:** `{story_file}`
 
-Stay the course - write with clarity, energy, and purpose! 🏰✍️"""
+When you write new narrative content, use:
+```
+add_to_story(content="your prose here", filepath="{story_file}")
+```
+
+All your creative story writing will be appended to this file. This is where your narrative output lives!"""
         
         # Initialize base agent
         super().__init__(
@@ -80,6 +81,12 @@ Stay the course - write with clarity, energy, and purpose! 🏰✍️"""
             stream=stream
         )
         
+        # Add completion tools
+        self._add_completion_tools()
+        
+        # Add rename tool
+        self._add_rename_tool()
+        
         # Add file operation tools
         self._add_file_tools()
         
@@ -88,6 +95,53 @@ Stay the course - write with clarity, energy, and purpose! 🏰✍️"""
         
         # Add image tools
         self._add_image_tools()
+    
+    def _add_completion_tools(self):
+        """Add completion/control flow tools."""
+        # done
+        done_def = {
+            "type": "function",
+            "function": litellm.utils.function_to_dict(done),
+            "_function": done
+        }
+        self.tools.append(done_def)
+    
+    def _add_rename_tool(self):
+        """Add rename story tool."""
+        # Create the rename method bound to this instance
+        def rename_my_story(new_filename: str):
+            """
+            Rename your story file to a new name.
+            
+            This will rename the actual file in wikicontent and update your agent 
+            configuration. Use this when you want to give your story a better name.
+            
+            Parameters
+            ----------
+            new_filename : str
+                New filename (e.g., "epic_adventure.md" or "stories/epic_adventure.md")
+                If no directory is specified, the file stays in its current directory.
+            
+            Returns
+            -------
+            dict
+                {"success": bool, "message": str, "old_file": str, "new_file": str}
+                or {"success": bool, "error": str}
+            
+            Examples
+            --------
+            >>> rename_my_story("epic_adventure.md")
+            {"success": True, "message": "Story renamed successfully", ...}
+            """
+            return self._rename_my_story_impl(new_filename)
+        
+        # Add to tools
+        rename_def = {
+            "type": "function",
+            "function": litellm.utils.function_to_dict(rename_my_story),
+            "_function": rename_my_story
+        }
+        self.tools.append(rename_def)
     
     def _add_file_tools(self):
         """Add general file operation tools."""
@@ -151,4 +205,104 @@ Stay the course - write with clarity, energy, and purpose! 🏰✍️"""
         # }
         # self.tools.append(create_image_def)
         pass
+    
+    def _rename_my_story_impl(self, new_filename: str) -> dict:
+        """
+        Implementation of rename_my_story tool.
+        
+        Renames the story file and updates agent configuration.
+        """
+        try:
+            # Parse new filename - if it's just a filename, keep current directory
+            old_path = Path(self.story_file)
+            new_path_input = Path(new_filename)
+            
+            # If new path has no directory, use old directory
+            if len(new_path_input.parts) == 1:
+                new_filepath = str(old_path.parent / new_filename)
+            else:
+                new_filepath = new_filename
+            
+            # Rename the actual file
+            rename_result = rename_story_file(self.story_file, new_filepath)
+            
+            if not rename_result.get("success"):
+                return rename_result
+            
+            # Update agent's story_file attribute
+            old_story_file = self.story_file
+            self.story_file = new_filepath
+            
+            # Update agents.json if we have an agent_id
+            if self.agent_id:
+                try:
+                    # Import here to avoid circular imports
+                    session_name = os.environ.get("SESSION_NAME", "dev_session")
+                    from server.config import SessionConfig
+                    session_config = SessionConfig(session_name)
+                    
+                    # Update the agent's config
+                    session_config.update_agent(
+                        self.agent_id,
+                        {"config": {"story_file": new_filepath}}
+                    )
+                    
+                    # Regenerate system prompt with new file path
+                    base_prompt = build_agent_prompt("writer", include_tools=True)
+                    self.system_prompt = f"""{base_prompt}
+
+---
+
+## Your Story File
+
+**Your designated output file:** `{new_filepath}`
+
+When you write new narrative content, use:
+```
+add_to_story(content="your prose here", filepath="{new_filepath}")
+```
+
+All your creative story writing will be appended to this file. This is where your narrative output lives!"""
+                    
+                except Exception as e:
+                    # If we can't update agents.json, at least we renamed the file
+                    return {
+                        "success": True,
+                        "message": f"Renamed file but couldn't update config: {str(e)}",
+                        "old_file": old_story_file,
+                        "new_file": new_filepath,
+                        "warning": "Agent config not updated - restart may be needed"
+                    }
+            
+            return {
+                "success": True,
+                "message": f"Story renamed successfully from {old_story_file} to {new_filepath}",
+                "old_file": old_story_file,
+                "new_file": new_filepath
+            }
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Error renaming story: {str(e)}"
+            }
+    
+    def _execute_tool(self, tool_call: dict):
+        """
+        Override tool execution to handle Finished sentinel.
+        
+        When done() is called, it returns a Finished object.
+        We need to convert this to a signal that AgentRunner recognizes.
+        """
+        result = super()._execute_tool(tool_call)
+        
+        # Check if result is Finished sentinel
+        if isinstance(result, Finished):
+            # Return a special dict that AgentRunner will recognize
+            return {
+                "_finished": True,
+                "message": "Task completed"
+            }
+        
+        return result
 

@@ -142,14 +142,29 @@ class SessionConfig:
         return agent_data
     
     def update_agent(self, agent_id: str, updates: Dict) -> Optional[Dict]:
-        """Update an existing agent in this session."""
+        """Update an existing agent in this session.
+        
+        Performs deep merge for nested dicts like 'config'.
+        """
         agents_data = self._load_agents()
         agents = agents_data.get("agents", [])
         
         for i, agent in enumerate(agents):
             if agent.get("id") == agent_id:
-                # Merge updates
-                agent.update(updates)
+                # Deep merge for nested config dict
+                if "config" in updates and "config" in agent:
+                    # Merge config specifically
+                    merged_config = agent["config"].copy()
+                    merged_config.update(updates["config"])
+                    agent["config"] = merged_config
+                    # Remove config from updates so we don't double-apply
+                    updates_copy = updates.copy()
+                    del updates_copy["config"]
+                    agent.update(updates_copy)
+                else:
+                    # Simple update for other fields
+                    agent.update(updates)
+                
                 agents[i] = agent
                 agents_data["agents"] = agents
                 self._save_agents(agents_data)

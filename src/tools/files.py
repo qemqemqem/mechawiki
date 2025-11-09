@@ -244,6 +244,70 @@ def add_to_story(content: str, filepath: str) -> Dict[str, Any]:
         }
 
 
+def rename_story_file(old_filepath: str, new_filepath: str) -> Dict[str, Any]:
+    """
+    Rename a story file in wikicontent.
+    
+    This is a utility function used by agent tools to rename their story files.
+    It only handles the file system operation, not agent config updates.
+    
+    Parameters
+    ----------
+    old_filepath : str
+        Current path relative to wikicontent root
+    new_filepath : str
+        New path relative to wikicontent root
+    
+    Returns
+    -------
+    dict
+        {"success": bool, "message": str, "old_path": str, "new_path": str}
+        or {"success": bool, "error": str}
+    """
+    try:
+        # Get wikicontent path
+        wikicontent_path = Path(os.environ.get(
+            'WIKICONTENT_PATH',
+            str(Path.home() / "Dev" / "wikicontent")
+        ))
+        
+        old_full_path = wikicontent_path / old_filepath
+        new_full_path = wikicontent_path / new_filepath
+        
+        # Check if old file exists
+        if not old_full_path.exists():
+            return {
+                "success": False,
+                "error": f"Source file not found: {old_filepath}"
+            }
+        
+        # Check if new file already exists
+        if new_full_path.exists():
+            return {
+                "success": False,
+                "error": f"Target file already exists: {new_filepath}"
+            }
+        
+        # Ensure target directory exists
+        new_full_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Rename the file
+        old_full_path.rename(new_full_path)
+        
+        return {
+            "success": True,
+            "message": f"Renamed story file from {old_filepath} to {new_filepath}",
+            "old_path": old_filepath,
+            "new_path": new_filepath
+        }
+    
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Error renaming file: {str(e)}"
+        }
+
+
 def _apply_diff(original_content: str, diff: str, file_exists: bool) -> tuple[str, Optional[str]]:
     """
     Apply Aider-style search/replace diff to content.

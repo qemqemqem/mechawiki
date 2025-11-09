@@ -147,7 +147,10 @@ def edit_story(
         with open(full_path, 'w') as f:
             f.write(new_content)
         
-        return {
+        # Commit the change to git
+        git_result = commit_file_change(filepath, operation="edit", wikicontent_path=wikicontent_path)
+        
+        result = {
             "success": True,
             "message": f"Replaced {occurrences} occurrence(s) in {filepath}",
             "file_path": filepath,
@@ -155,6 +158,13 @@ def edit_story(
             "lines_removed": lines_removed,
             "occurrences": occurrences
         }
+        
+        # Add git commit info to result
+        if git_result["committed"]:
+            result["git_commit"] = git_result["commit_hash"]
+            result["git_message"] = git_result["message"]
+        
+        return result
     
     except Exception as e:
         return {

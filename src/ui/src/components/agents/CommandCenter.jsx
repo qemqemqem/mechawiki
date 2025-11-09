@@ -11,6 +11,8 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         return '◉' // Circle with dot
       case 'paused':
         return '◐' // Half circle
+      case 'finished':
+        return '✓' // Checkmark - finished but resumable
       case 'stopped':
       case 'archived':
         return '○' // Empty circle
@@ -27,6 +29,8 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         return 'status-waiting'
       case 'paused':
         return 'status-paused'
+      case 'finished':
+        return 'status-finished'
       default:
         return 'status-stopped'
     }
@@ -40,6 +44,8 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         return 'Waiting for input'
       case 'paused':
         return 'Paused by user'
+      case 'finished':
+        return 'Finished (send message to resume)'
       case 'stopped':
         return 'Stopped'
       case 'archived':
@@ -57,6 +63,92 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         <p style={{ fontSize: '0.9rem', marginTop: '8px' }}>
           Click "+ New Agent" to create your first agent
         </p>
+      </div>
+    )
+  }
+
+  // Group agents by status
+  const needsInputAgents = agents.filter(a => a.status === 'waiting_for_input')
+  const runningAgents = agents.filter(a => a.status === 'running')
+  const pausedAgents = agents.filter(a => a.status === 'paused')
+  const finishedAgents = agents.filter(a => a.status === 'finished')
+  const stoppedAgents = agents.filter(a => a.status === 'stopped' || a.status === 'archived')
+
+  const renderAgentCard = (agent) => (
+    <div
+      key={agent.id}
+      className={`card agent-card ${agent.status === 'waiting_for_input' ? 'agent-waiting' : ''}`}
+      onClick={() => onSelectAgent(agent)}
+    >
+      <div className="agent-card-header">
+        <span className={`status-indicator ${getStatusClass(agent.status)}`}>
+          {getStatusIcon(agent.status)}
+        </span>
+        <span className="agent-name">{agent.name}</span>
+        
+        <div className="agent-controls" onClick={(e) => e.stopPropagation()}>
+          {agent.status === 'running' && (
+            <button
+              onClick={() => onPauseAgent(agent.id)}
+              title="Pause"
+            >
+              ⏸
+            </button>
+          )}
+          {(agent.status === 'paused' || agent.status === 'waiting_for_input' || agent.status === 'finished') && (
+            <button
+              onClick={() => onResumeAgent(agent.id)}
+              title="Resume"
+            >
+              ▶
+            </button>
+          )}
+          <button
+            onClick={() => onArchiveAgent(agent.id)}
+            title="Archive"
+          >
+            📦
+          </button>
+        </div>
+      </div>
+
+      <div className="agent-meta">
+        <span className="agent-id" title={`ID: ${agent.id}`}>{agent.id}</span> • {agent.type}
+        {agent.created_at && (
+          <span> • Created {formatDistanceToNow(agent.created_at)}</span>
+        )}
+      </div>
+      
+      <div className="agent-status-detail">
+        {getStatusLabel(agent.status)}
+      </div>
+
+      {agent.last_action && (
+        <div className="agent-last-action">
+          Last: {agent.last_action}
+        </div>
+      )}
+
+      {agent.last_action_time && (
+        <div className="agent-timestamp">
+          {formatDistanceToNow(agent.last_action_time)}
+        </div>
+      )}
+    </div>
+  )
+
+  const renderAgentSection = (title, agentsList) => {
+    if (agentsList.length === 0) return null
+    
+    return (
+      <div className="agent-section">
+        <div className="section-header">
+          <h3>{title}</h3>
+          <span className="section-count">{agentsList.length}</span>
+        </div>
+        <div className="agents-list">
+          {agentsList.map(agent => renderAgentCard(agent))}
+        </div>
       </div>
     )
   }
@@ -82,70 +174,11 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         </div>
       )}
       
-      <div className="agents-list">
-        {agents.map(agent => (
-          <div
-            key={agent.id}
-            className={`card agent-card ${agent.status === 'waiting_for_input' ? 'agent-waiting' : ''}`}
-            onClick={() => onSelectAgent(agent)}
-          >
-            <div className="agent-card-header">
-              <span className={`status-indicator ${getStatusClass(agent.status)}`}>
-                {getStatusIcon(agent.status)}
-              </span>
-              <span className="agent-name">{agent.name}</span>
-              
-              <div className="agent-controls" onClick={(e) => e.stopPropagation()}>
-                {agent.status === 'running' && (
-                  <button
-                    onClick={() => onPauseAgent(agent.id)}
-                    title="Pause"
-                  >
-                    ⏸
-                  </button>
-                )}
-                {(agent.status === 'paused' || agent.status === 'waiting_for_input') && (
-                  <button
-                    onClick={() => onResumeAgent(agent.id)}
-                    title="Resume"
-                  >
-                    ▶
-                  </button>
-                )}
-                <button
-                  onClick={() => onArchiveAgent(agent.id)}
-                  title="Archive"
-                >
-                  📦
-                </button>
-              </div>
-            </div>
-
-            <div className="agent-meta">
-              <span className="agent-id" title={`ID: ${agent.id}`}>{agent.id}</span> • {agent.type}
-              {agent.created_at && (
-                <span> • Created {formatDistanceToNow(agent.created_at)}</span>
-              )}
-            </div>
-            
-            <div className="agent-status-detail">
-              {getStatusLabel(agent.status)}
-            </div>
-
-            {agent.last_action && (
-              <div className="agent-last-action">
-                Last: {agent.last_action}
-              </div>
-            )}
-
-            {agent.last_action_time && (
-              <div className="agent-timestamp">
-                {formatDistanceToNow(agent.last_action_time)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {renderAgentSection('⚠️ Needs Input', needsInputAgents)}
+      {renderAgentSection('▶️ Running', runningAgents)}
+      {renderAgentSection('⏸️ Paused', pausedAgents)}
+      {renderAgentSection('✓ Finished', finishedAgents)}
+      {renderAgentSection('📦 Stopped / Archived', stoppedAgents)}
     </div>
   )
 }

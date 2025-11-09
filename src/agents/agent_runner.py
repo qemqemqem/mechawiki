@@ -107,9 +107,14 @@ class AgentRunner:
                 if tracker:
                     tracker.add_cost(self.agent_id, incremental_cost)
                     self.last_reported_cost = current_cost
-            except Exception:
+                    logger.info(f"💰 Reported ${incremental_cost:.6f} to cost tracker")
+                else:
+                    logger.warning("Cost tracker not available")
+            except Exception as e:
                 # If tracker not available (e.g., running standalone), skip
-                pass
+                logger.warning(f"Failed to report cost: {e}")
+        else:
+            logger.debug(f"No cost to report (current: ${current_cost:.6f}, last: ${self.last_reported_cost:.6f})")
     
     def _handle_event(self, event: Dict) -> Optional[str]:
         """
@@ -288,13 +293,20 @@ class AgentRunner:
                 # Report cost to session tracker
                 self._report_cost_to_tracker()
                 
-                # If agent marked as finished, stop running
+                # If agent marked as finished, wait for user message to resume
                 if agent_finished:
-                    self.running = False
-                    break
-                
+                    self._log({
+                        'type': 'status',
+                        'status': 'finished',
+                        'message': 'Agent finished. Send a message to resume.',
+                        'source': 'agent_runner._run_loop.finished_waiting'
+                    })
+                    self._wait_for_user_message()
+                    # User message was added by _wait_for_user_message
+                    # Resume with continuation prompt
+                    initial_prompt = "Continue your task."
                 # If waiting for user input, poll for user_message in log
-                if waiting_for_user:
+                elif waiting_for_user:
                     self._wait_for_user_message()
                     # User message was added by _wait_for_user_message, so pass None
                     initial_prompt = None

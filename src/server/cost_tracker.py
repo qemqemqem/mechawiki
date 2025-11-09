@@ -53,6 +53,10 @@ class CostTracker:
             self._total_cost += cost
             self._agent_costs[agent_id] = self._agent_costs.get(agent_id, 0.0) + cost
             
+            # Log every cost increase (for debugging and granular tracking)
+            if cost > 0:
+                self._log_cost_increase(agent_id, cost)
+            
             # Check if we crossed a dollar milestone
             current_dollar = int(self._total_cost)
             if current_dollar > self._last_logged_dollar:
@@ -82,14 +86,22 @@ class CostTracker:
                 }
             }
     
+    def _log_cost_increase(self, agent_id: str, cost: float):
+        """Log every cost increase to costs.log."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        message = f"[{timestamp}] {agent_id}: +${cost:.6f} (session total: ${self._total_cost:.6f})\n"
+        
+        with open(self.cost_log, 'a') as f:
+            f.write(message)
+    
     def _log_milestone(self, dollar_amount: int):
         """Log a dollar milestone to costs.log."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if dollar_amount == 1:
-            message = f"[{timestamp}] First dollar spent! Total: ${dollar_amount}.00\n"
+            message = f"[{timestamp}] 🎉 First dollar spent! Total: ${dollar_amount}.00\n"
         else:
-            message = f"[{timestamp}] Another ${dollar_amount - self._last_logged_dollar} spent. Total spend this session: ${dollar_amount}.00\n"
+            message = f"[{timestamp}] 🎉 Another ${dollar_amount - self._last_logged_dollar} spent. Total spend this session: ${dollar_amount}.00\n"
         
         with open(self.cost_log, 'a') as f:
             f.write(message)

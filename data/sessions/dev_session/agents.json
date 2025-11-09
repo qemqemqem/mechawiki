@@ -38,6 +38,17 @@
       },
       "created_at": "2025-11-08T20:51:07.627744",
       "log_file": "logs/agent_interactive-001.jsonl"
+    },
+    {
+      "id": "writeragent-20251108205525",
+      "name": "duck writer",
+      "type": "WriterAgent",
+      "status": "stopped",
+      "config": {
+        "description": "A deep, psychological story about a duck who meets lord dunasy and slowly converts into a human, like a reverse metamorphosis. Long and slow, with lots of psychological twists and turns"
+      },
+      "created_at": "2025-11-08T20:55:25.877550",
+      "log_file": "logs/agent_writeragent-20251108205525.jsonl"
     }
   ]
 }

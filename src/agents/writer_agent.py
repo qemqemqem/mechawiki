@@ -270,12 +270,10 @@ All your creative story writing will be appended to this file. This is where you
             if self.agent_id:
                 try:
                     # Import here to avoid circular imports
-                    session_name = os.environ.get("SESSION_NAME", "dev_session")
-                    from server.config import SessionConfig
-                    session_config = SessionConfig(session_name)
+                    from server.config import agent_config
                     
                     # Update the agent's config
-                    session_config.update_agent(
+                    agent_config.update_agent(
                         self.agent_id,
                         {"config": {"story_file": new_filepath}}
                     )

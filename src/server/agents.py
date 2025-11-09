@@ -8,7 +8,7 @@ import queue
 from datetime import datetime
 from pathlib import Path
 from flask import Blueprint, jsonify, request, Response
-from .config import session_config
+from .config import agent_config, WIKICONTENT_PATH
 from .log_watcher import log_manager
 from .agent_manager import agent_manager
 import json
@@ -21,7 +21,7 @@ bp = Blueprint('agents', __name__, url_prefix='/api/agents')
 @bp.route('', methods=['GET'])
 def list_agents():
     """List all agents with their current status."""
-    agents = session_config.list_agents()
+    agents = agent_config.list_agents()
     
     # Enrich with status from logs
     enriched = []
@@ -52,8 +52,11 @@ def create_agent():
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
     
-    # Generate ID
-    agent_id = f"{data['type'].lower()}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    # Use provided ID or generate one
+    if 'id' in data and data['id']:
+        agent_id = data['id']
+    else:
+        agent_id = f"{data['type'].lower()}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
     # Create agent config
     agent_data = {
@@ -65,27 +68,26 @@ def create_agent():
     }
     
     try:
-        agent_config = session_config.add_agent(agent_data)
+        agent_data_saved = agent_config.add_agent(agent_data)
         
         # Create empty log file
-        log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
+        log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
         log_file.write_text('')
         
         # Start watching this agent's log
-        log_manager.start_watching_agent(agent_id, str(log_file), agent_config.get('config', {}))
+        log_manager.start_watching_agent(agent_id, str(log_file), agent_data_saved.get('config', {}))
         
         # Start the agent instance (unpaused by default)
-        wikicontent_path = Path.home() / "Dev" / "wikicontent"
         agent_manager.start_agent(
             agent_id=agent_id,
             agent_type=data['type'],
             log_file=log_file,
-            wikicontent_path=wikicontent_path,
-            agent_config=agent_config.get('config', {})
+            wikicontent_path=WIKICONTENT_PATH,
+            agent_config=agent_data_saved.get('config', {})
         )
         
         logger.info(f"✅ Created and started agent (running): {agent_id}")
-        return jsonify(agent_config), 201
+        return jsonify(agent_data_saved), 201
     
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -94,7 +96,7 @@ def create_agent():
 @bp.route('/<agent_id>', methods=['GET'])
 def get_agent(agent_id):
     """Get specific agent details."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -113,7 +115,7 @@ def get_agent(agent_id):
 @bp.route('/<agent_id>/pause', methods=['POST'])
 def pause_agent(agent_id):
     """Pause an agent."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -128,7 +130,7 @@ def pause_agent(agent_id):
 @bp.route('/<agent_id>/resume', methods=['POST'])
 def resume_agent(agent_id):
     """Resume a paused agent."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -143,13 +145,13 @@ def resume_agent(agent_id):
 @bp.route('/<agent_id>/archive', methods=['POST'])
 def archive_agent(agent_id):
     """Archive an agent."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
     # Write archive status to log
-    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "status",
@@ -174,7 +176,7 @@ def archive_agent(agent_id):
 def pause_all_agents():
     """Pause all running agents."""
     # Get all agents and filter by status
-    agents = session_config.list_agents()
+    agents = agent_config.list_agents()
     paused_count = 0
     
     for agent in agents:
@@ -195,7 +197,7 @@ def pause_all_agents():
 def resume_all_agents():
     """Resume all paused agents."""
     # Get all agents and filter by status
-    agents = session_config.list_agents()
+    agents = agent_config.list_agents()
     resumed_count = 0
     
     for agent in agents:
@@ -215,7 +217,7 @@ def resume_all_agents():
 @bp.route('/<agent_id>/message', methods=['POST'])
 def send_message(agent_id):
     """Send a message to an agent."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -235,7 +237,7 @@ def send_message(agent_id):
         logger.info(f"▶️ Auto-resumed agent {agent_id} (was {current_status})")
     
     # Write user message to log
-    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "user_message",
@@ -252,13 +254,13 @@ def send_message(agent_id):
 @bp.route('/<agent_id>/reload', methods=['POST'])
 def reload_agent(agent_id):
     """Reload agent status from logs."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
     
     # Force re-read of log file
-    log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_manager.start_watching_agent(agent_id, str(log_file), agent.get('config'))
     
     logger.info(f"🔄 Reloaded agent: {agent_id}")
@@ -280,7 +282,7 @@ def get_session_cost():
 @bp.route('/<agent_id>/logs', methods=['GET'])
 def get_logs(agent_id):
     """Stream agent logs via SSE."""
-    agent = session_config.get_agent(agent_id)
+    agent = agent_config.get_agent(agent_id)
     
     if not agent:
         return jsonify({"error": "Agent not found"}), 404
@@ -291,7 +293,7 @@ def get_logs(agent_id):
         log_queue = log_manager.subscribe_to_agent(agent_id)
         
         # Send existing logs first
-        log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
+        log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
         if log_file.exists():
             with open(log_file, 'r') as f:
                 for line in f:

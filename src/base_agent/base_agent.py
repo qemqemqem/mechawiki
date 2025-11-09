@@ -426,7 +426,39 @@ class BaseAgent:
         repairs_made = 0
         
         while i < len(self.messages):
-            msg = self.messages[i]
+            msg = self.messages[i].copy()  # Work with a copy
+            
+            # Validate tool message content
+            if msg.get("role") == "tool":
+                content = msg.get("content", "")
+                
+                # Check if content is a string
+                if not isinstance(content, str):
+                    logger.warning(f"⚠️ Tool result content is not a string: {type(content)}. Converting to string.")
+                    msg["content"] = str(content)
+                    repairs_made += 1
+                
+                # Check if content is valid (not empty, not too large)
+                content = msg.get("content", "")
+                if not content or len(content) < 2:
+                    logger.warning(f"⚠️ Tool result has empty or invalid content. Adding error message.")
+                    msg["content"] = json.dumps({"error": "Tool result content was empty or invalid"})
+                    repairs_made += 1
+                
+                # Truncate if too large (> 100KB)
+                max_content_size = 100000
+                if len(content) > max_content_size:
+                    logger.warning(f"⚠️ Tool result content too large ({len(content)} chars). Truncating to {max_content_size} chars.")
+                    msg["content"] = content[:max_content_size] + "\n... [truncated]"
+                    repairs_made += 1
+                
+                # Verify it's valid JSON (Anthropic expects JSON in tool results)
+                try:
+                    json.loads(msg["content"])
+                except json.JSONDecodeError:
+                    logger.warning(f"⚠️ Tool result content is not valid JSON. Wrapping in JSON object.")
+                    msg["content"] = json.dumps({"result": msg["content"]})
+                    repairs_made += 1
             
             # Check if this is an assistant message with tool_calls
             if msg.get("role") == "assistant" and msg.get("tool_calls"):

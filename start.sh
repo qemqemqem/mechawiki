@@ -5,70 +5,8 @@
 # Exit on any error
 set -e
 
-export SESSION_NAME=tales_of_wonder
-
-# Session configuration
-export SESSION_NAME="${SESSION_NAME:-dev_session}"
-
-# Use mock agents for testing (set to 'true' to disable real LLM-powered agents)
-export USE_MOCK_AGENTS=${USE_MOCK_AGENTS:-false}
-
 echo "🏰 Starting MechaWiki..."
 echo ""
-echo "Session: $SESSION_NAME"
-echo "Agent Mode: $([ "$USE_MOCK_AGENTS" = "true" ] && echo "🎭 MOCK AGENTS (testing)" || echo "⚡ REAL AGENTS (LLM-powered)")"
-echo ""
-
-# Check if session exists, run setup wizard if not
-SESSION_DIR="data/sessions/$SESSION_NAME"
-if [ ! -d "$SESSION_DIR" ] && [ "$SESSION_NAME" != "dev_session" ]; then
-    echo "📋 Session '$SESSION_NAME' doesn't exist yet."
-    echo "Running setup wizard..."
-    echo ""
-    
-    # Check for Python first
-    if ! command -v python3 &> /dev/null; then
-        echo "❌ Python 3 not found!"
-        echo "Please install Python 3.8 or higher"
-        exit 1
-    fi
-    
-    # Run setup script
-    python3 setup_session.py
-    
-    # Check if setup was successful
-    if [ ! -d "$SESSION_DIR" ]; then
-        echo ""
-        echo "❌ Session setup failed or was cancelled."
-        exit 1
-    fi
-    
-    echo ""
-fi
-
-# Clean dev_session on every start (WARNING!)
-if [ "$SESSION_NAME" = "dev_session" ]; then
-    echo "⚠️  ═══════════════════════════════════════════════════════════"
-    echo "⚠️  WARNING: Cleaning dev_session - SESSION DATA IS BEING DELETED!"
-    echo "⚠️  ═══════════════════════════════════════════════════════════"
-    echo "⚠️  "
-    echo "⚠️  Deleting: data/sessions/dev_session/"
-    echo "⚠️  This includes:"
-    echo "⚠️    - All agent configurations in agents.json"
-    echo "⚠️    - All agent logs in logs/"
-    echo "⚠️    - Session config in config.yaml"
-    echo "⚠️  ═══════════════════════════════════════════════════════════"
-    echo ""
-    
-    # Delete the dev_session directory
-    if [ -d "data/sessions/dev_session" ]; then
-        rm -rf data/sessions/dev_session
-        echo "✓ Cleaned dev_session"
-    else
-        echo "✓ dev_session doesn't exist yet (first run)"
-    fi
-    echo ""
-fi
 
 # Check for Python
 if ! command -v python3 &> /dev/null; then
@@ -138,9 +76,115 @@ if [ ! -f "config.toml" ]; then
     echo ""
 fi
 
-# Create session directories
-mkdir -p "data/sessions/$SESSION_NAME/logs"
-echo "✓ Created session directories for: $SESSION_NAME"
+# Validate wikicontent configuration
+echo "🌿 Validating wikicontent configuration..."
+
+# Use Python to parse config.toml and extract paths
+WIKICONTENT_INFO=$(python3 << 'PYEOF'
+import toml
+import sys
+try:
+    config = toml.load('config.toml')
+    content_repo = config['paths']['content_repo']
+    content_branch = config['paths'].get('content_branch', 'main')
+    print(f"{content_repo}|{content_branch}")
+except Exception as e:
+    print(f"ERROR|{e}", file=sys.stderr)
+    sys.exit(1)
+PYEOF
+)
+
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to parse config.toml"
+    echo "Please check that config.toml is valid TOML format"
+    exit 1
+fi
+
+# Split the output
+CONTENT_REPO=$(echo "$WIKICONTENT_INFO" | cut -d'|' -f1)
+CONTENT_BRANCH=$(echo "$WIKICONTENT_INFO" | cut -d'|' -f2)
+
+# Check if wikicontent directory exists
+if [ ! -d "$CONTENT_REPO" ]; then
+    echo ""
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo "❌ WIKICONTENT REPOSITORY NOT FOUND!"
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo ""
+    echo "Expected location: $CONTENT_REPO"
+    echo ""
+    echo "📋 To fix this:"
+    echo "   1. Clone or create your wikicontent repository:"
+    echo "      git clone <your-repo-url> $CONTENT_REPO"
+    echo "      OR"
+    echo "      mkdir -p $CONTENT_REPO && cd $CONTENT_REPO && git init"
+    echo ""
+    echo "   2. Update config.toml with the correct path:"
+    echo "      [paths]"
+    echo "      content_repo = \"/path/to/your/wikicontent\""
+    echo ""
+    exit 1
+fi
+
+# Check if it's a git repository
+if [ ! -d "$CONTENT_REPO/.git" ]; then
+    echo ""
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo "❌ WIKICONTENT IS NOT A GIT REPOSITORY!"
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo ""
+    echo "Location: $CONTENT_REPO"
+    echo ""
+    echo "📋 To fix this:"
+    echo "   cd $CONTENT_REPO"
+    echo "   git init"
+    echo "   git add ."
+    echo "   git commit -m \"Initial commit\""
+    echo ""
+    exit 1
+fi
+
+# Check current branch
+CURRENT_BRANCH=$(cd "$CONTENT_REPO" && git branch --show-current)
+
+if [ "$CURRENT_BRANCH" != "$CONTENT_BRANCH" ]; then
+    echo ""
+    echo "⚠️  ═══════════════════════════════════════════════════════════"
+    echo "⚠️  BRANCH MISMATCH!"
+    echo "⚠️  ═══════════════════════════════════════════════════════════"
+    echo ""
+    echo "Expected branch: $CONTENT_BRANCH"
+    echo "Current branch:  $CURRENT_BRANCH"
+    echo ""
+    echo "📋 To fix this, choose one option:"
+    echo ""
+    echo "   Option 1: Switch to the configured branch"
+    echo "      cd $CONTENT_REPO"
+    echo "      git checkout $CONTENT_BRANCH"
+    echo ""
+    echo "   Option 2: Update config.toml to use current branch"
+    echo "      Edit config.toml and set:"
+    echo "      [paths]"
+    echo "      content_branch = \"$CURRENT_BRANCH\""
+    echo ""
+    echo "   Option 3: Create the branch if it doesn't exist"
+    echo "      cd $CONTENT_REPO"
+    echo "      git checkout -b $CONTENT_BRANCH"
+    echo ""
+    exit 1
+fi
+
+echo "✓ Wikicontent found: $CONTENT_REPO"
+echo "✓ Branch confirmed: $CONTENT_BRANCH"
+
+# Ensure agents directory exists in wikicontent
+AGENTS_DIR="$CONTENT_REPO/agents"
+if [ ! -d "$AGENTS_DIR" ]; then
+    echo "📁 Creating agents directory..."
+    mkdir -p "$AGENTS_DIR/logs"
+    echo "✓ Created $AGENTS_DIR"
+fi
+
 echo ""
 
 # Start backend in background
@@ -209,12 +253,6 @@ fi
 
 echo "✓ Frontend started successfully"
 echo ""
-if [ "$USE_MOCK_AGENTS" = "true" ]; then
-    echo "🎭 Mock agents active - no API keys needed"
-else
-    echo "⚡ Real agents active - ensure config.toml has valid API keys!"
-fi
-echo ""
 
 echo "✨ MechaWiki is running!"
 echo ""
@@ -233,4 +271,3 @@ trap "echo ''; echo '🛑 Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 
 
 # Wait for both processes
 wait
-

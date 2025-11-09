@@ -6,6 +6,7 @@ These tools allow agents to write and edit stories in wikicontent.
 import os
 from pathlib import Path
 from typing import Dict, Any
+from .git_helper import commit_file_change
 
 
 def write_story(content: str, filepath: str, append: bool = True) -> Dict[str, Any]:
@@ -55,7 +56,11 @@ def write_story(content: str, filepath: str, append: bool = True) -> Dict[str, A
         
         lines_added = content.count('\n') + 1
         
-        return {
+        # Commit the change to git
+        operation = "append" if append else "edit"
+        git_result = commit_file_change(filepath, operation=operation, wikicontent_path=wikicontent_path)
+        
+        result = {
             "success": True,
             "message": f"{'Appended to' if append else 'Wrote'} {filepath}",
             "file_path": filepath,
@@ -63,6 +68,13 @@ def write_story(content: str, filepath: str, append: bool = True) -> Dict[str, A
             "lines_removed": lines_removed,
             "mode": "append" if append else "overwrite"
         }
+        
+        # Add git commit info to result
+        if git_result["committed"]:
+            result["git_commit"] = git_result["commit_hash"]
+            result["git_message"] = git_result["message"]
+        
+        return result
     
     except Exception as e:
         return {

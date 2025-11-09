@@ -72,6 +72,7 @@ function AgentsPane({
         <NewAgentModal
           onClose={() => setShowNewAgentModal(false)}
           onCreate={onCreateAgent}
+          agents={agents}
         />
       )}
     </div>

@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from typing import Dict, Any, Optional
 import re
+from .git_helper import commit_file_change, commit_file_rename
 
 
 def read_file(
@@ -163,13 +164,24 @@ def edit_file(filepath: str, diff: str) -> Dict[str, Any]:
         lines_added = max(0, new_lines - old_lines)
         lines_removed = max(0, old_lines - new_lines)
         
-        return {
+        # Commit the change to git
+        operation = "create" if not file_exists else "edit"
+        git_result = commit_file_change(filepath, operation=operation, wikicontent_path=wikicontent_path)
+        
+        result = {
             "success": True,
             "error": None,
             "file_path": filepath,
             "lines_added": lines_added,
             "lines_removed": lines_removed
         }
+        
+        # Add git commit info to result
+        if git_result["committed"]:
+            result["git_commit"] = git_result["commit_hash"]
+            result["git_message"] = git_result["message"]
+        
+        return result
     
     except Exception as e:
         return {
@@ -228,7 +240,10 @@ def add_to_story(content: str, filepath: str) -> Dict[str, Any]:
         
         lines_added = content.count('\n') + 1
         
-        return {
+        # Commit the change to git
+        git_result = commit_file_change(filepath, operation="append", wikicontent_path=wikicontent_path)
+        
+        result = {
             "success": True,
             "message": f"Appended to {filepath}",
             "file_path": filepath,
@@ -236,6 +251,13 @@ def add_to_story(content: str, filepath: str) -> Dict[str, Any]:
             "lines_removed": 0,
             "mode": "append"
         }
+        
+        # Add git commit info to result
+        if git_result["committed"]:
+            result["git_commit"] = git_result["commit_hash"]
+            result["git_message"] = git_result["message"]
+        
+        return result
     
     except Exception as e:
         return {
@@ -294,12 +316,22 @@ def rename_story_file(old_filepath: str, new_filepath: str) -> Dict[str, Any]:
         # Rename the file
         old_full_path.rename(new_full_path)
         
-        return {
+        # Commit the rename to git
+        git_result = commit_file_rename(old_filepath, new_filepath, wikicontent_path=wikicontent_path)
+        
+        result = {
             "success": True,
             "message": f"Renamed story file from {old_filepath} to {new_filepath}",
             "old_path": old_filepath,
             "new_path": new_filepath
         }
+        
+        # Add git commit info to result
+        if git_result["committed"]:
+            result["git_commit"] = git_result["commit_hash"]
+            result["git_message"] = git_result["message"]
+        
+        return result
     
     except Exception as e:
         return {

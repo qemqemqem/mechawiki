@@ -264,12 +264,10 @@ Read systematically through the entire story, advancing the window as you go."""
         if self.agent_id:
             try:
                 # Import here to avoid circular imports
-                session_name = os.environ.get("SESSION_NAME", "dev_session")
-                from server.config import SessionConfig
-                session_config = SessionConfig(session_name)
+                from server.config import agent_config
                 
                 # Update the agent's config with current position
-                session_config.update_agent(
+                agent_config.update_agent(
                     self.agent_id,
                     {"config": {"current_position": pos_info["current_position"]}}
                 )
@@ -360,11 +358,9 @@ Use advance() to continue reading."""
         # Persist position to agents.json if we have an agent_id
         if self.agent_id:
             try:
-                session_name = os.environ.get("SESSION_NAME", "dev_session")
-                from server.config import SessionConfig
-                session_config = SessionConfig(session_name)
+                from server.config import agent_config
                 
-                session_config.update_agent(
+                agent_config.update_agent(
                     self.agent_id,
                     {"config": {"current_position": pos_info["current_position"]}}
                 )

@@ -32,32 +32,20 @@ MechaWiki now uses **real LLM-powered agents** by default:
 
 **Requirements:** Add your Claude API key to `config.toml`
 
-**Switch to mock agents:** Run with `USE_REAL_AGENTS=false ./start.sh`
-
 **Test without UI:** `python test_real_agents.py`
 
-### 🗂️ Session Management
+### 🌿 Branch-Based Configuration
 
-MechaWiki supports multiple sessions - each with its own agents and wikicontent branch:
+MechaWiki uses git branches in your wikicontent repository for project isolation. All agent data (configurations, logs, costs) is stored in the `agents/` directory on your current branch.
 
-```bash
-# Development session (auto-cleaned on start)
-./start.sh
-
-# Create a new persistent session
-SESSION_NAME=tales_of_wonder ./start.sh
+Configure your branch in `config.toml`:
+```toml
+[paths]
+content_repo = "/home/keenan/Dev/wikicontent"
+content_branch = "tales_of_wonder/main"
 ```
 
-**First time with a new session?** An interactive setup wizard will guide you through:
-- Branch selection (auto-detected from wikicontent)
-- Session configuration
-- Directory structure creation
-
-**Already configured?** It just loads and runs!
-
-**Note:** `dev_session` is wiped clean on every start! Use a different session name to preserve state.
-
-See **[Session Setup Guide](notes/session_setup.md)** for details!
+Switch projects by checking out a different branch in wikicontent and updating `config.toml`.
 
 See `notes/IMPLEMENTATION_COMPLETE.md` for full details!
 
@@ -111,7 +99,7 @@ Track file changes as agents create and edit wiki content:
                      │
 ┌────────────────────┴────────────────────────────────┐
 │              Agent Log Files (JSONL)                 │
-│  data/logs/agent_{id}.jsonl                         │
+│  wikicontent/agents/logs/agent_{id}.jsonl           │
 │  - All agent actions logged here                    │
 │  - Backend watches these for updates                │
 └─────────────────────────────────────────────────────┘
@@ -125,25 +113,27 @@ Track file changes as agents create and edit wiki content:
 - **`src/ui/`** - React frontend (Vite)
 - **`src/agents/`** - Agent implementations
 - **`src/tools/`** - Agent tools (read/write articles, search, images)
-- **`data/sessions/dev_session/`** - Active session (agents, logs, config)
-- **`~/Dev/wikicontent/`** - Wiki content repository (git-managed separately)
+- **`~/Dev/wikicontent/`** - Wiki content repository (git-managed, contains agent data)
 
-### Session Structure
+### Content Repository Structure
 
-Each session tracks its git branch and agents:
+Your wikicontent repository contains both wiki content and agent data:
 ```
-data/sessions/dev_session/
-├── config.yaml      # Session config (git branch, etc)
-├── agents.json      # Agents in this session
-└── logs/            # Agent JSONL logs
+wikicontent/
+├── articles/        # Wiki articles
+├── stories/         # Story content
+├── images/          # Generated images
+└── agents/          # Agent data (tracked per branch)
+    ├── agents.json  # Agent configurations
+    ├── costs.log    # Cost tracking
+    └── logs/        # Agent JSONL logs
 ```
 
-See **[Session Management](notes/sessions.md)** for details.
+All agent data is stored in the content repository on the current branch, so different branches can have different agents working on different content.
 
 ## Documentation
 
 - **[UI Documentation](src/ui/README.md)** - Frontend setup and architecture
-- **[Session Management](notes/sessions.md)** - How sessions work
 - **[Plan Document](notes/ui_plan.md)** - Full design and implementation plan
 - **[Agent User Stories](notes/agents_user_stories.md)** - Agent types and use cases
 - **[Agent Implementation](notes/agents_tools_and_implementation.md)** - Technical details

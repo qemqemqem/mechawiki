@@ -21,12 +21,12 @@ CORS(app)  # Enable CORS for frontend
 
 # Initialize log manager
 from .log_watcher import init_log_manager
-from .config import session_config
-log_manager = init_log_manager(session_config.logs_dir)
+from .config import agent_config, WIKICONTENT_PATH
+log_manager = init_log_manager(agent_config.logs_dir)
 
 # Initialize cost tracker
 from .cost_tracker import init_cost_tracker
-cost_tracker = init_cost_tracker(session_config.session_dir)
+cost_tracker = init_cost_tracker(agent_config.logs_dir.parent)  # agents/ directory
 
 # Initialize agent manager
 from .agent_manager import agent_manager
@@ -34,20 +34,14 @@ from .agent_manager import agent_manager
 # Function to initialize agents (called from run_server, not at module level)
 def init_and_start_agents():
     """Initialize and start agents. Called once from run_server()."""
-    from .init_agents import init_test_agents, start_test_agents
+    from .init_agents import start_agents
     
-    # Only initialize test agents for dev_session (has defensive guard inside too)
-    if session_config.session_name == "dev_session":
-        logger.info("🤖 Initializing test agents for dev_session...")
-        init_test_agents()
-    else:
-        logger.info(f"🤖 Loading agents for session '{session_config.session_name}'...")
-    
-    start_test_agents(agent_manager)
+    logger.info("🤖 Loading agents...")
+    start_agents(agent_manager)
     
     # Start watching existing agents
-    for agent in session_config.list_agents():
-        log_file = session_config.logs_dir / f"agent_{agent['id']}.jsonl"
+    for agent in agent_config.list_agents():
+        log_file = agent_config.logs_dir / f"agent_{agent['id']}.jsonl"
         if log_file.exists():
             log_manager.start_watching_agent(agent['id'], str(log_file), agent.get('config'))
 

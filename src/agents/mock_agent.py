@@ -228,7 +228,8 @@ class MockAgent:
         self._log({
             'type': 'status',
             'status': 'waiting_for_input',
-            'message': 'What should I do next?'
+            'message': 'What should I do next?',
+            'source': 'mock_agent._action_wait_for_input.waiting'
         })
         
         # Actually pause and wait
@@ -241,7 +242,8 @@ class MockAgent:
         self._log({
             'type': 'status',
             'status': 'running',
-            'message': 'Continuing...'
+            'message': 'Continuing...',
+            'source': 'mock_agent._action_wait_for_input.continuing'
         })
         
         self.paused = False
@@ -264,7 +266,8 @@ class MockAgent:
         self._log({
             'type': 'status',
             'status': 'running',
-            'message': f'{self.agent_type} initialized'
+            'message': f'{self.agent_type} initialized',
+            'source': 'mock_agent.start'
         })
         
         # Start in background thread
@@ -337,7 +340,8 @@ class MockAgent:
         self._log({
             'type': 'status',
             'status': 'stopped',
-            'message': 'Agent stopped'
+            'message': 'Agent stopped',
+            'source': 'mock_agent.stop'
         })
     
     def pause(self):
@@ -347,7 +351,8 @@ class MockAgent:
         self._log({
             'type': 'status',
             'status': 'paused',
-            'message': 'Paused by user'
+            'message': 'Paused by user',
+            'source': 'mock_agent.pause'
         })
     
     def resume(self):
@@ -357,7 +362,8 @@ class MockAgent:
         self._log({
             'type': 'status',
             'status': 'running',
-            'message': 'Resumed by user'
+            'message': 'Resumed by user',
+            'source': 'mock_agent.resume'
         })
 
 

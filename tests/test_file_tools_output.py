@@ -289,7 +289,7 @@ class TestReadArticleOutput:
 
 
 def test_all_tools_have_consistent_error_format():
-    """All tools should return strings for errors."""
+    """All tools should return error dicts or strings for errors."""
     from src.tools import articles
     from src.tools.story import edit_story
     
@@ -306,9 +306,11 @@ def test_all_tools_have_consistent_error_format():
     # Test edit_story with non-existent file instead
     edit_error = edit_story("this/file/does/not/exist.md", "search", "replace")
     
-    # All should be strings or dicts with success=False
+    # read_article returns dict with error field
+    assert isinstance(read_error, dict) and "error" in read_error
+    # write_article returns error string
     assert isinstance(article_error, str)
-    assert isinstance(read_error, str)
+    # edit_story returns dict with success=False
     assert isinstance(edit_error, dict) and edit_error["success"] is False
 
 

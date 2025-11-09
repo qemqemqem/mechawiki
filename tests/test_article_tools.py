@@ -122,7 +122,7 @@ class TestReadArticle:
         assert "Merlin" in result["content"]
     
     def test_returns_error_for_nonexistent_article(self, tmp_path):
-        """Should return error message for missing article."""
+        """Should return error dict for missing article."""
         config_path = tmp_path / "config.toml"
         config_path.write_text(toml.dumps({
             "paths": {
@@ -140,7 +140,9 @@ class TestReadArticle:
         
         result = articles.read_article("does-not-exist")
         
-        assert "❌" in result or "Error" in result
+        assert isinstance(result, dict)
+        assert "error" in result
+        assert "not found" in result["error"].lower()
 
 
 class TestSearchArticles:

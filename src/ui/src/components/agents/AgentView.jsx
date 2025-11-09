@@ -149,6 +149,17 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
     
     // Tool call - collapsed by default
     if (type === 'tool_call') {
+      // Special handling for add_to_story - render as prominent story bubble
+      if (log.tool === 'add_to_story' && log.args && log.args.content) {
+        return (
+          <div key={index} className="log-story-bubble">
+            <div className="story-label">📖 Story</div>
+            <div className="story-content">{log.args.content}</div>
+            {timestamp}
+          </div>
+        )
+      }
+      
       // Find the matching tool_result in the next few log entries
       let toolResult = null
       for (let i = index + 1; i < Math.min(index + 5, logs.length); i++) {
@@ -263,12 +274,10 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
         </div>
       </div>
 
-      <div className="agent-info">
-        <h3>{agent.name}</h3>
-        <p>{agent.type} • {agent.status}</p>
-      </div>
-
       <div className="agent-view-options">
+        <div className="agent-info-compact">
+          {agent.type} • {agent.status}
+        </div>
         <label className="timestamp-checkbox">
           <input
             type="checkbox"

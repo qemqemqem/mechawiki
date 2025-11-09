@@ -400,7 +400,7 @@ class BaseAgent:
         
         return content, "", tool_calls
     
-    def run_forever(self, initial_message: str, max_turns: int = 3) -> Generator[Dict, None, None]:
+    def run_forever(self, initial_message: Optional[str] = None, max_turns: int = 3) -> Generator[Dict, None, None]:
         """
         Run a conversation with the agent - yields events.
         
@@ -408,7 +408,7 @@ class BaseAgent:
         and tool results. AgentRunner consumes these events and logs them.
         
         Args:
-            initial_message: First user message
+            initial_message: First user message (optional - None to continue without adding)
             max_turns: Maximum turns (None = run forever, int = limit turns)
             
         Yields:
@@ -417,8 +417,9 @@ class BaseAgent:
         Raises:
             ContextLengthExceeded: If conversation exceeds 300,000 characters
         """
-        # Add initial message
-        self.add_user_message(initial_message)
+        # Add initial message if provided
+        if initial_message is not None:
+            self.add_user_message(initial_message)
         
         turn = 0
         while True:
@@ -501,7 +502,8 @@ class BaseAgent:
                         yield {
                             'type': 'status',
                             'status': 'ended',
-                            'reason': 'Agent called end()'
+                            'reason': 'Agent called end()',
+                            'source': 'base_agent.run_forever.end_conversation'
                         }
                         return  # Exit generator
                     
@@ -511,7 +513,8 @@ class BaseAgent:
                         yield {
                             'type': 'status',
                             'status': 'waiting_for_input',
-                            'message': raw_result.get('prompt', 'Waiting for user input')
+                            'message': raw_result.get('prompt', 'Waiting for user input'),
+                            'source': 'base_agent.run_forever.waiting_for_input'
                         }
                         # Also yield the tool_result
                         yield {

@@ -81,3 +81,25 @@
   font-style: italic;
 }
 
+/* Highlight agents waiting for input */
+.agent-card.agent-waiting {
+  background: rgba(245, 197, 24, 0.15);
+  border-color: rgba(245, 197, 24, 0.6);
+  box-shadow: 0 4px 20px rgba(245, 197, 24, 0.3);
+  animation: cardGlow 2s infinite;
+}
+
+.agent-card.agent-waiting:hover {
+  border-color: rgba(245, 197, 24, 0.8);
+  box-shadow: 0 6px 24px rgba(245, 197, 24, 0.4);
+}
+
+@keyframes cardGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(245, 197, 24, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 28px rgba(245, 197, 24, 0.5);
+  }
+}
+

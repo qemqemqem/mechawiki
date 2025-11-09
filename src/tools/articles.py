@@ -32,9 +32,9 @@ def read_article(article_name: str):
         
     Returns
     -------
-    dict or str
-        Dict with file_path, content, and read flag for successful reads.
-        Error message string if the article is not found or if config could not be loaded.
+    dict
+        Success: {"file_path": str, "content": str, "read": True, ...}
+        Error: {"error": str}
         
     Examples
     --------
@@ -49,15 +49,15 @@ def read_article(article_name: str):
     """
     # Check if config was loaded successfully
     if _config is None or _content_repo_path is None:
-        return "❌ Error: Could not load config.toml or required config values"
+        return {"error": "Could not load config.toml or required config values"}
     
     if not article_name.strip():
-        return "❌ Error: Article name cannot be empty"
+        return {"error": "Article name cannot be empty"}
     
     articles_dir = _content_repo_path / _articles_dir_name
     
     if not articles_dir.exists():
-        return f"❌ Error: Articles directory not found: {articles_dir}"
+        return {"error": f"Articles directory not found: {articles_dir}"}
     
     # Normalize the article name
     article_name = article_name.strip()
@@ -83,7 +83,7 @@ def read_article(article_name: str):
                 break
     
     if found_file is None:
-        return f"❌ Error: Article '{article_name}' not found in {articles_dir}"
+        return {"error": f"Article '{article_name}' not found in {articles_dir}"}
     
     try:
         with open(found_file, 'r', encoding='utf-8') as f:
@@ -103,7 +103,7 @@ def read_article(article_name: str):
         }
     
     except Exception as e:
-        return f"❌ Error reading article '{found_file.name}': {str(e)}"
+        return {"error": f"Error reading article '{found_file.name}': {str(e)}"}
 
 
 def write_article(article_name: str, content: str):

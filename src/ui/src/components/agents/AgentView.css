@@ -8,8 +8,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--light-border);
 }
 
@@ -19,27 +19,19 @@
   color: var(--medieval-blue);
 }
 
-.agent-info {
-  margin-bottom: var(--spacing-md);
-}
-
-.agent-info h3 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: 1.3rem;
-}
-
-.agent-info p {
-  margin: 0;
-  color: #666;
-}
-
 .agent-view-options {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--light-border);
+}
+
+.agent-info-compact {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .timestamp-checkbox {
@@ -177,6 +169,39 @@
   color: #888;
   padding: var(--spacing-xs) var(--spacing-sm);
   max-width: 90%;
+}
+
+/* Story bubble - THE MAIN EVENT */
+.log-story-bubble {
+  align-self: center;
+  width: 90%;
+  background: white;
+  border: 2px solid #3498db;
+  border-radius: 12px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+  animation: slideIn 0.3s ease-out;
+  margin: var(--spacing-sm) 0;
+}
+
+.story-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3498db;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.story-content {
+  font-size: 1rem;
+  color: #2c3e50;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 /* Agent messages - chat bubble style */

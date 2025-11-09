@@ -219,9 +219,9 @@ class AgentRunner:
         """Main agent loop - consume events and log them."""
         # Log initial status based on paused state
         if self.paused:
-            self._log({'type': 'status', 'status': 'paused', 'message': 'Agent started (paused)'})
+            self._log({'type': 'status', 'status': 'paused', 'message': 'Agent started (paused)', 'source': 'agent_runner._run_loop.initial_paused'})
         else:
-            self._log({'type': 'status', 'status': 'running', 'message': 'Agent started'})
+            self._log({'type': 'status', 'status': 'running', 'message': 'Agent started', 'source': 'agent_runner._run_loop.initial_running'})
         
         initial_prompt = self.agent_config.get(
             'initial_prompt',
@@ -243,9 +243,9 @@ class AgentRunner:
                     signal = self._handle_event(event)
                     
                     if signal == 'wait_for_input':
-                        # Break turn, wait for user message in log
+                        # Mark that we'll wait, but DON'T break yet
+                        # We need to consume remaining events (like tool_result)
                         waiting_for_user = True
-                        break
                 
                 # Flush any remaining content at turn end
                 self._flush_text()
@@ -254,10 +254,11 @@ class AgentRunner:
                 # If waiting for user input, poll for user_message in log
                 if waiting_for_user:
                     self._wait_for_user_message()
-                    # User message will be added to agent's conversation by next turn
-                
-                # After first turn, use continuation prompt
-                initial_prompt = "Continue your task."
+                    # User message was added by _wait_for_user_message, so pass None
+                    initial_prompt = None
+                else:
+                    # After first turn, use continuation prompt
+                    initial_prompt = "Continue your task."
             
             except ContextLengthExceeded as e:
                 # Agent hit context limit
@@ -265,7 +266,8 @@ class AgentRunner:
                     'type': 'status',
                     'status': 'archived',
                     'reason': 'context_limit',
-                    'message': str(e)
+                    'message': str(e),
+                    'source': 'agent_runner._run_loop.context_limit'
                 })
                 self.running = False
                 break
@@ -285,7 +287,7 @@ class AgentRunner:
             time.sleep(1)
         
         # Log final stop
-        self._log({'type': 'status', 'status': 'stopped', 'message': 'Agent stopped'})
+        self._log({'type': 'status', 'status': 'stopped', 'message': 'Agent stopped', 'source': 'agent_runner._run_loop.final_stop'})
     
     def start(self):
         """Start agent in background thread."""
@@ -307,7 +309,8 @@ class AgentRunner:
         self._log({
             'type': 'status',
             'status': 'paused',
-            'message': 'Paused by user'
+            'message': 'Paused by user',
+            'source': 'agent_runner.pause'
         })
     
     def resume(self):
@@ -315,7 +318,8 @@ class AgentRunner:
         self._log({
             'type': 'status',
             'status': 'running',
-            'message': 'Resumed by user'
+            'message': 'Resumed by user',
+            'source': 'agent_runner.resume'
         })
     
     def is_alive(self) -> bool:

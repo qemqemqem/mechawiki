@@ -103,7 +103,22 @@ function App() {
       try {
         const data = JSON.parse(event.data)
         if (data.type === 'file_changed') {
-          setFileChanges(prev => [data, ...prev])
+          setFileChanges(prev => {
+            // Create unique key for deduplication
+            const key = `${data.timestamp}-${data.agent_id}-${data.file_path}-${data.action}`
+            
+            // Check if this event already exists
+            const exists = prev.some(item => {
+              const itemKey = `${item.timestamp}-${item.agent_id}-${item.file_path}-${item.action}`
+              return itemKey === key
+            })
+            
+            if (exists) {
+              return prev // Skip duplicate
+            }
+            
+            return [data, ...prev]
+          })
         }
       } catch (error) {
         // Ignore keepalive messages

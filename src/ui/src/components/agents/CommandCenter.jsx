@@ -86,7 +86,7 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         {agents.map(agent => (
           <div
             key={agent.id}
-            className="card agent-card"
+            className={`card agent-card ${agent.status === 'waiting_for_input' ? 'agent-waiting' : ''}`}
             onClick={() => onSelectAgent(agent)}
           >
             <div className="agent-card-header">

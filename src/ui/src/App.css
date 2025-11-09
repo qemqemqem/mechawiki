@@ -15,7 +15,7 @@
   
   /* Status colors */
   --status-running: #8FB8A0;
-  --status-waiting: #D4A5A5;
+  --status-waiting: #F5C518;
   --status-paused: #C8B6E2;
   --status-stopped: #B0B0C0;
   
@@ -279,8 +279,8 @@ button.danger:hover {
 
 .status-waiting {
   background: var(--status-waiting);
-  box-shadow: 0 0 12px rgba(212, 165, 165, 0.6);
-  animation: gentlePulse 2s infinite;
+  box-shadow: 0 0 16px rgba(245, 197, 24, 0.8);
+  animation: urgentPulse 1.5s infinite;
 }
 
 .status-paused {
@@ -310,6 +310,19 @@ button.danger:hover {
   50% {
     opacity: 0.7;
     transform: scale(1.1);
+  }
+}
+
+@keyframes urgentPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 16px rgba(245, 197, 24, 0.8);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.15);
+    box-shadow: 0 0 24px rgba(245, 197, 24, 1);
   }
 }
 

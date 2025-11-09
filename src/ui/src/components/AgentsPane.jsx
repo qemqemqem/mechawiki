@@ -31,7 +31,7 @@ function AgentsPane({
     <div className="pane agents-pane">
       <div className="pane-header">
         <h2>
-          {selectedAgent ? '⚔️ Agent View' : 'Command Center'}
+          {selectedAgent ? `⚔️ ${selectedAgent.name}` : 'Command Center'}
         </h2>
         {!selectedAgent && (
           <button 

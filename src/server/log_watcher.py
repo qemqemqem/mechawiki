@@ -228,9 +228,9 @@ class LogManager:
         
         tool = log_entry.get('tool', '')
         file_tools = [
-            'read_file', 'edit_file', 'add_to_story', 
+            'read_file', 'edit_file', 'add_to_story', 'add_to_my_story',
             'read_article', 'write_article', 'write_story', 'edit_story',
-            'create_image'
+            'create_image', 'rename_my_story'
         ]
         
         return tool in file_tools
@@ -243,7 +243,11 @@ class LogManager:
         if not isinstance(result, dict):
             return None
         
+        # Handle rename operations specially (they have new_path instead of file_path)
         file_path = result.get('file_path')
+        if not file_path and tool == 'rename_my_story':
+            file_path = result.get('new_path')
+        
         if not file_path:
             return None
         

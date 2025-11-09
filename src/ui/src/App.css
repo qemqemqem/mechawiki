@@ -18,6 +18,7 @@
   --status-waiting: #F5C518;
   --status-paused: #C8B6E2;
   --status-finished: #10B981;
+  --status-error: #EF4444;
   --status-stopped: #B0B0C0;
   
   /* Spacing */
@@ -289,6 +290,17 @@ button.danger:hover {
   box-shadow: 0 0 8px rgba(200, 182, 226, 0.5);
 }
 
+.status-finished {
+  background: var(--status-finished);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+
+.status-error {
+  background: var(--status-error);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
+  animation: errorPulse 2s infinite;
+}
+
 .status-stopped {
   background: var(--status-stopped);
   opacity: 0.6;
@@ -324,6 +336,19 @@ button.danger:hover {
     opacity: 0.85;
     transform: scale(1.15);
     box-shadow: 0 0 24px rgba(245, 197, 24, 1);
+  }
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.9);
   }
 }
 

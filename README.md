@@ -34,11 +34,30 @@ MechaWiki now uses **real LLM-powered agents** by default:
 
 **Switch to mock agents:** Run with `USE_REAL_AGENTS=false ./start.sh`
 
-**Use different session:** Run with `SESSION_NAME=my_session ./start.sh`
+**Test without UI:** `python test_real_agents.py`
+
+### 🗂️ Session Management
+
+MechaWiki supports multiple sessions - each with its own agents and wikicontent branch:
+
+```bash
+# Development session (auto-cleaned on start)
+./start.sh
+
+# Create a new persistent session
+SESSION_NAME=tales_of_wonder ./start.sh
+```
+
+**First time with a new session?** An interactive setup wizard will guide you through:
+- Branch selection (auto-detected from wikicontent)
+- Session configuration
+- Directory structure creation
+
+**Already configured?** It just loads and runs!
 
 **Note:** `dev_session` is wiped clean on every start! Use a different session name to preserve state.
 
-**Test without UI:** `python test_real_agents.py`
+See **[Session Setup Guide](notes/session_setup.md)** for details!
 
 See `notes/IMPLEMENTATION_COMPLETE.md` for full details!
 

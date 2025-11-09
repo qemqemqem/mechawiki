@@ -13,6 +13,8 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         return '◐' // Half circle
       case 'finished':
         return '✓' // Checkmark - finished but resumable
+      case 'error_waiting':
+        return '⚠️' // Warning - error but resumable
       case 'stopped':
       case 'archived':
         return '○' // Empty circle
@@ -31,6 +33,8 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         return 'status-paused'
       case 'finished':
         return 'status-finished'
+      case 'error_waiting':
+        return 'status-error'
       default:
         return 'status-stopped'
     }
@@ -46,6 +50,8 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
         return 'Paused by user'
       case 'finished':
         return 'Finished (send message to resume)'
+      case 'error_waiting':
+        return 'Error - Send message to retry'
       case 'stopped':
         return 'Stopped'
       case 'archived':
@@ -69,6 +75,7 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
 
   // Group agents by status
   const needsInputAgents = agents.filter(a => a.status === 'waiting_for_input')
+  const errorAgents = agents.filter(a => a.status === 'error_waiting')
   const runningAgents = agents.filter(a => a.status === 'running')
   const pausedAgents = agents.filter(a => a.status === 'paused')
   const finishedAgents = agents.filter(a => a.status === 'finished')
@@ -95,7 +102,7 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
               ⏸
             </button>
           )}
-          {(agent.status === 'paused' || agent.status === 'waiting_for_input' || agent.status === 'finished') && (
+          {(agent.status === 'paused' || agent.status === 'waiting_for_input' || agent.status === 'finished' || agent.status === 'error_waiting') && (
             <button
               onClick={() => onResumeAgent(agent.id)}
               title="Resume"
@@ -175,6 +182,7 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
       )}
       
       {renderAgentSection('⚠️ Needs Input', needsInputAgents)}
+      {renderAgentSection('🚨 Error - Needs Retry', errorAgents)}
       {renderAgentSection('▶️ Running', runningAgents)}
       {renderAgentSection('⏸️ Paused', pausedAgents)}
       {renderAgentSection('✓ Finished', finishedAgents)}

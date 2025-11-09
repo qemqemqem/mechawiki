@@ -127,6 +127,10 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage,
     if (toolName === 'add_to_story' && toolArgs.filepath) {
       return `${displayName}: ${toolArgs.filepath}`
     }
+    // add_to_my_story doesn't need filepath since it's bound to the agent
+    if (toolName === 'add_to_my_story') {
+      return displayName
+    }
     
     return displayName
   }
@@ -151,8 +155,8 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage,
     
     // Tool call - collapsed by default
     if (type === 'tool_call') {
-      // Special handling for add_to_story - render as prominent story bubble
-      if (log.tool === 'add_to_story' && log.args && log.args.content) {
+      // Special handling for story writing tools - render as prominent story bubble
+      if ((log.tool === 'add_to_story' || log.tool === 'add_to_my_story') && log.args && log.args.content) {
         return (
           <div key={index} className="log-story-bubble">
             <div className="story-label">📖 Story</div>
@@ -281,7 +285,7 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage,
           {agent.status === 'running' && (
             <button onClick={onPause}>⏸ Pause</button>
           )}
-          {(agent.status === 'paused' || agent.status === 'waiting_for_input') && (
+          {(agent.status === 'paused' || agent.status === 'waiting_for_input' || agent.status === 'finished' || agent.status === 'error_waiting') && (
             <button onClick={onResume}>▶ Resume</button>
           )}
           <button onClick={onArchive} className="danger">📦 Archive</button>

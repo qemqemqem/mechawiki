@@ -10,7 +10,7 @@
         "model": "claude-haiku-4-5-20251001",
         "story_file": "story.txt"
       },
-      "created_at": "2025-11-08T21:30:21.375200",
+      "created_at": "2025-11-08T21:38:22.289409",
       "log_file": "logs/agent_reader-001.jsonl"
     },
     {
@@ -21,9 +21,9 @@
         "description": "Writes stories from wiki content",
         "initial_prompt": "Search for some articles to get inspiration, then write a short story based on wiki content.",
         "model": "claude-haiku-4-5-20251001",
-        "story_file": "stories/the-keepers-call.md"
+        "story_file": "stories/writer_story.md"
       },
-      "created_at": "2025-11-08T21:30:21.375210",
+      "created_at": "2025-11-08T21:38:22.289425",
       "log_file": "logs/agent_writer-001.jsonl"
     },
     {
@@ -36,7 +36,7 @@
         "model": "claude-haiku-4-5-20251001",
         "story_file": "stories/interactive_adventure.md"
       },
-      "created_at": "2025-11-08T21:30:21.375212",
+      "created_at": "2025-11-08T21:38:22.289431",
       "log_file": "logs/agent_interactive-001.jsonl"
     }
   ]

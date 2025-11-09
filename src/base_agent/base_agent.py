@@ -581,14 +581,12 @@ class BaseAgent:
                 tools=self.tools if self.tools else None,
                 tool_choice="auto" if self.tools else None,
                 stream=self.stream,
+                stream_options={'include_usage': True} if self.stream else None,
                 temperature=1.0
             )
             
-            # Track cost (for streaming, we'll get the complete response at the end)
-            # For non-streaming, we get it immediately
-            turn_cost = 0.0
-            turn_prompt_tokens = 0
-            turn_completion_tokens = 0
+            # Store response for cost calculation later
+            original_response = response
             
             # Handle response - yields events from streaming
             if self.stream:
@@ -615,13 +613,18 @@ class BaseAgent:
             
             # Calculate cost using litellm utility (handles model-specific pricing)
             try:
-                # Create a mock response object with usage info for cost calculation
-                # litellm.completion_cost() can work with just model name and token counts
-                turn_cost = litellm.completion_cost(
-                    model=self.model,
-                    prompt_tokens=turn_prompt_tokens,
-                    completion_tokens=turn_completion_tokens
-                )
+                if self.stream:
+                    # For streaming, use prompt/completion strings method
+                    # (streaming response generator is consumed, can't reuse it)
+                    prompt_text = " ".join([msg.get("content", "") for msg in self.messages if msg.get("role") == "user"])
+                    turn_cost = litellm.completion_cost(
+                        model=self.model,
+                        prompt=prompt_text,
+                        completion=collected_content
+                    )
+                else:
+                    # For non-streaming, use the actual response object
+                    turn_cost = litellm.completion_cost(completion_response=original_response)
             except Exception as e:
                 logger.warning(f"Could not calculate cost: {e}")
                 turn_cost = 0.0

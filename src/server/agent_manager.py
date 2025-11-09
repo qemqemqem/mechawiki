@@ -109,13 +109,18 @@ class AgentManager:
                 
                 agent_instance = agent_class(**init_params)
                 
+                # Get cost tracker for this runner
+                from .cost_tracker import get_cost_tracker
+                cost_tracker = get_cost_tracker()
+                
                 # Wrap in AgentRunner
                 runner = AgentRunner(
                     agent_instance=agent_instance,
                     agent_id=agent_id,
                     log_file=log_file,
                     agent_config=agent_config or {},
-                    start_paused=start_paused
+                    start_paused=start_paused,
+                    cost_tracker=cost_tracker
                 )
                 runner.start()
                 

@@ -67,7 +67,7 @@ class WriterAgent(BaseAgent):
 
 When you write new narrative content, use:
 ```
-add_to_story(content="your prose here", filepath="{story_file}")
+add_to_my_story(content="your prose here")
 ```
 
 All your creative story writing will be appended to this file. This is where your narrative output lives!"""
@@ -161,13 +161,44 @@ All your creative story writing will be appended to this file. This is where you
         }
         self.tools.append(edit_file_def)
         
-        # add_to_story
-        add_to_story_def = {
+        # add_to_my_story - bound version of add_to_story for this agent
+        def add_to_my_story(content: str):
+            """
+            Append narrative prose to YOUR story file.
+            
+            This writes to your designated story file automatically.
+            Use this when continuing your narrative - it's your primary writing tool!
+            
+            Parameters
+            ----------
+            content : str
+                The narrative prose to append
+            
+            Returns
+            -------
+            dict
+                {
+                    "success": bool,
+                    "message": str,
+                    "file_path": str,
+                    "lines_added": int,
+                    "lines_removed": int,
+                    "mode": "append"
+                }
+            
+            Examples
+            --------
+            >>> add_to_my_story("The wizard cast a powerful spell...")
+            {"success": True, "message": "Appended to stories/tale.md", ...}
+            """
+            return add_to_story(content=content, filepath=self.story_file)
+        
+        add_to_my_story_def = {
             "type": "function",
-            "function": litellm.utils.function_to_dict(add_to_story),
-            "_function": add_to_story
+            "function": litellm.utils.function_to_dict(add_to_my_story),
+            "_function": add_to_my_story
         }
-        self.tools.append(add_to_story_def)
+        self.tools.append(add_to_my_story_def)
     
     def _add_article_tools(self):
         """Add article search and reading tools."""
@@ -259,7 +290,7 @@ All your creative story writing will be appended to this file. This is where you
 
 When you write new narrative content, use:
 ```
-add_to_story(content="your prose here", filepath="{new_filepath}")
+add_to_my_story(content="your prose here")
 ```
 
 All your creative story writing will be appended to this file. This is where your narrative output lives!"""

@@ -222,6 +222,39 @@ class TestLogWatcherFileDetection:
             
             assert log_manager._is_file_operation(log_entry) is False
     
+    def test_is_file_operation_detects_add_to_my_story(self):
+        """Should detect add_to_my_story (writer agent tool) as file operation."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_manager = LogManager(Path(tmpdir))
+            
+            log_entry = {
+                "type": "tool_result",
+                "tool": "add_to_my_story",
+                "result": {
+                    "file_path": "stories/my_story.md",
+                    "lines_added": 15,
+                    "lines_removed": 0
+                }
+            }
+            
+            assert log_manager._is_file_operation(log_entry) is True
+    
+    def test_is_file_operation_detects_rename_my_story(self):
+        """Should detect rename_my_story (writer agent tool) as file operation."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_manager = LogManager(Path(tmpdir))
+            
+            log_entry = {
+                "type": "tool_result",
+                "tool": "rename_my_story",
+                "result": {
+                    "old_path": "stories/old_name.md",
+                    "new_path": "stories/new_name.md"
+                }
+            }
+            
+            assert log_manager._is_file_operation(log_entry) is True
+    
     def test_extract_file_event_from_write_article(self):
         """Should extract complete file event from write_article result."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -283,6 +316,61 @@ class TestLogWatcherFileDetection:
             file_event = log_manager._extract_file_event("agent_writer-001", log_entry)
             
             assert file_event is None
+    
+    def test_extract_file_event_from_add_to_my_story(self):
+        """Should extract file event from add_to_my_story (writer agent tool)."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_manager = LogManager(Path(tmpdir))
+            
+            log_entry = {
+                "type": "tool_result",
+                "tool": "add_to_my_story",
+                "result": {
+                    "success": True,
+                    "file_path": "stories/my_story.md",
+                    "lines_added": 20,
+                    "lines_removed": 0,
+                    "mode": "append"
+                },
+                "timestamp": "2025-11-09T12:00:00"
+            }
+            
+            file_event = log_manager._extract_file_event("agent_writer-001", log_entry)
+            
+            assert file_event is not None
+            assert file_event["type"] == "file_changed"
+            assert file_event["agent_id"] == "agent_writer-001"
+            assert file_event["file_path"] == "stories/my_story.md"
+            assert file_event["action"] == "add_to_my_story"
+            assert file_event["changes"]["added"] == 20
+            assert file_event["changes"]["removed"] == 0
+    
+    def test_extract_file_event_from_rename_my_story(self):
+        """Should extract file event from rename_my_story using new_path."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_manager = LogManager(Path(tmpdir))
+            
+            log_entry = {
+                "type": "tool_result",
+                "tool": "rename_my_story",
+                "result": {
+                    "success": True,
+                    "message": "Story renamed successfully",
+                    "old_path": "stories/old_name.md",
+                    "new_path": "stories/epic_adventure.md"
+                },
+                "timestamp": "2025-11-09T12:00:00"
+            }
+            
+            file_event = log_manager._extract_file_event("agent_writer-001", log_entry)
+            
+            assert file_event is not None
+            assert file_event["type"] == "file_changed"
+            assert file_event["agent_id"] == "agent_writer-001"
+            assert file_event["file_path"] == "stories/epic_adventure.md"
+            assert file_event["action"] == "rename_my_story"
+            assert file_event["changes"]["added"] == 0
+            assert file_event["changes"]["removed"] == 0
 
 
 class TestEndToEndFileTracking:

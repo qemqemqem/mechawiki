@@ -5,6 +5,8 @@
 # Exit on any error
 set -e
 
+export SESSION_NAME=tales_of_wonder
+
 # Session configuration
 export SESSION_NAME="${SESSION_NAME:-dev_session}"
 
@@ -16,6 +18,33 @@ echo ""
 echo "Session: $SESSION_NAME"
 echo "Agent Mode: $([ "$USE_MOCK_AGENTS" = "true" ] && echo "🎭 MOCK AGENTS (testing)" || echo "⚡ REAL AGENTS (LLM-powered)")"
 echo ""
+
+# Check if session exists, run setup wizard if not
+SESSION_DIR="data/sessions/$SESSION_NAME"
+if [ ! -d "$SESSION_DIR" ] && [ "$SESSION_NAME" != "dev_session" ]; then
+    echo "📋 Session '$SESSION_NAME' doesn't exist yet."
+    echo "Running setup wizard..."
+    echo ""
+    
+    # Check for Python first
+    if ! command -v python3 &> /dev/null; then
+        echo "❌ Python 3 not found!"
+        echo "Please install Python 3.8 or higher"
+        exit 1
+    fi
+    
+    # Run setup script
+    python3 setup_session.py
+    
+    # Check if setup was successful
+    if [ ! -d "$SESSION_DIR" ]; then
+        echo ""
+        echo "❌ Session setup failed or was cancelled."
+        exit 1
+    fi
+    
+    echo ""
+fi
 
 # Clean dev_session on every start (WARNING!)
 if [ "$SESSION_NAME" = "dev_session" ]; then

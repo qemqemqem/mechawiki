@@ -5,12 +5,15 @@ Bridges the event-yielding BaseAgent to MechaWiki's log-based architecture.
 No monkey-patching needed - just a clean event consumer!
 """
 import json
+import logging
 import time
 import threading
 import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
 
 # Import base agent and exception
 import sys
@@ -35,7 +38,8 @@ class AgentRunner:
         agent_id: str,
         log_file: Path,
         agent_config: Optional[Dict[str, Any]] = None,
-        start_paused: bool = False
+        start_paused: bool = False,
+        cost_tracker = None
     ):
         """
         Initialize AgentRunner.
@@ -46,11 +50,13 @@ class AgentRunner:
             log_file: Path to JSONL log file
             agent_config: Optional agent configuration dict
             start_paused: If True, agent starts in paused state (default: False)
+            cost_tracker: Optional cost tracker instance for reporting costs
         """
         self.agent = agent_instance
         self.agent_id = agent_id
         self.log_file = Path(log_file)
         self.agent_config = agent_config or {}
+        self.cost_tracker = cost_tracker
         
         # Control state
         self.running = False
@@ -92,6 +98,9 @@ class AgentRunner:
     
     def _report_cost_to_tracker(self):
         """Report incremental cost to session tracker."""
+        if not self.cost_tracker:
+            return  # No cost tracker provided, skip silently
+        
         # Get current total cost from agent
         current_cost = self.agent.total_cost
         
@@ -99,22 +108,12 @@ class AgentRunner:
         incremental_cost = current_cost - self.last_reported_cost
         
         if incremental_cost > 0:
-            # Report to session tracker
             try:
-                # Import here to avoid circular imports
-                from ..server.cost_tracker import get_cost_tracker
-                tracker = get_cost_tracker()
-                if tracker:
-                    tracker.add_cost(self.agent_id, incremental_cost)
-                    self.last_reported_cost = current_cost
-                    logger.info(f"💰 Reported ${incremental_cost:.6f} to cost tracker")
-                else:
-                    logger.warning("Cost tracker not available")
+                self.cost_tracker.add_cost(self.agent_id, incremental_cost)
+                self.last_reported_cost = current_cost
+                logger.info(f"💰 Reported ${incremental_cost:.6f} to cost tracker (session total: ${self.cost_tracker.get_total_cost():.6f})")
             except Exception as e:
-                # If tracker not available (e.g., running standalone), skip
                 logger.warning(f"Failed to report cost: {e}")
-        else:
-            logger.debug(f"No cost to report (current: ${current_cost:.6f}, last: ${self.last_reported_cost:.6f})")
     
     def _handle_event(self, event: Dict) -> Optional[str]:
         """
@@ -327,15 +326,23 @@ class AgentRunner:
                 break
             
             except Exception as e:
-                # Other errors stop the agent
+                # Log error but don't kill the agent - wait for user to resume
                 self._log({
                     'type': 'error',
                     'error': str(e),
                     'traceback': traceback.format_exc()
                 })
-                # Don't raise - just log and stop
-                self.running = False
-                break
+                self._log({
+                    'type': 'status',
+                    'status': 'error_waiting',
+                    'message': 'Agent encountered an error. Send a message to retry.',
+                    'source': 'agent_runner._run_loop.error_recovery'
+                })
+                # Wait for user message to retry
+                self._wait_for_user_message()
+                # User message received, retry with continuation prompt
+                initial_prompt = "Continue your task."
+                continue
             
             # Small delay between turns
             time.sleep(1)

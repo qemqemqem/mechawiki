@@ -32,6 +32,10 @@ def list_agents():
         status_info = log_manager.get_agent_status(agent['id'])
         agent_data.update(status_info)
         
+        # Flatten story_file to top level for frontend convenience
+        if 'config' in agent_data and 'story_file' in agent_data['config']:
+            agent_data['story_file'] = agent_data['config']['story_file']
+        
         enriched.append(agent_data)
     
     return jsonify({"agents": enriched})
@@ -99,6 +103,10 @@ def get_agent(agent_id):
     status_info = log_manager.get_agent_status(agent_id)
     agent.update(status_info)
     
+    # Flatten story_file to top level for frontend convenience
+    if 'config' in agent and 'story_file' in agent['config']:
+        agent['story_file'] = agent['config']['story_file']
+    
     return jsonify(agent)
 
 
@@ -165,22 +173,42 @@ def archive_agent(agent_id):
 @bp.route('/pause-all', methods=['POST'])
 def pause_all_agents():
     """Pause all running agents."""
-    # Pause all agents in agent manager (they will write to their own logs)
-    agent_manager.pause_all()
+    # Get all agents and filter by status
+    agents = session_config.list_agents()
+    paused_count = 0
     
-    paused_count = len(session_config.list_agents())
-    logger.info(f"⏸️ Paused all agents ({paused_count})")
+    for agent in agents:
+        agent_id = agent['id']
+        status_info = log_manager.get_agent_status(agent_id)
+        current_status = status_info.get('status', 'unknown')
+        
+        # Only pause agents that are currently running
+        if current_status == 'running':
+            agent_manager.pause_agent(agent_id)
+            paused_count += 1
+    
+    logger.info(f"⏸️ Paused {paused_count} running agents")
     return jsonify({"status": "paused", "count": paused_count})
 
 
 @bp.route('/resume-all', methods=['POST'])
 def resume_all_agents():
     """Resume all paused agents."""
-    # Resume all agents in agent manager (they will write to their own logs)
-    agent_manager.resume_all()
+    # Get all agents and filter by status
+    agents = session_config.list_agents()
+    resumed_count = 0
     
-    resumed_count = len(session_config.list_agents())
-    logger.info(f"▶️ Resumed all agents ({resumed_count})")
+    for agent in agents:
+        agent_id = agent['id']
+        status_info = log_manager.get_agent_status(agent_id)
+        current_status = status_info.get('status', 'unknown')
+        
+        # Only resume agents that are currently paused
+        if current_status == 'paused':
+            agent_manager.resume_agent(agent_id)
+            resumed_count += 1
+    
+    logger.info(f"▶️ Resumed {resumed_count} paused agents")
     return jsonify({"status": "running", "count": resumed_count})
 
 

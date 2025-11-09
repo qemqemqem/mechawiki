@@ -6,6 +6,7 @@ Uses the HighlightContent system to manage story windows efficiently.
 import sys
 import os
 import json
+import re
 import toml
 import litellm
 from pathlib import Path
@@ -28,10 +29,10 @@ config = toml.load("config.toml")
 class StoryWindow:
     """Manages the reading window through a long story."""
     
-    def __init__(self, story_path: str):
+    def __init__(self, story_path: str, starting_position: Optional[int] = None):
         self.story_path = Path(story_path)
         self.story_text = ""
-        self.current_position = config["story"]["story_start"]
+        self.current_position = starting_position if starting_position is not None else config["story"]["story_start"]
         self.chunk_size = config["story"]["chunk_size"]
         
         self._load_story()
@@ -83,6 +84,61 @@ class StoryWindow:
             "progress_percent": progress_percent,
             "is_complete": self.current_position >= total_words
         }
+    
+    def set_position(self, position: int) -> str:
+        """Jump to a specific word position in the story."""
+        words = self.story_text.split()
+        total_words = len(words)
+        
+        # Clamp position to valid range
+        position = max(0, min(position, total_words))
+        
+        old_position = self.current_position
+        self.current_position = position
+        
+        # Get chunk at new position
+        chunk = self.get_current_chunk()
+        
+        return chunk, old_position
+    
+    def grep_story(self, search_term: str, max_results: int = 10, context_words: int = 20) -> list:
+        """
+        Search the story using regex patterns.
+        
+        Returns list of matches with context.
+        """
+        words = self.story_text.split()
+        results = []
+        
+        # Search through the text
+        pattern = re.compile(search_term, re.IGNORECASE)
+        
+        # Find all matches in the full text
+        for match in pattern.finditer(self.story_text):
+            if len(results) >= max_results:
+                break
+                
+            match_start = match.start()
+            match_end = match.end()
+            
+            # Calculate word position (approximate)
+            text_before_match = self.story_text[:match_start]
+            word_position = len(text_before_match.split())
+            
+            # Get context
+            start_word = max(0, word_position - context_words)
+            end_word = min(len(words), word_position + context_words + 10)  # +10 for matched words
+            
+            context = " ".join(words[start_word:end_word])
+            matched_text = match.group()
+            
+            results.append({
+                "word_position": word_position,
+                "matched_text": matched_text,
+                "context": context
+            })
+        
+        return results
 
 
 class ReaderAgent(BaseAgent):
@@ -92,25 +148,37 @@ class ReaderAgent(BaseAgent):
     Manages story content via HighlightContent system to prevent context bloat.
     """
     
-    def __init__(self, story_file: str = "story.txt", **kwargs):
+    def __init__(self, story_file: str = "story.txt", agent_id: Optional[str] = None, agent_config: Optional[dict] = None, **kwargs):
         """Initialize the ReaderAgent with story reading tools.
         
         Args:
             story_file: Path to story file relative to content repo (default: "story.txt")
+            agent_id: Agent ID for updating config (optional)
+            agent_config: Agent configuration dict containing current_position (optional)
             **kwargs: Additional arguments passed to BaseAgent
         """
+        
+        # Store agent_id for config updates
+        self.agent_id = agent_id
         
         # Load the story file
         story_path = Path(config["paths"]["content_repo"]) / story_file
         story_name = story_file  # Use filename as story name
         
-        # Initialize story window
-        self.story_window = StoryWindow(story_path)
+        # Get starting position from agent config if available
+        starting_position = None
+        if agent_config and 'current_position' in agent_config:
+            starting_position = agent_config['current_position']
+        
+        # Initialize story window with saved position
+        self.story_window = StoryWindow(story_path, starting_position=starting_position)
         
         # Create tools using litellm helper with embedded functions
         tools = [
             {"type": "function", "function": litellm.utils.function_to_dict(self.advance), "_function": self.advance},
             {"type": "function", "function": litellm.utils.function_to_dict(self.get_status), "_function": self.get_status},
+            {"type": "function", "function": litellm.utils.function_to_dict(self.go_to_position_in_story), "_function": self.go_to_position_in_story},
+            {"type": "function", "function": litellm.utils.function_to_dict(self.grep_story), "_function": self.grep_story},
             # {"type": "function", "function": litellm.utils.function_to_dict(create_image), "_function": create_image},  # Too slow for dev
             {"type": "function", "function": litellm.utils.function_to_dict(find_articles), "_function": find_articles},
             {"type": "function", "function": litellm.utils.function_to_dict(find_images), "_function": find_images},
@@ -151,12 +219,34 @@ Read systematically through the entire story, advancing the window as you go."""
     
     def advance(self, num_words: Optional[int] = None):
         """
-        Advance the story reading window.
+        Advance the story reading window forward and return the next chunk of text.
+        
+        This is your primary tool for progressing through the story. Each call moves 
+        the reading position forward and returns the next chunk of story text.
         
         Parameters
         ----------
         num_words : int, optional
-            Number of words to advance (default uses config chunk_size)
+            Number of words to advance through the story. 
+            Units: words (whitespace-separated tokens)
+            Default: 5000 words (from config.toml story.chunk_size)
+            
+        Returns
+        -------
+        str
+            The next chunk of story text, up to num_words in length
+            
+        Side Effects
+        ------------
+        - Updates current reading position in memory
+        - Persists position to agents.json for resuming later
+        - Advances cannot be undone (position only moves forward)
+        
+        Example
+        -------
+        advance()           # Advance by default chunk size (5000 words)
+        advance(1000)       # Advance by exactly 1000 words
+        advance(10000)      # Read a larger chunk (10000 words)
         """
         # Get new chunk
         chunk = self.story_window.advance(num_words)
@@ -170,6 +260,25 @@ Read systematically through the entire story, advancing the window as you go."""
             "is_complete": pos_info["is_complete"]
         })
         
+        # Persist current position to agents.json if we have an agent_id
+        if self.agent_id:
+            try:
+                # Import here to avoid circular imports
+                session_name = os.environ.get("SESSION_NAME", "dev_session")
+                from server.config import SessionConfig
+                session_config = SessionConfig(session_name)
+                
+                # Update the agent's config with current position
+                session_config.update_agent(
+                    self.agent_id,
+                    {"config": {"current_position": pos_info["current_position"]}}
+                )
+                
+            except Exception as e:
+                # Don't fail the advance operation if config update fails
+                # Just log it (agent can still continue reading)
+                pass
+        
         # Calculate start word for this chunk
         chunk_word_count = len(chunk.split()) if chunk.strip() else 0
         start_word = pos_info["current_position"] - chunk_word_count
@@ -181,7 +290,7 @@ Read systematically through the entire story, advancing the window as you go."""
         }
         
         # Return simple confirmation - the content will be added after tool execution
-        return f"Advanced to word {pos_info['current_position']} ({pos_info['progress_percent']:.1f}% complete)."
+        return f"Advanced from word {start_word} to word {pos_info['current_position']} ({pos_info['progress_percent']:.1f}% complete)."
     
     def get_status(self):
         """
@@ -206,6 +315,126 @@ Status: {"✅ Complete" if pos_info['is_complete'] else "🔄 In Progress"}
 Use advance() to continue reading."""
         
         return status
+    
+    def go_to_position_in_story(self, position: int):
+        """
+        Jump to a specific word position in the story.
+        
+        This allows you to skip ahead or go back to a specific location in the story.
+        Unlike advance(), this sets the reading position to an exact word number.
+        
+        Parameters
+        ----------
+        position : int
+            The word position to jump to (0-indexed)
+            Position will be clamped to valid range [0, total_words]
+            
+        Returns
+        -------
+        str
+            Confirmation message with the chunk at the new position
+            
+        Side Effects
+        ------------
+        - Updates current reading position
+        - Persists new position to agents.json
+        - Returns a chunk at the new position via highlighted content
+        
+        Example
+        -------
+        go_to_position_in_story(0)       # Jump to the beginning
+        go_to_position_in_story(10000)   # Jump to word 10000
+        go_to_position_in_story(50000)   # Skip ahead to word 50000
+        """
+        chunk, old_position = self.story_window.set_position(position)
+        
+        # Update memory with new position
+        pos_info = self.story_window.get_position_info()
+        self.update_memory({
+            "current_position": pos_info["current_position"],
+            "total_words": pos_info["total_words"],
+            "progress_percent": pos_info["progress_percent"],
+            "is_complete": pos_info["is_complete"]
+        })
+        
+        # Persist position to agents.json if we have an agent_id
+        if self.agent_id:
+            try:
+                session_name = os.environ.get("SESSION_NAME", "dev_session")
+                from server.config import SessionConfig
+                session_config = SessionConfig(session_name)
+                
+                session_config.update_agent(
+                    self.agent_id,
+                    {"config": {"current_position": pos_info["current_position"]}}
+                )
+            except Exception as e:
+                pass
+        
+        # Calculate chunk info for display
+        chunk_word_count = len(chunk.split()) if chunk.strip() else 0
+        
+        # Store content for deferred addition
+        self._pending_content = {
+            'content': chunk,
+            'start_word': pos_info["current_position"]
+        }
+        
+        # Return confirmation
+        return f"Jumped from word {old_position} to word {pos_info['current_position']} ({pos_info['progress_percent']:.1f}% complete)."
+    
+    def grep_story(self, search_term: str, max_results: int = 10, context_words: int = 20):
+        """
+        Search through the entire story using regex patterns.
+        
+        This powerful search tool lets you find specific text, phrases, or patterns 
+        anywhere in the story without reading through it sequentially. Perfect for 
+        finding mentions of characters, locations, or specific events.
+        
+        Parameters
+        ----------
+        search_term : str
+            Regex pattern to search for (case-insensitive by default)
+            Examples: "dragon", "Chapter \\d+", "said.*sadly"
+        max_results : int, optional
+            Maximum number of results to return (default: 10)
+            Prevents overwhelming output for common terms
+        context_words : int, optional
+            Number of words to show before the match (default: 20)
+            Context helps understand where in the story the match occurs
+            
+        Returns
+        -------
+        str
+            Formatted list of matches with word positions and context
+            
+        Side Effects
+        ------------
+        None - this is a read-only operation that doesn't change position
+        
+        Example
+        -------
+        grep_story("Frodo")                    # Find all mentions of Frodo
+        grep_story("Chapter \\d+", max_results=5)  # Find first 5 chapter headers
+        grep_story("dragon.*fire", context_words=30)  # Find dragon/fire phrases with more context
+        """
+        results = self.story_window.grep_story(search_term, max_results, context_words)
+        
+        if not results:
+            return f"No matches found for pattern: '{search_term}'"
+        
+        # Format results
+        output = [f"Found {len(results)} match(es) for pattern: '{search_term}'\n"]
+        
+        for i, result in enumerate(results, 1):
+            output.append(f"\n{i}. At word {result['word_position']}:")
+            output.append(f"   Matched: '{result['matched_text']}'")
+            output.append(f"   Context: ...{result['context']}...")
+        
+        if len(results) == max_results:
+            output.append(f"\n(Showing first {max_results} results. Use max_results parameter to see more.)")
+        
+        return "\n".join(output)
     
     def process_pending_content(self):
         """Process any pending content after tool execution is complete."""

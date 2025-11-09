@@ -226,6 +226,14 @@ def send_message(agent_id):
     if not message:
         return jsonify({"error": "Message cannot be empty"}), 400
     
+    # Check agent's current status and resume if not running
+    status_info = log_manager.get_agent_status(agent_id)
+    current_status = status_info.get('status', 'unknown')
+    
+    if current_status != 'running':
+        agent_manager.resume_agent(agent_id)
+        logger.info(f"▶️ Auto-resumed agent {agent_id} (was {current_status})")
+    
     # Write user message to log
     log_file = session_config.logs_dir / f"agent_{agent_id}.jsonl"
     log_entry = {
@@ -291,13 +299,13 @@ def get_logs(agent_id):
                         yield f"data: {line}\n\n"
         
         # Stream new logs as they arrive
-        try:
-            while True:
+        while True:
+            try:
                 log_entry = log_queue.get(timeout=30)  # 30 second timeout
                 yield f"data: {json.dumps(log_entry)}\n\n"
-        except queue.Empty:
-            # Send keepalive
-            yield f": keepalive\n\n"
+            except queue.Empty:
+                # Send keepalive and continue
+                yield f": keepalive\n\n"
     
     return Response(generate(), mimetype='text/event-stream')
 

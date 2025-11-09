@@ -35,7 +35,9 @@ class InteractiveAgent(BaseAgent):
         story_file: str = "stories/interactive_adventure.md",
         system_prompt: str = None,
         memory: dict = None,
-        stream: bool = True
+        stream: bool = True,
+        agent_id: str = None,
+        agent_config: dict = None
     ):
         """
         Initialize InteractiveAgent.
@@ -46,8 +48,11 @@ class InteractiveAgent(BaseAgent):
             system_prompt: Optional custom system prompt
             memory: Optional initial memory dict
             stream: Whether to stream responses
+            agent_id: Optional agent ID for updating config
+            agent_config: Optional agent configuration dict (for future state persistence)
         """
         self.story_file = story_file
+        self.agent_id = agent_id  # Store agent ID for config updates
         # Load system prompt from files if not provided
         if system_prompt is None:
             system_prompt = build_agent_prompt("interactive", include_tools=True)

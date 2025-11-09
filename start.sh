@@ -150,12 +150,39 @@ python3 run_server.py > backend.log 2>&1 &
 BACKEND_PID=$!
 echo "Backend PID: $BACKEND_PID"
 
-# Wait a moment for backend to start and check if it's still running
-sleep 2
+# Wait for backend to initialize (agents take time to start)
+echo "⏳ Waiting for backend initialization (5 seconds)..."
+sleep 5
 
+# Check if backend is still running
 if ! kill -0 $BACKEND_PID 2>/dev/null; then
-    echo "❌ Backend failed to start! Check backend.log for details:"
-    tail -20 backend.log
+    echo ""
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo "❌ BACKEND FAILED TO START!"
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo ""
+    echo "Last 30 lines of backend.log:"
+    echo "─────────────────────────────────────────────────────────────"
+    tail -30 backend.log
+    echo "─────────────────────────────────────────────────────────────"
+    echo ""
+    echo "Check backend.log for full error details."
+    exit 1
+fi
+
+# Check for critical errors in backend log (even if process is alive)
+if grep -q "CRITICAL ERROR DURING AGENT INITIALIZATION" backend.log; then
+    echo ""
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo "❌ AGENT INITIALIZATION FAILED!"
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo ""
+    echo "Last 30 lines of backend.log:"
+    echo "─────────────────────────────────────────────────────────────"
+    tail -30 backend.log
+    echo "─────────────────────────────────────────────────────────────"
+    echo ""
+    kill $BACKEND_PID 2>/dev/null
     exit 1
 fi
 

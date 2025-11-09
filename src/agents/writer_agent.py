@@ -38,7 +38,8 @@ class WriterAgent(BaseAgent):
         system_prompt: str = None,
         memory: dict = None,
         stream: bool = True,
-        agent_id: str = None
+        agent_id: str = None,
+        agent_config: dict = None
     ):
         """
         Initialize WriterAgent.
@@ -50,6 +51,7 @@ class WriterAgent(BaseAgent):
             memory: Optional initial memory dict
             stream: Whether to stream responses
             agent_id: Optional agent ID for updating config when renaming story
+            agent_config: Optional agent configuration dict (for future state persistence)
         """
         self.story_file = story_file
         self.agent_id = agent_id  # Store agent ID for config updates

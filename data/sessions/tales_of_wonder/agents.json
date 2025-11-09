@@ -8,9 +8,10 @@
         "description": "Reads stories and creates wiki articles",
         "initial_prompt": "Start by listing some articles in the articles directory. Then advance through the story and comment on what you find interesting.",
         "model": "claude-haiku-4-5-20251001",
-        "story_file": "story.txt"
+        "story_file": "story.txt",
+        "current_position": 41282
       },
-      "created_at": "2025-11-08T21:38:22.289409",
+      "created_at": "2025-11-09T08:43:11.992322",
       "log_file": "logs/agent_reader-001.jsonl"
     },
     {
@@ -23,7 +24,7 @@
         "model": "claude-haiku-4-5-20251001",
         "story_file": "stories/writer_story.md"
       },
-      "created_at": "2025-11-08T21:38:22.289425",
+      "created_at": "2025-11-09T08:43:11.992341",
       "log_file": "logs/agent_writer-001.jsonl"
     },
     {
@@ -36,8 +37,19 @@
         "model": "claude-haiku-4-5-20251001",
         "story_file": "stories/interactive_adventure.md"
       },
-      "created_at": "2025-11-08T21:38:22.289431",
+      "created_at": "2025-11-09T08:43:11.992345",
       "log_file": "logs/agent_interactive-001.jsonl"
+    },
+    {
+      "id": "interactiveagent-20251109101603",
+      "name": "Interactive Agent 2",
+      "type": "InteractiveAgent",
+      "status": "stopped",
+      "config": {
+        "description": "A fast paced yet strangely philosophical story"
+      },
+      "created_at": "2025-11-09T10:16:03.110320",
+      "log_file": "logs/agent_interactiveagent-20251109101603.jsonl"
     }
   ]
 }

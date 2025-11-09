@@ -19,7 +19,12 @@ from agents.mock_agent import MockAgent
 
 
 def init_test_agents():
-    """Initialize test agents in the dev session.
+    """Initialize test agents in the dev session ONLY.
+    
+    This function should ONLY be called for the dev_session, typically by start.sh.
+    It completely resets the dev environment with fresh test agents.
+    
+    For production sessions, agents should be loaded from existing agents.json.
     
     This function:
     1. Cleans up the dev_session directory (removes old logs)
@@ -28,7 +33,13 @@ def init_test_agents():
     4. Normal startup then reads from these files
     """
     
-    print("🤖 Initializing test agents...")
+    # DEFENSIVE GUARD: Only run for dev_session
+    if session_config.session_name != "dev_session":
+        print(f"⚠️  WARNING: init_test_agents() called for session '{session_config.session_name}'")
+        print(f"⚠️  This function should ONLY run for 'dev_session'. Skipping initialization.")
+        return
+    
+    print("🤖 Initializing test agents for dev_session...")
     print("🧹 Cleaning dev_session directory...")
     
     # Clean up logs directory
@@ -83,7 +94,7 @@ def init_test_agents():
         }
     ]
     
-    # Write agents.json directly
+    # Write agents.json directly (clean reset for dev_session)
     agents_file = session_config.agents_file
     agents_data = {"agents": test_agents}
     

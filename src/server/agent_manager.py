@@ -103,9 +103,10 @@ class AgentManager:
                 if 'story_file' in agent_config:
                     init_params['story_file'] = agent_config['story_file']
                 
-                # Add agent_id for WriterAgent (needed for rename tool)
-                if agent_type == 'WriterAgent':
+                # Add agent_id and agent_config for agents that need to persist state
+                if agent_type in ['WriterAgent', 'ReaderAgent', 'InteractiveAgent']:
                     init_params['agent_id'] = agent_id
+                    init_params['agent_config'] = agent_config
                 
                 agent_instance = agent_class(**init_params)
                 

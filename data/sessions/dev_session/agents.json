@@ -8,7 +8,8 @@
         "description": "Reads stories and creates wiki articles",
         "initial_prompt": "Start by listing some articles in the articles directory. Then advance through the story and comment on what you find interesting.",
         "model": "claude-haiku-4-5-20251001",
-        "story_file": "story.txt"
+        "story_file": "story.txt",
+        "current_position": 5000
       },
       "created_at": "2025-11-08T21:30:21.375200",
       "log_file": "logs/agent_reader-001.jsonl"

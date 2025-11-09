@@ -70,6 +70,133 @@ class AgentRunner:
         
         # Track last reported cost for incremental reporting
         self.last_reported_cost = 0.0
+        
+        # Load existing conversation history from log file
+        self._load_history_from_log()
+    
+    def _load_history_from_log(self):
+        """Load conversation history from existing log file.
+        
+        This reconstructs the agent's conversation history from previous sessions,
+        allowing the agent to resume with full context of what happened before.
+        """
+        if not self.log_file.exists():
+            logger.info(f"No existing log file for {self.agent_id}, starting fresh")
+            return
+        
+        logger.info(f"📚 Loading conversation history for {self.agent_id} from {self.log_file}")
+        
+        messages_loaded = 0
+        accumulated_assistant_text = ""
+        current_tool_calls = []
+        
+        try:
+            with open(self.log_file, 'r') as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    
+                    try:
+                        entry = json.loads(line)
+                        entry_type = entry.get('type')
+                        
+                        # Skip status entries and thinking
+                        if entry_type in ['status', 'thinking', 'error']:
+                            continue
+                        
+                        # Accumulate assistant message text
+                        if entry_type == 'message' and entry.get('role') == 'assistant':
+                            accumulated_assistant_text += entry.get('content', '')
+                        
+                        # Handle tool calls
+                        elif entry_type == 'tool_call':
+                            # Add tool call to list
+                            tool_call_id = f"call_{entry.get('tool')}_{len(current_tool_calls)}"
+                            current_tool_calls.append({
+                                "id": tool_call_id,
+                                "type": "function",
+                                "function": {
+                                    "name": entry.get('tool'),
+                                    "arguments": json.dumps(entry.get('args', {}))
+                                }
+                            })
+                        
+                        # Handle tool results
+                        elif entry_type == 'tool_result':
+                            tool_name = entry.get('tool')
+                            result = entry.get('result')
+                            
+                            # If we have pending tool calls, create an assistant message with them
+                            if current_tool_calls:
+                                # Flush accumulated text into assistant message with tool calls
+                                self.agent.messages.append({
+                                    "role": "assistant",
+                                    "content": accumulated_assistant_text,
+                                    "tool_calls": current_tool_calls
+                                })
+                                messages_loaded += 1
+                                accumulated_assistant_text = ""
+                            
+                            # Find the matching tool call
+                            matching_call = None
+                            for tc in current_tool_calls:
+                                if tc['function']['name'] == tool_name:
+                                    matching_call = tc
+                                    break
+                            
+                            # Add tool result message
+                            if matching_call:
+                                tool_result_msg = {
+                                    "role": "tool",
+                                    "tool_call_id": matching_call['id'],
+                                    "name": tool_name,
+                                    "content": json.dumps(result) if not isinstance(result, str) else result
+                                }
+                                self.agent.messages.append(tool_result_msg)
+                                messages_loaded += 1
+                            
+                            # Clear tool calls list
+                            current_tool_calls = []
+                        
+                        # Handle user messages
+                        elif entry_type == 'user_message':
+                            # Flush any accumulated assistant text
+                            if accumulated_assistant_text:
+                                self.agent.messages.append({
+                                    "role": "assistant",
+                                    "content": accumulated_assistant_text
+                                })
+                                messages_loaded += 1
+                                accumulated_assistant_text = ""
+                            
+                            # Add user message
+                            self.agent.messages.append({
+                                "role": "user",
+                                "content": entry.get('content', '')
+                            })
+                            messages_loaded += 1
+                    
+                    except json.JSONDecodeError:
+                        logger.warning(f"Failed to parse log line: {line[:100]}")
+                        continue
+            
+            # Flush any remaining accumulated text
+            if accumulated_assistant_text:
+                self.agent.messages.append({
+                    "role": "assistant",
+                    "content": accumulated_assistant_text
+                })
+                messages_loaded += 1
+            
+            # Validate and repair the loaded history
+            if messages_loaded > 0:
+                self.agent._validate_and_repair_conversation_history()
+                logger.info(f"✅ Loaded {messages_loaded} conversation turns from log file")
+                logger.info(f"📊 Agent now has {len(self.agent.messages)} messages in history")
+        
+        except Exception as e:
+            logger.error(f"Error loading history from log: {e}")
+            logger.info("Agent will start with empty history")
     
     def _log(self, log_entry: Dict):
         """Write JSONL log entry with timestamp."""

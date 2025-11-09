@@ -8,62 +8,90 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage,
   const [message, setMessage] = useState('')
   const [showTimestamps, setShowTimestamps] = useState(false)
   const [expandedTools, setExpandedTools] = useState({}) // Track which tools are expanded
+  const [hasScrolledInitially, setHasScrolledInitially] = useState(false)
   const logsEndRef = useRef(null)
   const logsContainerRef = useRef(null)
 
   useEffect(() => {
-    // Connect to agent logs SSE
-    const eventSource = new EventSource(`http://localhost:5000/api/agents/${agent.id}/logs`)
+    let eventSource = null
+    let reconnectTimeout = null
+    let isMounted = true
     
-    eventSource.onmessage = (event) => {
-      try {
-        const logEntry = JSON.parse(event.data)
+    const connectToLogs = () => {
+      if (!isMounted) return
+      
+      // Connect to agent logs SSE
+      eventSource = new EventSource(`http://localhost:5000/api/agents/${agent.id}/logs`)
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const logEntry = JSON.parse(event.data)
+          
+          // Handle message accumulation - if the last log is also a message, append to it
+          setLogs(prev => {
+            if (prev.length === 0) {
+              return [logEntry]
+            }
+            
+            const lastLog = prev[prev.length - 1]
+            
+            // Accumulate consecutive messages into one bubble
+            if (logEntry.type === 'message' && lastLog.type === 'message') {
+              return [
+                ...prev.slice(0, -1),
+                {
+                  ...lastLog,
+                  content: lastLog.content + logEntry.content
+                }
+              ]
+            }
+            
+            // Accumulate consecutive thinking entries
+            if (logEntry.type === 'thinking' && lastLog.type === 'thinking') {
+              return [
+                ...prev.slice(0, -1),
+                {
+                  ...lastLog,
+                  content: lastLog.content + logEntry.content
+                }
+              ]
+            }
+            
+            // Otherwise, append as new entry
+            return [...prev, logEntry]
+          })
+        } catch (error) {
+          // Ignore parse errors (keepalive messages, etc.)
+        }
+      }
+      
+      eventSource.onerror = () => {
+        console.error('❌ SSE connection error, reconnecting in 3 seconds...')
+        eventSource.close()
         
-        // Handle message accumulation - if the last log is also a message, append to it
-        setLogs(prev => {
-          if (prev.length === 0) {
-            return [logEntry]
-          }
-          
-          const lastLog = prev[prev.length - 1]
-          
-          // Accumulate consecutive messages into one bubble
-          if (logEntry.type === 'message' && lastLog.type === 'message') {
-            return [
-              ...prev.slice(0, -1),
-              {
-                ...lastLog,
-                content: lastLog.content + logEntry.content
-              }
-            ]
-          }
-          
-          // Accumulate consecutive thinking entries
-          if (logEntry.type === 'thinking' && lastLog.type === 'thinking') {
-            return [
-              ...prev.slice(0, -1),
-              {
-                ...lastLog,
-                content: lastLog.content + logEntry.content
-              }
-            ]
-          }
-          
-          // Otherwise, append as new entry
-          return [...prev, logEntry]
-        })
-      } catch (error) {
-        // Ignore parse errors
+        // Reconnect after 3 seconds if still mounted
+        if (isMounted) {
+          reconnectTimeout = setTimeout(connectToLogs, 3000)
+        }
       }
     }
     
-    eventSource.onerror = () => {
-      console.error('Error connecting to agent logs')
-      eventSource.close()
-    }
+    connectToLogs()
     
-    return () => eventSource.close()
+    return () => {
+      isMounted = false
+      if (eventSource) eventSource.close()
+      if (reconnectTimeout) clearTimeout(reconnectTimeout)
+    }
   }, [agent.id])
+
+  // Initial scroll to bottom when logs first load
+  useEffect(() => {
+    if (logs.length > 0 && !hasScrolledInitially) {
+      logsEndRef.current?.scrollIntoView({ behavior: 'auto' })
+      setHasScrolledInitially(true)
+    }
+  }, [logs, hasScrolledInitially])
 
   useEffect(() => {
     // Auto-scroll to bottom only if user is already at or near the bottom
@@ -130,6 +158,18 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage,
     // add_to_my_story doesn't need filepath since it's bound to the agent
     if (toolName === 'add_to_my_story') {
       return displayName
+    }
+    
+    // General rule: if there's exactly one argument and it fits in 100 chars, show it inline
+    const argKeys = Object.keys(toolArgs)
+    if (argKeys.length === 1) {
+      const argKey = argKeys[0]
+      const argValue = toolArgs[argKey]
+      const argString = String(argValue)
+      
+      if (argString.length <= 100) {
+        return `${displayName}: ${argString}`
+      }
     }
     
     return displayName

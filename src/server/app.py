@@ -34,9 +34,15 @@ from .agent_manager import agent_manager
 # Function to initialize agents (called from run_server, not at module level)
 def init_and_start_agents():
     """Initialize and start agents. Called once from run_server()."""
-    logger.info("🤖 Initializing test agents...")
     from .init_agents import init_test_agents, start_test_agents
-    init_test_agents()
+    
+    # Only initialize test agents for dev_session (has defensive guard inside too)
+    if session_config.session_name == "dev_session":
+        logger.info("🤖 Initializing test agents for dev_session...")
+        init_test_agents()
+    else:
+        logger.info(f"🤖 Loading agents for session '{session_config.session_name}'...")
+    
     start_test_agents(agent_manager)
     
     # Start watching existing agents
@@ -61,7 +67,17 @@ def run_server(host='localhost', port=5000, debug=True):
     # Initialize agents once at startup
     # In debug mode, we disable the reloader to prevent agents from restarting
     # on every code change (frontend has its own Vite reloader)
-    init_and_start_agents()
+    try:
+        init_and_start_agents()
+    except Exception as e:
+        logger.error("=" * 80)
+        logger.error("❌ CRITICAL ERROR DURING AGENT INITIALIZATION")
+        logger.error("=" * 80)
+        logger.error(f"Error: {type(e).__name__}: {e}")
+        logger.error("=" * 80)
+        logger.error("Server startup failed. Fix the error and restart.")
+        logger.error("=" * 80)
+        raise  # Re-raise to crash the process
     
     logger.info(f"🚀 Starting server on {host}:{port}")
     # Disable reloader to prevent agent restarts on Python file changes

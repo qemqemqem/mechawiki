@@ -54,16 +54,15 @@ logger.info("🏰 MechaWiki server initialized")
 
 def run_server(host='localhost', port=5000, debug=True):
     """Run the Flask development server."""
-    # Initialize agents here (not at module level) to avoid double-init in debug mode
-    # Only run when:
-    # - Not in debug mode (run once), OR
-    # - In debug mode AND in the reloader child process (WERKZEUG_RUN_MAIN='true')
-    # This prevents running in BOTH the initial process AND the child process
-    if not debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        init_and_start_agents()
+    # Initialize agents once at startup
+    # In debug mode, we disable the reloader to prevent agents from restarting
+    # on every code change (frontend has its own Vite reloader)
+    init_and_start_agents()
     
     logger.info(f"🚀 Starting server on {host}:{port}")
-    app.run(host=host, port=port, debug=debug, threaded=True, use_reloader=debug)
+    # Disable reloader to prevent agent restarts on Python file changes
+    # Frontend has Vite for hot reloading, backend can be manually restarted
+    app.run(host=host, port=port, debug=debug, threaded=True, use_reloader=False)
 
 
 if __name__ == '__main__':

@@ -90,21 +90,43 @@ else:
     initial_prompt = "Continue your task."
 ```
 
+### Part 4: Defensive Programming - Automatic Repair
+
+**File:** `src/base_agent/base_agent.py`
+
+Added `_validate_and_repair_conversation_history()` method that runs **before every LLM call** to catch any orphaned tool_calls and automatically add dummy tool_results. This provides a safety net in case bugs slip through or conversation history is loaded from disk.
+
+```python
+def run_forever(self, initial_message: Optional[str] = None, max_turns: int = 3):
+    # ...
+    # Validate and repair conversation history (defensive programming)
+    self._validate_and_repair_conversation_history()
+    
+    # Make LLM call
+    response = litellm.completion(...)
+```
+
+**Benefits:**
+- ✅ Prevents crashes from malformed conversation history
+- ✅ Logs warnings when repairs are made (helps catch bugs)
+- ✅ Handles edge cases like loading saved conversations
+- ✅ Zero impact when conversation is already valid
+
 ## The Conversation State (Fixed)
 
 ```
-assistant: [tool_call: wait_for_user]
-tool: [result for wait_for_user]
-user: "I dance!"                    ← Added by _wait_for_user_message()
-                                    ← No duplicate! ✅
+assistant: "..." [tool_call: wait_for_user]
+tool: [result for wait_for_user]    ← Now properly added! ✅
+user: "I am curious about the minerals"
 ```
 
 ## Why This Works
 
-1. When resuming after user input, the user's message is **already in the conversation**
-2. Passing `None` to `run_forever()` tells it to continue **without adding another message**
-3. The conversation format stays valid for Anthropic's API
-4. **Backward compatible**: Existing code that passes messages still works
+1. **All events are consumed**: The loop doesn't break early, so `tool_result` is processed
+2. **Tool result is logged**: The tool_result event is properly logged to JSONL
+3. **Conversation is complete**: The tool_call has its corresponding tool_result
+4. **No duplicates**: Passing `None` on resume prevents duplicate user messages
+5. **Backward compatible**: Existing code that passes messages still works
 
 ## Testing
 
@@ -120,16 +142,21 @@ user: "I dance!"                    ← Added by _wait_for_user_message()
 
 ```jsonl
 {"type": "tool_call", "tool": "wait_for_user", "args": {...}}
-{"type": "tool_result", "tool": "wait_for_user", "result": {...}}
 {"type": "status", "status": "waiting_for_input", ...}
-{"type": "user_message", "content": "I dance!"}
+{"type": "tool_result", "tool": "wait_for_user", "result": {...}}  ← NOW LOGGED!
+{"type": "user_message", "content": "I am curious about the minerals"}
 {"type": "tool_call", "tool": "add_to_story", ...}  ← Continues successfully!
 ```
 
 ## Files Changed
 
-- `src/base_agent/base_agent.py`: Made `initial_message` optional
-- `src/agents/agent_runner.py`: Pass `None` when resuming after user input
+- `src/agents/agent_runner.py`: 
+  - Don't break early when waiting for input - consume all events
+  - Pass `None` when resuming after user input
+- `src/base_agent/base_agent.py`: 
+  - Made `initial_message` optional
+  - Added `_validate_and_repair_conversation_history()` defensive check
+  - Runs repair before every LLM call to catch any orphaned tool_calls
 
 ## Impact
 
@@ -137,15 +164,24 @@ user: "I dance!"                    ← Added by _wait_for_user_message()
 - ✅ Conversation format stays valid for Anthropic API
 - ✅ Backward compatible with all existing agent code
 - ✅ Cleaner architecture (no duplicate messages)
+- ✅ Defensive programming prevents future similar bugs
+- ✅ Automatic repair helps debug conversation history issues
 
 ## Related Patterns
 
-This bug was similar to the previous `wait_for_user` fix (BUGFIX_INTERACTIVE_AGENT.md), but **different**:
+This was actually **TWO bugs** that we fixed:
 
-- **Previous bug**: AgentRunner wasn't waiting for user input at all
-- **This bug**: AgentRunner WAS waiting, but then added a duplicate message on resume
+### Bug 1: Early Break Abandoning Events
+- **Problem**: `break` in the event loop abandoned unconsumed events
+- **Fix**: Set flag but continue consuming events until generator exhausts
+- **Lesson**: When consuming generator events, exhaust the generator before acting on signals!
 
-**The lesson:** When resuming agent execution after external input, be careful not to add redundant messages to the conversation history!
+### Bug 2: Duplicate User Messages  
+- **Problem**: `run_forever()` always added initial_message, even on resume
+- **Fix**: Made initial_message optional, pass `None` when resuming
+- **Lesson**: When resuming execution after external input, don't duplicate messages!
+
+**The deeper lesson:** Event-driven architectures require careful coordination between producers (generators) and consumers (event loops). Signals can be passed through events, but the consumer must finish consuming before acting on control flow signals!
 
 ---
 

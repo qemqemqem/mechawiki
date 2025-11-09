@@ -9,7 +9,7 @@
         "initial_prompt": "Start by listing some articles in the articles directory. Then advance through the story and comment on what you find interesting.",
         "model": "claude-haiku-4-5-20251001"
       },
-      "created_at": "2025-11-08T19:07:31.550044",
+      "created_at": "2025-11-08T19:22:25.513286",
       "log_file": "logs/agent_reader-001.jsonl"
     },
     {
@@ -21,7 +21,7 @@
         "initial_prompt": "Search for some articles to get inspiration, then write a short story based on wiki content.",
         "model": "claude-haiku-4-5-20251001"
       },
-      "created_at": "2025-11-08T19:07:31.551534",
+      "created_at": "2025-11-08T19:22:25.513871",
       "log_file": "logs/agent_writer-001.jsonl"
     },
     {
@@ -33,7 +33,7 @@
         "initial_prompt": "Create an interactive adventure. Set the scene and ask the user what they want to do using wait_for_user().",
         "model": "claude-haiku-4-5-20251001"
       },
-      "created_at": "2025-11-08T19:07:31.561354",
+      "created_at": "2025-11-08T19:22:25.514544",
       "log_file": "logs/agent_interactive-001.jsonl"
     }
   ]

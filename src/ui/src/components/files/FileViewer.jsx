@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './FileViewer.css'
 
-function FileViewer({ filePath, onBack, onNavigate }) {
+function FileViewer({ filePath, onBack, onNavigate, onTitleExtracted }) {
   const [content, setContent] = useState('')
   const [editMode, setEditMode] = useState(false)
   const [editedContent, setEditedContent] = useState('')
@@ -14,6 +14,35 @@ function FileViewer({ filePath, onBack, onNavigate }) {
   useEffect(() => {
     fetchFile()
   }, [filePath])
+
+  // Extract title from markdown content (first H1)
+  const extractTitle = (markdown) => {
+    const lines = markdown.split('\n')
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (trimmed.startsWith('# ')) {
+        return trimmed.substring(2).trim()
+      }
+    }
+    return null
+  }
+
+  // Remove first H1 from content for display
+  const getContentWithoutTitle = (markdown) => {
+    const lines = markdown.split('\n')
+    let foundFirstH1 = false
+    const filteredLines = []
+    
+    for (const line of lines) {
+      if (!foundFirstH1 && line.trim().startsWith('# ')) {
+        foundFirstH1 = true
+        continue // Skip this line
+      }
+      filteredLines.push(line)
+    }
+    
+    return filteredLines.join('\n').trim()
+  }
 
   const fetchFile = async () => {
     setLoading(true)
@@ -26,8 +55,16 @@ function FileViewer({ filePath, onBack, onNavigate }) {
       }
       
       const data = await response.json()
-      setContent(data.content || '')
-      setEditedContent(data.content || '')
+      const fileContent = data.content || ''
+      setContent(fileContent)
+      setEditedContent(fileContent)
+      
+      // Extract and send title to parent
+      const title = extractTitle(fileContent)
+      if (title && onTitleExtracted) {
+        onTitleExtracted(title)
+      }
+      
       setLoading(false)
     } catch (err) {
       setError(err.message)
@@ -144,8 +181,6 @@ function FileViewer({ filePath, onBack, onNavigate }) {
           ← Back to Feed
         </button>
         
-        <h3 className="file-path">{filePath}</h3>
-        
         <div className="file-controls">
           {editMode ? (
             <>
@@ -188,7 +223,7 @@ function FileViewer({ filePath, onBack, onNavigate }) {
                 a: renderLink
               }}
             >
-              {content}
+              {getContentWithoutTitle(content)}
             </ReactMarkdown>
           </div>
         )}

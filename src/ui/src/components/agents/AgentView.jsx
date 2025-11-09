@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import './AgentView.css'
 
 function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage }) {
@@ -154,7 +156,11 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
         return (
           <div key={index} className="log-story-bubble">
             <div className="story-label">📖 Story</div>
-            <div className="story-content">{log.args.content}</div>
+            <div className="story-content">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {log.args.content}
+              </ReactMarkdown>
+            </div>
             {timestamp}
           </div>
         )
@@ -217,7 +223,11 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
     if (type === 'message') {
       return (
         <div key={index} className="log-message-bubble">
-          <div className="log-content">{log.content}</div>
+          <div className="log-content">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {log.content}
+            </ReactMarkdown>
+          </div>
           {timestamp}
         </div>
       )
@@ -227,7 +237,11 @@ function AgentView({ agent, onBack, onPause, onResume, onArchive, onSendMessage 
     if (type === 'user_message') {
       return (
         <div key={index} className="log-user-bubble">
-          <div className="log-content">{log.content}</div>
+          <div className="log-content">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {log.content}
+            </ReactMarkdown>
+          </div>
           {timestamp}
         </div>
       )

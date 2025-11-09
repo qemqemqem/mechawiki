@@ -39,6 +39,7 @@ class AgentManager:
             return
         
         self._agents: Dict[str, Union[MockAgent, AgentRunner]] = {}
+        self._agents_started = False  # Track if init_and_start_agents() has been called
         self._initialized = True
         logger.info("🤖 Agent Manager initialized")
     
@@ -188,6 +189,14 @@ class AgentManager:
     def list_running(self) -> list:
         """Get list of running agent IDs."""
         return list(self._agents.keys())
+    
+    def mark_agents_started(self):
+        """Mark that agents have been initialized (prevents duplicate initialization on reloads)."""
+        self._agents_started = True
+    
+    def agents_already_started(self) -> bool:
+        """Check if agents have already been initialized."""
+        return self._agents_started
     
     def stop_all(self):
         """Stop all running agents."""

@@ -1,2 +1,1 @@
-{"type": "status", "status": "paused", "message": "Agent started (paused)", "source": "agent_runner._run_loop.initial_paused", "timestamp": "2025-11-08T19:07:31.581372"}
-{"type": "status", "status": "paused", "message": "Agent started (paused)", "source": "agent_runner._run_loop.initial_paused", "timestamp": "2025-11-08T19:10:07.494852"}
+{"type": "status", "status": "paused", "message": "Agent started (paused)", "source": "agent_runner._run_loop.initial_paused", "timestamp": "2025-11-08T19:22:25.524144"}

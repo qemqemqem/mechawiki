@@ -5,7 +5,10 @@ Agents are generators that yield events instead of printing.
 """
 import json
 import litellm
+import logging
 from typing import Dict, List, Callable, Any, Optional, Generator
+
+logger = logging.getLogger(__name__)
 
 
 class ToolError(Exception):
@@ -374,6 +377,99 @@ class BaseAgent:
         
         return None
     
+    def _validate_and_repair_conversation_history(self) -> None:
+        """
+        Validate and repair conversation history to ensure Anthropic API requirements.
+        
+        Anthropic requires that every assistant message with tool_calls (tool_use) 
+        must be immediately followed by tool messages (tool_result) with matching IDs.
+        
+        This method modifies self.messages in-place to add missing tool_results.
+        """
+        if not self.messages:
+            return
+        
+        repaired_history = []
+        i = 0
+        repairs_made = 0
+        
+        while i < len(self.messages):
+            msg = self.messages[i]
+            
+            # Check if this is an assistant message with tool_calls
+            if msg.get("role") == "assistant" and msg.get("tool_calls"):
+                # Add the assistant message with tool_calls
+                repaired_history.append(msg)
+                
+                tool_calls = msg.get("tool_calls", [])
+                tool_call_ids = [tc.get("id") for tc in tool_calls if tc.get("id")]
+                
+                # Check if the next message(s) contain tool results for these IDs
+                found_ids = set()
+                j = i + 1
+                
+                # Look ahead for tool results (must be immediately after)
+                while j < len(self.messages):
+                    next_msg = self.messages[j]
+                    if next_msg.get("role") == "tool":
+                        tool_call_id = next_msg.get("tool_call_id")
+                        if tool_call_id and tool_call_id in tool_call_ids:
+                            found_ids.add(tool_call_id)
+                            repaired_history.append(next_msg)
+                            j += 1
+                        else:
+                            # This is a tool result for a different tool call - stop here
+                            break
+                    else:
+                        # Hit a non-tool message - stop looking for tool results
+                        break
+                
+                # Check for orphaned tool calls (tool_calls without matching tool results)
+                missing_ids = set(tool_call_ids) - found_ids
+                if missing_ids:
+                    logger.warning(
+                        f"⚠️ Found {len(missing_ids)} orphaned tool_call(s) without tool_result: {list(missing_ids)}. "
+                        "Adding dummy tool_result(s) to satisfy API requirements."
+                    )
+                    repairs_made += len(missing_ids)
+                    
+                    # Add dummy tool results for missing IDs
+                    for missing_id in missing_ids:
+                        # Find the tool name for better error messages
+                        tool_name = "unknown"
+                        for tc in tool_calls:
+                            if tc.get("id") == missing_id:
+                                tool_name = tc.get("function", {}).get("name", "unknown")
+                                break
+                        
+                        repaired_history.append({
+                            "role": "tool",
+                            "tool_call_id": missing_id,
+                            "name": tool_name,
+                            "content": json.dumps({
+                                "error": "Tool result was lost during history loading. This is a repair operation.",
+                                "repaired": True,
+                                "tool_name": tool_name
+                            })
+                        })
+                
+                # Move past the messages we processed
+                i = j
+            else:
+                # Regular message - just add it
+                repaired_history.append(msg)
+                i += 1
+        
+        # Log if we made any repairs
+        if repairs_made > 0:
+            logger.info(
+                f"🔧 Repaired conversation history: added {repairs_made} dummy tool_result(s) "
+                f"({len(self.messages)} -> {len(repaired_history)} messages)"
+            )
+        
+        # Update conversation history in-place
+        self.messages = repaired_history
+    
     def _handle_non_streaming_response(self, response) -> tuple[str, str, List[Dict]]:
         """
         Handle non-streaming response from litellm.
@@ -435,6 +531,9 @@ class BaseAgent:
                 raise ContextLengthExceeded(
                     f"Context length is {context_length} characters (limit: 300,000)"
                 )
+            
+            # Validate and repair conversation history (defensive programming)
+            self._validate_and_repair_conversation_history()
             
             # Make LLM call (Haiku 4.5 has built-in thinking)
             response = litellm.completion(

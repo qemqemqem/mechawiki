@@ -240,6 +240,126 @@
   line-height: 1.5;
 }
 
+/* Markdown styling within message bubbles */
+.log-message-bubble .log-content h1,
+.log-user-bubble .log-content h1,
+.story-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.5em 0 0.3em 0;
+  color: #2c3e50;
+}
+
+.log-message-bubble .log-content h2,
+.log-user-bubble .log-content h2,
+.story-content h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.3em 0;
+  color: #34495e;
+}
+
+.log-message-bubble .log-content h3,
+.log-user-bubble .log-content h3,
+.story-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.4em 0 0.2em 0;
+  color: #34495e;
+}
+
+.log-message-bubble .log-content p,
+.log-user-bubble .log-content p,
+.story-content p {
+  margin: 0.5em 0;
+}
+
+.log-message-bubble .log-content p:first-child,
+.log-user-bubble .log-content p:first-child,
+.story-content p:first-child {
+  margin-top: 0;
+}
+
+.log-message-bubble .log-content p:last-child,
+.log-user-bubble .log-content p:last-child,
+.story-content p:last-child {
+  margin-bottom: 0;
+}
+
+.log-message-bubble .log-content ul,
+.log-message-bubble .log-content ol,
+.log-user-bubble .log-content ul,
+.log-user-bubble .log-content ol,
+.story-content ul,
+.story-content ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.log-message-bubble .log-content li,
+.log-user-bubble .log-content li,
+.story-content li {
+  margin: 0.3em 0;
+}
+
+.log-message-bubble .log-content strong,
+.log-user-bubble .log-content strong,
+.story-content strong {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.log-message-bubble .log-content em,
+.log-user-bubble .log-content em,
+.story-content em {
+  font-style: italic;
+}
+
+.log-message-bubble .log-content code,
+.log-user-bubble .log-content code,
+.story-content code {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.log-message-bubble .log-content pre,
+.log-user-bubble .log-content pre,
+.story-content pre {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.8em;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.log-message-bubble .log-content pre code,
+.log-user-bubble .log-content pre code,
+.story-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.log-message-bubble .log-content blockquote,
+.log-user-bubble .log-content blockquote,
+.story-content blockquote {
+  border-left: 3px solid #3498db;
+  padding-left: 1em;
+  margin: 0.5em 0;
+  color: #555;
+  font-style: italic;
+}
+
+.log-message-bubble .log-content hr,
+.log-user-bubble .log-content hr,
+.story-content hr {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 1em 0;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

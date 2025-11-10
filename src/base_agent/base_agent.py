@@ -42,7 +42,8 @@ class BaseAgent:
         system_prompt: str = "You love good stories.",
         tools: Optional[List[Dict]] = None,
         memory: Optional[Dict[str, Any]] = None,
-        stream: bool = True
+        stream: bool = True,
+        agent_config: Optional[Dict[str, Any]] = None
     ):
         """
         Initialize the base agent.
@@ -53,6 +54,7 @@ class BaseAgent:
             tools: List of tool definitions in OpenAI format
             memory: Dict to store agent memory/context 
             stream: Whether to stream responses
+            agent_config: Optional agent configuration dict (for subclass use)
         """
         self.model = model
         self.tools = tools or []

@@ -73,13 +73,13 @@ function CommandCenter({ agents, onSelectAgent, onPauseAgent, onResumeAgent, onA
     )
   }
 
-  // Group agents by status
-  const needsInputAgents = agents.filter(a => a.status === 'waiting_for_input')
-  const errorAgents = agents.filter(a => a.status === 'error_waiting')
-  const runningAgents = agents.filter(a => a.status === 'running')
-  const pausedAgents = agents.filter(a => a.status === 'paused')
-  const finishedAgents = agents.filter(a => a.status === 'finished')
-  const stoppedAgents = agents.filter(a => a.status === 'stopped' || a.status === 'archived')
+  // Group agents by status (newest first within each group)
+  const needsInputAgents = agents.filter(a => a.status === 'waiting_for_input').reverse()
+  const errorAgents = agents.filter(a => a.status === 'error_waiting').reverse()
+  const runningAgents = agents.filter(a => a.status === 'running').reverse()
+  const pausedAgents = agents.filter(a => a.status === 'paused').reverse()
+  const finishedAgents = agents.filter(a => a.status === 'finished').reverse()
+  const stoppedAgents = agents.filter(a => a.status === 'stopped' || a.status === 'archived').reverse()
 
   const renderAgentCard = (agent) => (
     <div

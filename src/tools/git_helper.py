@@ -114,11 +114,19 @@ def commit_file_change(
                         text=True
                     )
                     
-                    # Extract agent ID from log path (e.g., "agent_reader-agent-005.jsonl" -> "reader-agent-005")
-                    log_filename = agent_log_path.name
-                    if log_filename.startswith("agent_"):
-                        agent_id = log_filename[6:].replace(".jsonl", "")  # Remove "agent_" prefix and ".jsonl" suffix
-                        
+                    # Extract agent ID from log path
+                    # New format: agents/{agent_id}/logs/agent.jsonl
+                    # Old format: agents/logs/agent_{agent_id}.jsonl
+                    agent_id = None
+                    
+                    if agent_log_path.name == "agent.jsonl" and agent_log_path.parent.name == "logs":
+                        # New format: extract from directory structure
+                        agent_id = agent_log_path.parent.parent.name
+                    elif agent_log_path.name.startswith("agent_"):
+                        # Old format: extract from filename
+                        agent_id = agent_log_path.name[6:].replace(".jsonl", "")
+                    
+                    if agent_id:
                         # Stage the agent's subdirectory (e.g., agents/reader-agent-005/)
                         agent_subdir = wikicontent_path / "agents" / agent_id
                         if agent_subdir.exists() and agent_subdir.is_dir():

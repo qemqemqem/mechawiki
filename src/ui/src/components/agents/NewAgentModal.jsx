@@ -15,7 +15,9 @@ function NewAgentModal({ onClose, onCreate, agents = [] }) {
     const typeMap = {
       'ReaderAgent': 'Reader Agent',
       'WriterAgent': 'Writer Agent',
-      'InteractiveAgent': 'Interactive Agent'
+      'InteractiveAgent': 'Interactive Agent',
+      'ToolTestAgent': 'Tool Test Agent',
+      'CoauthoringAgent': 'Coauthoring Agent'
     }
     return typeMap[agentType] || agentType
   }
@@ -124,12 +126,16 @@ function NewAgentModal({ onClose, onCreate, agents = [] }) {
             >
               <option value="ReaderAgent">Reader Agent</option>
               <option value="WriterAgent">Writer Agent</option>
+              <option value="CoauthoringAgent">Coauthoring Agent</option>
               <option value="InteractiveAgent">Interactive Agent</option>
+              <option value="ToolTestAgent">Tool Test Agent</option>
             </select>
             <p className="help-text">
               {type === 'ReaderAgent' && 'Reads stories and creates wiki content'}
               {type === 'WriterAgent' && 'Writes stories from wiki content'}
+              {type === 'CoauthoringAgent' && 'Collaborates with you to write stories together'}
               {type === 'InteractiveAgent' && 'Creates interactive RPG experiences'}
+              {type === 'ToolTestAgent' && 'Rigorously tests ALL tools and hunts for bugs'}
             </p>
           </div>
 

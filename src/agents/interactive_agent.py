@@ -4,7 +4,10 @@ InteractiveAgent - Creates interactive experiences with user.
 Combines storytelling with user interaction, pausing for input at key moments.
 """
 import sys
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Add parent to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
@@ -17,6 +20,7 @@ from tools.articles import (
     search_articles,
     list_articles_in_directory
 )
+from tools.context import get_context
 from agents.prompts.loader import build_agent_prompt
 # from tools.images import create_image  # Too slow for dev
 import litellm
@@ -53,6 +57,7 @@ class InteractiveAgent(BaseAgent):
         """
         self.story_file = story_file
         self.agent_id = agent_id  # Store agent ID for config updates
+        logger.info(f"🎮 InteractiveAgent initialized: story_file={story_file}, agent_id={agent_id}")
         # Load system prompt from files if not provided
         if system_prompt is None:
             system_prompt = build_agent_prompt("interactive", include_tools=True)
@@ -131,6 +136,14 @@ class InteractiveAgent(BaseAgent):
             "_function": read_article
         }
         self.tools.append(read_article_def)
+        
+        # get_context (multi-document expansion via memtool)
+        get_context_def = {
+            "type": "function",
+            "function": litellm.utils.function_to_dict(get_context),
+            "_function": get_context
+        }
+        self.tools.append(get_context_def)
         
         # search_articles
         search_articles_def = {

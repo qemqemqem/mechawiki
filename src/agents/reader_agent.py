@@ -9,8 +9,11 @@ import json
 import re
 import toml
 import litellm
+import logging
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 # Add parent directory to sys.path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -20,6 +23,7 @@ from base_agent.base_agent import BaseAgent, EndConversation
 from tools.search import find_articles, find_images, find_songs, find_files
 from tools.articles import read_article
 from tools.files import edit_file
+from tools.context import get_context
 from agents.prompts.loader import build_agent_prompt
 from utils.git import ensure_content_branch
 
@@ -173,6 +177,7 @@ class ReaderAgent(BaseAgent):
         
         # Initialize story window with saved position
         self.story_window = StoryWindow(story_path, starting_position=starting_position)
+        logger.info(f"📖 ReaderAgent initialized: story={story_file}, starting_position={starting_position}")
         
         # Create tools using litellm helper with embedded functions
         tools = [
@@ -186,6 +191,7 @@ class ReaderAgent(BaseAgent):
             {"type": "function", "function": litellm.utils.function_to_dict(find_songs), "_function": find_songs},
             {"type": "function", "function": litellm.utils.function_to_dict(find_files), "_function": find_files},
             {"type": "function", "function": litellm.utils.function_to_dict(read_article), "_function": read_article},
+            {"type": "function", "function": litellm.utils.function_to_dict(get_context), "_function": get_context},
             {"type": "function", "function": litellm.utils.function_to_dict(edit_file), "_function": edit_file},
         ]
         
@@ -255,6 +261,7 @@ Read systematically through the entire story, advancing the window as you go."""
         
         # Update memory with current position
         pos_info = self.story_window.get_position_info()
+        logger.debug(f"📖 Advanced story: position={pos_info['current_position']}/{pos_info['total_words']} ({pos_info['progress_percent']:.1f}%)")
         self.update_memory({
             "current_position": pos_info["current_position"],
             "total_words": pos_info["total_words"],
@@ -437,6 +444,9 @@ Use advance() to continue reading."""
     def process_pending_content(self):
         """Process any pending content after tool execution is complete."""
         if self._pending_content:
+            start_word = self._pending_content['start_word']
+            content_length = len(self._pending_content['content'])
+            logger.debug(f"📝 Processing pending content: start_word={start_word}, length={content_length} chars")
             self.advance_content(
                 self._pending_content['content'], 
                 self._pending_content['start_word']

@@ -38,11 +38,24 @@ class LogFileHandler(FileSystemEventHandler):
         self._read_new_entries(file_path, agent_id)
     
     def _extract_agent_id(self, file_path: Path) -> Optional[str]:
-        """Extract agent ID from log file name."""
-        # Format: agent_{agent_id}.jsonl
+        """Extract agent ID from log file path.
+        
+        New format: agents/{agent_id}/logs/agent.jsonl
+        Old format: agents/logs/agent_{agent_id}.jsonl (for compatibility)
+        """
+        file_path = Path(file_path)
+        
+        # Check if it's the new format: agents/{agent_id}/logs/agent.jsonl
+        if file_path.name == 'agent.jsonl' and file_path.parent.name == 'logs':
+            # Extract agent_id from parent directory structure
+            agent_id = file_path.parent.parent.name
+            return agent_id
+        
+        # Fall back to old format for compatibility: agent_{agent_id}.jsonl
         name = file_path.stem
         if name.startswith('agent_'):
             return name[6:]  # Remove 'agent_' prefix
+        
         return None
     
     def _read_new_entries(self, file_path: Path, agent_id: str):
@@ -77,8 +90,8 @@ class LogFileHandler(FileSystemEventHandler):
 class LogManager:
     """Manages agent log watching and provides updates."""
     
-    def __init__(self, logs_dir: Path):
-        self.logs_dir = logs_dir
+    def __init__(self, agents_dir: Path):
+        self.agents_dir = agents_dir
         self.observer = Observer()
         self.handler = LogFileHandler(self)
         
@@ -91,11 +104,11 @@ class LogManager:
         # File feed subscribers (all file operations across all agents)
         self.file_feed_subscribers: list = []
         
-        # Start watching
-        self.observer.schedule(self.handler, str(logs_dir), recursive=False)
+        # Start watching agents directory recursively to catch all agent log dirs
+        self.observer.schedule(self.handler, str(agents_dir), recursive=True)
         self.observer.start()
         
-        logger.info(f"📁 Started watching agent logs in {logs_dir}")
+        logger.info(f"📁 Started watching agent logs in {agents_dir}")
     
     def start_watching_agent(self, agent_id: str, log_file: str, agent_config: dict = None):
         """Start watching a specific agent's log.
@@ -281,9 +294,13 @@ class LogManager:
 # Global log manager instance
 log_manager = None
 
-def init_log_manager(logs_dir: Path):
-    """Initialize the global log manager."""
+def init_log_manager(agents_dir: Path):
+    """Initialize the global log manager.
+    
+    Args:
+        agents_dir: Path to agents directory (not logs subdirectory)
+    """
     global log_manager
-    log_manager = LogManager(logs_dir)
+    log_manager = LogManager(agents_dir)
     return log_manager
 

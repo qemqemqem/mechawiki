@@ -44,7 +44,11 @@ fi
 echo "Activating virtual environment..."
 source .venv/bin/activate
 
-if ! pip show flask &> /dev/null; then
+# Check if memtool is installed (key dependency)
+if ! .venv/bin/python3 -c "import memtool" 2>/dev/null; then
+    echo "Installing Python dependencies..."
+    pip install -q -r requirements.txt
+elif ! pip show flask &> /dev/null; then
     echo "Installing Python dependencies..."
     pip install -q -r requirements.txt
 else
@@ -203,6 +207,125 @@ echo "   Server:  $DEBUG_LOGS_DIR/server.log"
 echo "   Agents:  $DEBUG_LOGS_DIR/{agent-id}.log"
 echo ""
 
+# Check for memtool installation and install if needed
+echo "🧠 Checking memtool installation..."
+if ! .venv/bin/python3 -c "import memtool" 2>/dev/null; then
+    echo "⚠️  memtool not found, attempting to install..."
+    
+    # Common paths to check for AgenticMemory
+    MEMTOOL_PATHS=(
+        "/home/keenan/Dev/AgenticMemory/memtool"
+        "../AgenticMemory/memtool"
+        "~/Dev/AgenticMemory/memtool"
+    )
+    
+    MEMTOOL_FOUND=false
+    for MEMTOOL_PATH in "${MEMTOOL_PATHS[@]}"; do
+        # Expand ~ if present
+        EXPANDED_PATH="${MEMTOOL_PATH/#\~/$HOME}"
+        
+        if [ -d "$EXPANDED_PATH" ] && [ -f "$EXPANDED_PATH/pyproject.toml" ]; then
+            echo "   Found memtool at: $EXPANDED_PATH"
+            echo "   Installing..."
+            if pip install -q -e "$EXPANDED_PATH"; then
+                echo "✓ memtool installed successfully"
+                MEMTOOL_FOUND=true
+                break
+            else
+                echo "❌ Failed to install memtool"
+                exit 1
+            fi
+        fi
+    done
+    
+    if [ "$MEMTOOL_FOUND" = false ]; then
+        echo ""
+        echo "❌ ═══════════════════════════════════════════════════════════"
+        echo "❌ MEMTOOL NOT FOUND!"
+        echo "❌ ═══════════════════════════════════════════════════════════"
+        echo ""
+        echo "memtool provides multi-document context expansion for agents."
+        echo ""
+        echo "📋 To install, you need the AgenticMemory repository:"
+        echo ""
+        echo "   1. Clone AgenticMemory (if not already cloned):"
+        echo "      cd ~/Dev"
+        echo "      git clone --recurse-submodules <AgenticMemory-repo-url>"
+        echo ""
+        echo "   2. Then run this script again:"
+        echo "      ./start.sh"
+        echo ""
+        echo "   OR install manually:"
+        echo "      pip install -e /path/to/AgenticMemory/memtool"
+        echo ""
+        echo "📖 See: notes/ai/MEMTOOL_INTEGRATION_COMPLETE.md"
+        echo ""
+        exit 1
+    fi
+else
+    echo "✓ memtool already installed"
+fi
+
+# Start memtool server
+echo "🧠 Starting memtool server (port 18861)..."
+
+# Check if server is already running
+if lsof -Pi :18861 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo "⚠️  Port 18861 is already in use!"
+    echo "   This might be an old memtool server."
+    echo "   Attempting to stop it..."
+    
+    # Try to stop via memtool CLI
+    if .venv/bin/python3 -m memtool.cli server stop 2>/dev/null; then
+        echo "✓ Stopped old server"
+        sleep 1
+    else
+        # Force kill
+        OLD_PID=$(lsof -ti:18861)
+        if [ -n "$OLD_PID" ]; then
+            kill $OLD_PID 2>/dev/null || kill -9 $OLD_PID 2>/dev/null
+            echo "✓ Killed process on port 18861"
+            sleep 1
+        fi
+    fi
+fi
+
+# Start memtool server in background (no --repo argument needed)
+.venv/bin/python3 -m memtool.cli server start --port 18861 > memtool.log 2>&1 &
+MEMTOOL_PID=$!
+echo "memtool PID: $MEMTOOL_PID"
+
+# Wait for memtool to be ready
+echo "⏳ Waiting for memtool server to initialize..."
+sleep 2
+
+# Check if memtool is still running
+if ! kill -0 $MEMTOOL_PID 2>/dev/null; then
+    echo ""
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo "❌ MEMTOOL SERVER FAILED TO START!"
+    echo "❌ ═══════════════════════════════════════════════════════════"
+    echo ""
+    echo "Last 20 lines of memtool.log:"
+    echo "─────────────────────────────────────────────────────────────"
+    tail -20 memtool.log
+    echo "─────────────────────────────────────────────────────────────"
+    echo ""
+    exit 1
+fi
+
+# Build index (or load if exists)
+echo "📚 Building/loading memtool index..."
+
+if ! .venv/bin/python3 scripts/ensure_memtool_index.py; then
+    echo "❌ Index build/load failed"
+    kill $MEMTOOL_PID 2>/dev/null
+    exit 1
+fi
+
+echo "✓ memtool server ready"
+echo ""
+
 # Start backend in background
 echo "🚀 Starting Flask backend (port 5000)..."
 source .venv/bin/activate
@@ -282,8 +405,8 @@ echo ""
 echo "Press Ctrl+C to stop all servers"
 echo ""
 
-# Trap Ctrl+C to kill both processes
-trap "echo ''; echo '🛑 Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT
+# Trap Ctrl+C to kill all processes
+trap "echo ''; echo '🛑 Stopping servers...'; kill $MEMTOOL_PID $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT
 
 # Wait for both processes
 wait

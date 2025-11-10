@@ -21,8 +21,8 @@ CORS(app)  # Enable CORS for frontend
 
 # Initialize log manager
 from .log_watcher import init_log_manager
-from .config import agent_config, WIKICONTENT_PATH
-log_manager = init_log_manager(agent_config.logs_dir)
+from .config import agent_config, WIKICONTENT_PATH, AGENTS_DIR
+log_manager = init_log_manager(AGENTS_DIR)
 
 # Set up file-based debug logging for server
 def setup_server_debug_logging():
@@ -42,7 +42,7 @@ setup_server_debug_logging()
 
 # Initialize cost tracker
 from .cost_tracker import init_cost_tracker
-cost_tracker = init_cost_tracker(agent_config.logs_dir.parent)  # agents/ directory
+cost_tracker = init_cost_tracker(AGENTS_DIR)  # agents/ directory
 
 # Initialize agent manager
 from .agent_manager import agent_manager
@@ -57,7 +57,7 @@ def init_and_start_agents():
     
     # Start watching existing agents
     for agent in agent_config.list_agents():
-        log_file = agent_config.logs_dir / f"agent_{agent['id']}.jsonl"
+        log_file = agent_config.get_agent_log_path(agent['id'])
         if log_file.exists():
             log_manager.start_watching_agent(agent['id'], str(log_file), agent.get('config'))
 

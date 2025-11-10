@@ -4,7 +4,10 @@ WriterAgent - Writes and edits stories.
 Inherits from BaseAgent and adds story writing tools.
 """
 import sys
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Add parent to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
@@ -16,6 +19,7 @@ from tools.articles import (
     search_articles,
     list_articles_in_directory
 )
+from tools.context import get_context
 from tools.interactive import done, Finished
 from agents.prompts.loader import build_agent_prompt
 # from tools.images import create_image  # Too slow for dev
@@ -55,6 +59,7 @@ class WriterAgent(BaseAgent):
         """
         self.story_file = story_file
         self.agent_id = agent_id  # Store agent ID for config updates
+        logger.info(f"✍️ WriterAgent initialized: story_file={story_file}, agent_id={agent_id}")
         # Load system prompt from files if not provided
         if system_prompt is None:
             base_prompt = build_agent_prompt("writer", include_tools=True)
@@ -211,6 +216,14 @@ All your creative story writing will be appended to this file. This is where you
             "_function": read_article
         }
         self.tools.append(read_article_def)
+        
+        # get_context (multi-document expansion via memtool)
+        get_context_def = {
+            "type": "function",
+            "function": litellm.utils.function_to_dict(get_context),
+            "_function": get_context
+        }
+        self.tools.append(get_context_def)
         
         # search_articles
         search_articles_def = {

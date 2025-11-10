@@ -80,12 +80,16 @@ class AgentManager:
             from agents.reader_agent import ReaderAgent
             from agents.writer_agent import WriterAgent
             from agents.interactive_agent import InteractiveAgent
+            from agents.tool_test_agent import ToolTestAgent
+            from agents.coauthoring_agent import CoauthoringAgent
             
             # Map agent_type to class
             agent_classes = {
                 'ReaderAgent': ReaderAgent,
                 'WriterAgent': WriterAgent,
                 'InteractiveAgent': InteractiveAgent,
+                'ToolTestAgent': ToolTestAgent,
+                'CoauthoringAgent': CoauthoringAgent,
             }
             
             agent_class = agent_classes.get(agent_type)
@@ -104,7 +108,7 @@ class AgentManager:
                     init_params['story_file'] = agent_config['story_file']
                 
                 # Add agent_id and agent_config for agents that need to persist state
-                if agent_type in ['WriterAgent', 'ReaderAgent', 'InteractiveAgent']:
+                if agent_type in ['WriterAgent', 'ReaderAgent', 'InteractiveAgent', 'ToolTestAgent', 'CoauthoringAgent']:
                     init_params['agent_id'] = agent_id
                     init_params['agent_config'] = agent_config
                 

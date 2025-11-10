@@ -31,7 +31,6 @@ WIKICONTENT_PATH = Path(config["paths"]["content_repo"])
 CONTENT_BRANCH = config["paths"].get("content_branch", "main")
 AGENTS_DIR = WIKICONTENT_PATH / config["paths"].get("agents_dir", "agents")
 AGENTS_FILE = AGENTS_DIR / "agents.json"
-LOGS_DIR = AGENTS_DIR / "logs"
 DEBUG_LOGS_DIR = AGENTS_DIR / "debug_logs"
 COSTS_LOG = AGENTS_DIR / "costs.log"
 
@@ -44,7 +43,6 @@ class AgentConfig:
     
     def __init__(self):
         self.agents_file = AGENTS_FILE
-        self.logs_dir = LOGS_DIR
         self.debug_logs_dir = DEBUG_LOGS_DIR
         self.costs_log = COSTS_LOG
         
@@ -53,7 +51,6 @@ class AgentConfig:
     def _ensure_structure_exists(self):
         """Create agents directory structure if needed."""
         AGENTS_DIR.mkdir(parents=True, exist_ok=True)
-        self.logs_dir.mkdir(exist_ok=True)
         self.debug_logs_dir.mkdir(exist_ok=True)
         
         # Create agents.json if missing
@@ -65,6 +62,19 @@ class AgentConfig:
         if not self.costs_log.exists():
             self.costs_log.touch()
             logger.info(f"📝 Created costs log at {self.costs_log}")
+    
+    def get_agent_log_path(self, agent_id: str) -> Path:
+        """Get the log file path for a specific agent.
+        
+        Returns path to agents/{agent_id}/logs/agent.jsonl
+        """
+        return AGENTS_DIR / agent_id / "logs" / "agent.jsonl"
+    
+    def ensure_agent_log_dir(self, agent_id: str):
+        """Ensure the logs directory exists for a specific agent."""
+        log_dir = AGENTS_DIR / agent_id / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        return log_dir
     
     def _load_agents(self) -> Dict:
         """Load agents from disk."""
@@ -106,8 +116,8 @@ class AgentConfig:
         if "created_at" not in agent_data:
             agent_data["created_at"] = datetime.now().isoformat()
         
-        # Update log file path
-        agent_data["log_file"] = f"logs/agent_{agent_data['id']}.jsonl"
+        # Update log file path (relative to agents dir)
+        agent_data["log_file"] = f"{agent_data['id']}/logs/agent.jsonl"
         
         agents.append(agent_data)
         agents_data["agents"] = agents

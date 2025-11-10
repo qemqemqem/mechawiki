@@ -44,8 +44,8 @@ def _setup_agent_directories(agent_id: str, agent_type: str):
     scratchpad_dir.mkdir(exist_ok=True)
     logger.info(f"📝 Created scratchpad: {scratchpad_dir}")
     
-    # Writer and Interactive agents get stories directory
-    if agent_type in ['WriterAgent', 'InteractiveAgent']:
+    # Writer, Coauthoring, and Interactive agents get stories directory
+    if agent_type in ['WriterAgent', 'CoauthoringAgent', 'InteractiveAgent']:
         stories_dir = agent_dir / "stories"
         stories_dir.mkdir(exist_ok=True)
         
@@ -56,11 +56,16 @@ def _setup_agent_directories(agent_id: str, agent_type: str):
         
         logger.info(f"📖 Created stories directory with story.md: {stories_dir}")
     
-    # Writer agents get subplots directory
-    if agent_type == 'WriterAgent':
+    # Writer and Coauthoring agents get subplots directory
+    if agent_type in ['WriterAgent', 'CoauthoringAgent']:
         subplots_dir = agent_dir / "subplots"
         subplots_dir.mkdir(exist_ok=True)
         logger.info(f"📚 Created subplots directory: {subplots_dir}")
+    
+    # All agents get a logs directory
+    logs_dir = agent_dir / "logs"
+    logs_dir.mkdir(exist_ok=True)
+    logger.info(f"📋 Created logs directory: {logs_dir}")
 
 
 @bp.route('', methods=['GET'])
@@ -119,7 +124,7 @@ def create_agent():
         _setup_agent_directories(agent_id, data['type'])
         
         # Create empty log file
-        log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+        log_file = agent_config.get_agent_log_path(agent_id)
         log_file.write_text('')
         
         # Start watching this agent's log
@@ -199,7 +204,7 @@ def archive_agent(agent_id):
         return jsonify({"error": "Agent not found"}), 404
     
     # Write archive status to log
-    log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_file = agent_config.get_agent_log_path(agent_id)
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "status",
@@ -285,7 +290,7 @@ def send_message(agent_id):
         logger.info(f"▶️ Auto-resumed agent {agent_id} (was {current_status})")
     
     # Write user message to log
-    log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_file = agent_config.get_agent_log_path(agent_id)
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "type": "user_message",
@@ -308,7 +313,7 @@ def reload_agent(agent_id):
         return jsonify({"error": "Agent not found"}), 404
     
     # Force re-read of log file
-    log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+    log_file = agent_config.get_agent_log_path(agent_id)
     log_manager.start_watching_agent(agent_id, str(log_file), agent.get('config'))
     
     logger.info(f"🔄 Reloaded agent: {agent_id}")
@@ -341,7 +346,7 @@ def get_logs(agent_id):
         log_queue = log_manager.subscribe_to_agent(agent_id)
         
         # Send existing logs first
-        log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+        log_file = agent_config.get_agent_log_path(agent_id)
         if log_file.exists():
             with open(log_file, 'r') as f:
                 for line in f:

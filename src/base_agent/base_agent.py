@@ -78,6 +78,8 @@ class BaseAgent:
         # Enhance system prompt with auto-generated tool descriptions
         self.system_prompt = self._enhance_system_prompt(system_prompt)
         
+        logger.debug(f"🤖 BaseAgent initialized: model={model}, stream={stream}, tools={len(self.tools)}")
+        
     def add_tool(self, tool_def: Dict, function: Callable):
         """Add a single tool to the agent."""
         self.tools.append(tool_def)
@@ -382,23 +384,28 @@ class BaseAgent:
         
         if function_to_call is None:
             # Tool not found - return error result
+            logger.error(f"❌ Tool not found: {function_name}")
             return {
                 "error": f"Tool {function_name} not available",
                 "success": False
             }
         
         try:
+            logger.debug(f"🔧 Executing tool: {function_name}({function_args})")
             result = function_to_call(**function_args)
             
             # Check if result is EndConversation signal
             if isinstance(result, EndConversation):
+                logger.info(f"🏁 Tool {function_name} returned EndConversation signal")
                 return result  # Return the signal directly
             
+            logger.debug(f"✅ Tool {function_name} completed successfully")
             return result  # Return the result directly
             
         except Exception as e:
             # Tool error - return as error result (not exception)
             # This allows the agent to see and respond to errors
+            logger.error(f"❌ Tool {function_name} raised exception: {e}")
             return {
                 "error": str(e),
                 "success": False,
@@ -637,13 +644,15 @@ class BaseAgent:
         # Log if we made any repairs
         total_changes = repairs_made + orphaned_results_removed
         if total_changes > 0 or results_rearranged > 0:
-            logger.info(
+            logger.warning(
                 f"🔧 Repaired conversation history: "
                 f"rearranged {results_rearranged} tool_result(s), "
                 f"added {repairs_made} dummy tool_result(s), "
                 f"removed {orphaned_results_removed} orphaned tool_result(s) "
                 f"({len(self.messages)} -> {len(repaired_history)} messages)"
             )
+        else:
+            logger.debug(f"✅ Conversation history validated: {len(self.messages)} messages, no repairs needed")
         
         # Update conversation history in-place
         self.messages = repaired_history
@@ -712,7 +721,9 @@ class BaseAgent:
             
             # Check context length BEFORE making LLM call
             context_length = self._get_context_length()
+            logger.debug(f"📏 Context length: {context_length} chars ({len(self.messages)} messages)")
             if context_length > 300000:
+                logger.error(f"❌ Context length exceeded: {context_length} chars (limit: 300,000)")
                 raise ContextLengthExceeded(
                     f"Context length is {context_length} characters (limit: 300,000)"
                 )
@@ -815,6 +826,7 @@ class BaseAgent:
                         function_args = json.loads(tool_call["function"]["arguments"])
                     except json.JSONDecodeError as e:
                         # Malformed JSON from LLM - provide a helpful error message
+                        logger.warning(f"⚠️ Malformed JSON in tool call {function_name}: {e}")
                         error_msg = self._create_helpful_json_error(
                             function_name, 
                             tool_call["function"]["arguments"],

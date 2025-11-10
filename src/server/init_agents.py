@@ -30,8 +30,8 @@ def _ensure_agent_directories(agent_id: str, agent_type: str):
     scratchpad_dir = agent_dir / "scratchpad"
     scratchpad_dir.mkdir(exist_ok=True)
     
-    # Writer and Interactive agents get stories directory
-    if agent_type in ['WriterAgent', 'InteractiveAgent']:
+    # Writer, Coauthoring, and Interactive agents get stories directory
+    if agent_type in ['WriterAgent', 'CoauthoringAgent', 'InteractiveAgent']:
         stories_dir = agent_dir / "stories"
         stories_dir.mkdir(exist_ok=True)
         
@@ -40,10 +40,14 @@ def _ensure_agent_directories(agent_id: str, agent_type: str):
         if not story_file.exists():
             story_file.write_text(f"# {agent_id} Story\n\nYour story begins here...\n")
     
-    # Writer agents get subplots directory
-    if agent_type == 'WriterAgent':
+    # Writer and Coauthoring agents get subplots directory
+    if agent_type in ['WriterAgent', 'CoauthoringAgent']:
         subplots_dir = agent_dir / "subplots"
         subplots_dir.mkdir(exist_ok=True)
+    
+    # All agents get a logs directory
+    logs_dir = agent_dir / "logs"
+    logs_dir.mkdir(exist_ok=True)
 
 
 def start_agents(agent_manager=None):
@@ -60,7 +64,7 @@ def start_agents(agent_manager=None):
         agent_id = agent_data["id"]
         agent_type = agent_data["type"]
         agent_cfg = agent_data.get("config", {})
-        log_file = agent_config.logs_dir / f"agent_{agent_id}.jsonl"
+        log_file = agent_config.get_agent_log_path(agent_id)
         
         # Ensure agent's directory structure exists
         _ensure_agent_directories(agent_id, agent_type)

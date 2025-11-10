@@ -28,7 +28,7 @@ log_manager = init_log_manager(AGENTS_DIR)
 def setup_server_debug_logging():
     """Add file handler to root logger for server-wide debug logging."""
     server_debug_file = agent_config.debug_logs_dir / "server.log"
-    file_handler = logging.FileHandler(server_debug_file, mode='a')
+    file_handler = logging.FileHandler(server_debug_file, mode='a', encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s',

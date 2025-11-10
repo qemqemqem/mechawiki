@@ -27,6 +27,17 @@
       ]
     },
     {
+      "path": ".memtool_index.json",
+      "intervals": [
+        {
+          "path": ".memtool_index.json",
+          "start": 1,
+          "end": 12958,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
       "path": "README.md",
       "intervals": [
         {
@@ -292,6 +303,17 @@
           "start": 288,
           "end": 315,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        }
+      ]
+    },
+    {
+      "path": "SETUP.md",
+      "intervals": [
+        {
+          "path": "SETUP.md",
+          "start": 1,
+          "end": 220,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -607,6 +629,17 @@
           "start": 69,
           "end": 71,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        }
+      ]
+    },
+    {
+      "path": "memtool.log",
+      "intervals": [
+        {
+          "path": "memtool.log",
+          "start": 1,
+          "end": 3,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -1059,6 +1092,17 @@
       ]
     },
     {
+      "path": "notes/ai/DEBUG_LOGGING_PATTERNS.md",
+      "intervals": [
+        {
+          "path": "notes/ai/DEBUG_LOGGING_PATTERNS.md",
+          "start": 1,
+          "end": 191,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
       "path": "notes/ai/FILE_TOOLS_REFACTORING.md",
       "intervals": [
         {
@@ -1110,6 +1154,61 @@
           "start": 1,
           "end": 512,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        }
+      ]
+    },
+    {
+      "path": "notes/ai/MEMTOOL_EMPTY_RESULTS_DIAGNOSIS.md",
+      "intervals": [
+        {
+          "path": "notes/ai/MEMTOOL_EMPTY_RESULTS_DIAGNOSIS.md",
+          "start": 1,
+          "end": 200,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
+      "path": "notes/ai/MEMTOOL_INDEX_ISSUE.md",
+      "intervals": [
+        {
+          "path": "notes/ai/MEMTOOL_INDEX_ISSUE.md",
+          "start": 1,
+          "end": 203,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
+      "path": "notes/ai/MEMTOOL_INTEGRATION_COMPLETE.md",
+      "intervals": [
+        {
+          "path": "notes/ai/MEMTOOL_INTEGRATION_COMPLETE.md",
+          "start": 1,
+          "end": 377,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
+      "path": "notes/ai/MEMTOOL_ROOT_CAUSE_AND_FIX.md",
+      "intervals": [
+        {
+          "path": "notes/ai/MEMTOOL_ROOT_CAUSE_AND_FIX.md",
+          "start": 1,
+          "end": 210,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
+      "path": "notes/ai/MEMTOOL_TYPE_COERCION_FIX.md",
+      "intervals": [
+        {
+          "path": "notes/ai/MEMTOOL_TYPE_COERCION_FIX.md",
+          "start": 1,
+          "end": 226,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -1679,6 +1778,12 @@
           "start": 17,
           "end": 18,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "requirements.txt",
+          "start": 19,
+          "end": 26,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -1690,6 +1795,17 @@
           "start": 1,
           "end": 9,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ensure_memtool_index.py",
+      "intervals": [
+        {
+          "path": "scripts/ensure_memtool_index.py",
+          "start": 1,
+          "end": 94,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -4281,97 +4397,114 @@
       ]
     },
     {
+      "path": "src/agents/coauthoring_agent.py",
+      "intervals": [
+        {
+          "path": "src/agents/coauthoring_agent.py",
+          "start": 1,
+          "end": 125,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
       "path": "src/agents/interactive_agent.py",
       "intervals": [
         {
           "path": "src/agents/interactive_agent.py",
           "start": 1,
-          "end": 19,
+          "end": 6,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 20,
-          "end": 20,
+          "start": 7,
+          "end": 7,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 8,
+          "end": 9,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 10,
+          "end": 11,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 12,
+          "end": 22,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 23,
+          "end": 23,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 24,
+          "end": 24,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 21,
-          "end": 21,
+          "start": 25,
+          "end": 25,
           "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 22,
-          "end": 34,
+          "start": 26,
+          "end": 38,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 35,
-          "end": 35,
+          "start": 39,
+          "end": 39,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 36,
-          "end": 37,
+          "start": 40,
+          "end": 41,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 38,
-          "end": 40,
+          "start": 42,
+          "end": 44,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 41,
-          "end": 46,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/agents/interactive_agent.py",
-          "start": 47,
-          "end": 47,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/interactive_agent.py",
-          "start": 48,
+          "start": 45,
           "end": 50,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/interactive_agent.py",
           "start": 51,
-          "end": 52,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "end": 51,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 53,
-          "end": 53,
+          "start": 52,
+          "end": 54,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 54,
-          "end": 54,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/interactive_agent.py",
           "start": 55,
-          "end": 55,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/interactive_agent.py",
-          "start": 56,
           "end": 56,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/interactive_agent.py",
@@ -4388,31 +4521,73 @@
         {
           "path": "src/agents/interactive_agent.py",
           "start": 59,
-          "end": 152,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "end": 59,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 153,
-          "end": 160,
-          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
+          "start": 60,
+          "end": 60,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 161,
-          "end": 176,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/agents/interactive_agent.py",
-          "start": 177,
-          "end": 177,
+          "start": 61,
+          "end": 61,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/interactive_agent.py",
-          "start": 178,
-          "end": 181,
+          "start": 62,
+          "end": 62,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 63,
+          "end": 63,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 64,
+          "end": 139,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 140,
+          "end": 147,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 148,
+          "end": 165,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 166,
+          "end": 173,
+          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 174,
+          "end": 189,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 190,
+          "end": 190,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/interactive_agent.py",
+          "start": 191,
+          "end": 194,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         }
       ]
@@ -4605,6 +4780,17 @@
           "start": 367,
           "end": 405,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        }
+      ]
+    },
+    {
+      "path": "src/agents/prompts/coauthoring_agent.md",
+      "intervals": [
+        {
+          "path": "src/agents/prompts/coauthoring_agent.md",
+          "start": 1,
+          "end": 141,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -4844,6 +5030,17 @@
       ]
     },
     {
+      "path": "src/agents/prompts/tool_test_agent.md",
+      "intervals": [
+        {
+          "path": "src/agents/prompts/tool_test_agent.md",
+          "start": 1,
+          "end": 163,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
       "path": "src/agents/prompts/tool_usage.md",
       "intervals": [
         {
@@ -4883,222 +5080,228 @@
         {
           "path": "src/agents/reader_agent.py",
           "start": 10,
-          "end": 18,
+          "end": 11,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 19,
-          "end": 19,
-          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
+          "start": 12,
+          "end": 12,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 20,
-          "end": 20,
+          "start": 13,
+          "end": 15,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 21,
+          "start": 16,
+          "end": 17,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 18,
           "end": 21,
-          "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 22,
           "end": 22,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 23,
           "end": 23,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 24,
-          "end": 32,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "end": 24,
+          "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 33,
-          "end": 33,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "start": 25,
+          "end": 25,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 34,
-          "end": 35,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "start": 26,
+          "end": 26,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 36,
+          "start": 27,
+          "end": 27,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 28,
           "end": 36,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 37,
-          "end": 87,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 88,
-          "end": 142,
+          "end": 37,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 143,
-          "end": 151,
+          "start": 38,
+          "end": 39,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 152,
-          "end": 152,
+          "start": 40,
+          "end": 40,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 153,
-          "end": 153,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 154,
-          "end": 154,
+          "start": 41,
+          "end": 91,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 155,
+          "start": 92,
+          "end": 146,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 147,
+          "end": 155,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 156,
           "end": 156,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 157,
+          "end": 157,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 158,
           "end": 158,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 159,
-          "end": 161,
+          "end": 160,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 162,
-          "end": 164,
+          "start": 161,
+          "end": 162,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 165,
-          "end": 167,
+          "start": 163,
+          "end": 165,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 168,
+          "start": 166,
           "end": 168,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 169,
-          "end": 175,
+          "end": 171,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 172,
+          "end": 172,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 173,
+          "end": 179,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 176,
+          "start": 180,
           "end": 180,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 181,
-          "end": 182,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 183,
-          "end": 183,
-          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 184,
-          "end": 187,
+          "end": 185,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 186,
+          "end": 187,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 188,
           "end": 188,
-          "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
+          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 189,
-          "end": 189,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 190,
-          "end": 191,
+          "end": 192,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 192,
+          "start": 193,
+          "end": 193,
+          "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 194,
           "end": 194,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 195,
           "end": 195,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 196,
-          "end": 196,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 197,
           "end": 197,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 198,
-          "end": 198,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 199,
-          "end": 199,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 200,
           "end": 200,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
@@ -5106,7 +5309,7 @@
           "path": "src/agents/reader_agent.py",
           "start": 201,
           "end": 201,
-          "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
@@ -5117,152 +5320,223 @@
         {
           "path": "src/agents/reader_agent.py",
           "start": 203,
+          "end": 203,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 204,
+          "end": 204,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 205,
           "end": 205,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 206,
+          "end": 206,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 207,
           "end": 207,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 208,
           "end": 208,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 209,
-          "end": 209,
+          "end": 211,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 212,
+          "end": 213,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 210,
-          "end": 223,
+          "start": 214,
+          "end": 214,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 224,
-          "end": 227,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "start": 215,
+          "end": 215,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 228,
-          "end": 231,
+          "start": 216,
+          "end": 229,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 232,
-          "end": 251,
+          "start": 230,
+          "end": 233,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 252,
+          "start": 234,
+          "end": 237,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 238,
+          "end": 257,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 258,
+          "end": 263,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 264,
           "end": 264,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 265,
-          "end": 268,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 269,
-          "end": 269,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 270,
           "end": 271,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
           "start": 272,
-          "end": 272,
+          "end": 275,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 276,
+          "end": 276,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 273,
-          "end": 281,
+          "start": 277,
+          "end": 278,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 282,
-          "end": 292,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 293,
-          "end": 293,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 294,
-          "end": 318,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 319,
-          "end": 362,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 363,
-          "end": 363,
+          "start": 279,
+          "end": 279,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 364,
-          "end": 364,
+          "start": 280,
+          "end": 288,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 365,
-          "end": 365,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 366,
-          "end": 436,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/reader_agent.py",
-          "start": 437,
-          "end": 470,
+          "start": 289,
+          "end": 299,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 471,
-          "end": 471,
+          "start": 300,
+          "end": 300,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 301,
+          "end": 325,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 326,
+          "end": 369,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 370,
+          "end": 370,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 371,
+          "end": 371,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 372,
+          "end": 372,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 373,
+          "end": 443,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 444,
+          "end": 446,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 447,
+          "end": 449,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 450,
+          "end": 480,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/agents/reader_agent.py",
+          "start": 481,
+          "end": 481,
           "commit": "5a011d9f3a21ce3bea707a0904a59993652ca775"
         },
         {
           "path": "src/agents/reader_agent.py",
-          "start": 472,
-          "end": 480,
+          "start": 482,
+          "end": 490,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        }
+      ]
+    },
+    {
+      "path": "src/agents/tool_test_agent.py",
+      "intervals": [
+        {
+          "path": "src/agents/tool_test_agent.py",
+          "start": 1,
+          "end": 168,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },
@@ -5272,90 +5546,108 @@
         {
           "path": "src/agents/writer_agent.py",
           "start": 1,
-          "end": 12,
+          "end": 6,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 13,
-          "end": 13,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "start": 7,
+          "end": 7,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 14,
-          "end": 18,
+          "start": 8,
+          "end": 9,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 19,
-          "end": 20,
+          "start": 10,
+          "end": 11,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 12,
+          "end": 15,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 16,
+          "end": 16,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 21,
+          "start": 17,
           "end": 21,
-          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
           "start": 22,
           "end": 22,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/agents/writer_agent.py",
           "start": 23,
-          "end": 23,
+          "end": 24,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 24,
-          "end": 36,
+          "start": 25,
+          "end": 25,
+          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 26,
+          "end": 26,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 37,
-          "end": 37,
+          "start": 27,
+          "end": 27,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 38,
-          "end": 39,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 40,
+          "start": 28,
           "end": 40,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
           "start": 41,
-          "end": 42,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 43,
-          "end": 48,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 49,
-          "end": 49,
+          "end": 41,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 50,
+          "start": 42,
+          "end": 43,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 44,
+          "end": 44,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 45,
+          "end": 46,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 47,
           "end": 52,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
@@ -5368,20 +5660,20 @@
         {
           "path": "src/agents/writer_agent.py",
           "start": 54,
-          "end": 54,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 55,
-          "end": 55,
+          "end": 56,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 56,
-          "end": 58,
+          "start": 57,
+          "end": 57,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 58,
+          "end": 58,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/agents/writer_agent.py",
@@ -5392,139 +5684,175 @@
         {
           "path": "src/agents/writer_agent.py",
           "start": 60,
-          "end": 71,
+          "end": 61,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 72,
-          "end": 72,
+          "start": 62,
+          "end": 62,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 63,
+          "end": 63,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 64,
+          "end": 64,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 65,
+          "end": 76,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 77,
+          "end": 77,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 73,
-          "end": 75,
+          "start": 78,
+          "end": 80,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 76,
-          "end": 85,
+          "start": 81,
+          "end": 90,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 86,
-          "end": 91,
+          "start": 91,
+          "end": 96,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 92,
-          "end": 100,
+          "start": 97,
+          "end": 105,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 101,
-          "end": 147,
+          "start": 106,
+          "end": 152,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 148,
-          "end": 165,
+          "start": 153,
+          "end": 170,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 166,
-          "end": 198,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 199,
-          "end": 199,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 200,
-          "end": 201,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 202,
-          "end": 202,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 203,
+          "start": 171,
           "end": 203,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/agents/writer_agent.py",
           "start": 204,
-          "end": 232,
+          "end": 204,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 233,
-          "end": 240,
-          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 241,
-          "end": 272,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 273,
-          "end": 273,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 274,
-          "end": 275,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 276,
-          "end": 276,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 277,
-          "end": 292,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/agents/writer_agent.py",
-          "start": 293,
-          "end": 293,
+          "start": 205,
+          "end": 206,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 294,
-          "end": 338,
+          "start": 207,
+          "end": 207,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 208,
+          "end": 208,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 209,
+          "end": 219,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 220,
+          "end": 227,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 228,
+          "end": 245,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 246,
+          "end": 253,
+          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 254,
+          "end": 285,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/agents/writer_agent.py",
-          "start": 339,
-          "end": 339,
+          "start": 286,
+          "end": 286,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 287,
+          "end": 288,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 289,
+          "end": 289,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 290,
+          "end": 305,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 306,
+          "end": 306,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 307,
+          "end": 351,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/agents/writer_agent.py",
+          "start": 352,
+          "end": 352,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         }
       ]
@@ -5631,90 +5959,90 @@
         {
           "path": "src/base_agent/base_agent.py",
           "start": 78,
-          "end": 100,
+          "end": 80,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 101,
-          "end": 119,
+          "start": 81,
+          "end": 82,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 83,
+          "end": 102,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 103,
+          "end": 121,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 120,
-          "end": 132,
+          "start": 122,
+          "end": 134,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 133,
-          "end": 133,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 134,
+          "start": 135,
           "end": 135,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 136,
-          "end": 155,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 156,
-          "end": 163,
+          "end": 137,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 164,
-          "end": 177,
+          "start": 138,
+          "end": 157,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 158,
+          "end": 165,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 166,
+          "end": 179,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 178,
-          "end": 234,
+          "start": 180,
+          "end": 236,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 235,
-          "end": 293,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 294,
+          "start": 237,
           "end": 295,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 296,
           "end": 297,
-          "commit": "3505ef5e8c0db7465d484eb39aeac9713afefff3"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 298,
-          "end": 301,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 302,
-          "end": 302,
+          "start": 298,
+          "end": 299,
           "commit": "3505ef5e8c0db7465d484eb39aeac9713afefff3"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 303,
+          "start": 300,
           "end": 303,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
@@ -5727,102 +6055,126 @@
         {
           "path": "src/base_agent/base_agent.py",
           "start": 305,
-          "end": 307,
+          "end": 305,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 308,
-          "end": 318,
+          "start": 306,
+          "end": 306,
           "commit": "3505ef5e8c0db7465d484eb39aeac9713afefff3"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 319,
-          "end": 324,
+          "start": 307,
+          "end": 309,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 325,
-          "end": 332,
+          "start": 310,
+          "end": 320,
           "commit": "3505ef5e8c0db7465d484eb39aeac9713afefff3"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 333,
-          "end": 339,
+          "start": 321,
+          "end": 326,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 340,
-          "end": 354,
+          "start": 327,
+          "end": 334,
           "commit": "3505ef5e8c0db7465d484eb39aeac9713afefff3"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 355,
-          "end": 358,
+          "start": 335,
+          "end": 341,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 359,
-          "end": 359,
+          "start": 342,
+          "end": 356,
+          "commit": "3505ef5e8c0db7465d484eb39aeac9713afefff3"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 357,
+          "end": 360,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 361,
+          "end": 361,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 360,
-          "end": 362,
+          "start": 362,
+          "end": 364,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 363,
-          "end": 365,
+          "start": 365,
+          "end": 367,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 366,
-          "end": 369,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 370,
+          "start": 368,
           "end": 371,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 372,
-          "end": 383,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 384,
-          "end": 388,
+          "end": 373,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 389,
-          "end": 396,
+          "start": 374,
+          "end": 385,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 397,
-          "end": 397,
+          "start": 386,
+          "end": 386,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 398,
+          "start": 387,
+          "end": 387,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 388,
+          "end": 391,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 392,
+          "end": 393,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 394,
+          "end": 394,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 395,
           "end": 398,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
@@ -5830,83 +6182,89 @@
           "path": "src/base_agent/base_agent.py",
           "start": 399,
           "end": 399,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 400,
-          "end": 406,
+          "end": 401,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 402,
+          "end": 402,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 403,
+          "end": 403,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 407,
-          "end": 407,
+          "start": 404,
+          "end": 404,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 405,
+          "end": 405,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 406,
+          "end": 407,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 408,
           "end": 408,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 409,
-          "end": 409,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 410,
-          "end": 410,
+          "end": 413,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 411,
-          "end": 411,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 412,
+          "start": 414,
           "end": 414,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 415,
           "end": 415,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 416,
           "end": 416,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 417,
+          "end": 417,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 418,
           "end": 418,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 419,
-          "end": 419,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 420,
-          "end": 420,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 421,
           "end": 421,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
@@ -5914,145 +6272,157 @@
           "path": "src/base_agent/base_agent.py",
           "start": 422,
           "end": 422,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 423,
-          "end": 424,
+          "end": 423,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 424,
+          "end": 425,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 425,
-          "end": 435,
+          "start": 426,
+          "end": 426,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 436,
-          "end": 436,
+          "start": 427,
+          "end": 427,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 437,
-          "end": 441,
+          "start": 428,
+          "end": 428,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 442,
+          "start": 429,
+          "end": 429,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 430,
+          "end": 431,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 432,
           "end": 442,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 443,
           "end": 443,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 444,
-          "end": 445,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 446,
-          "end": 446,
+          "end": 448,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 447,
-          "end": 464,
+          "start": 449,
+          "end": 449,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 465,
-          "end": 470,
+          "start": 450,
+          "end": 450,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 451,
+          "end": 452,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 453,
+          "end": 453,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 454,
+          "end": 471,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 472,
+          "end": 477,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 471,
-          "end": 474,
+          "start": 478,
+          "end": 481,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 475,
-          "end": 478,
+          "start": 482,
+          "end": 485,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 479,
-          "end": 479,
+          "start": 486,
+          "end": 486,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 480,
-          "end": 495,
+          "start": 487,
+          "end": 502,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 496,
-          "end": 496,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 497,
+          "start": 503,
           "end": 503,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 504,
-          "end": 508,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 509,
-          "end": 512,
+          "end": 510,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 513,
-          "end": 513,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 514,
+          "start": 511,
           "end": 515,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 516,
-          "end": 516,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 517,
           "end": 519,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 520,
           "end": 520,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
@@ -6063,30 +6433,30 @@
         {
           "path": "src/base_agent/base_agent.py",
           "start": 523,
+          "end": 523,
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 524,
           "end": 526,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 527,
           "end": 527,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 528,
-          "end": 530,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 531,
-          "end": 531,
+          "start": 528,
+          "end": 529,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 532,
+          "start": 530,
           "end": 533,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
@@ -6099,6 +6469,18 @@
         {
           "path": "src/base_agent/base_agent.py",
           "start": 535,
+          "end": 537,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 538,
+          "end": 538,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 539,
           "end": 540,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
@@ -6111,330 +6493,348 @@
         {
           "path": "src/base_agent/base_agent.py",
           "start": 542,
-          "end": 544,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 545,
-          "end": 545,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 546,
-          "end": 546,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 547,
           "end": 547,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 548,
-          "end": 549,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 550,
-          "end": 550,
+          "end": 548,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 551,
+          "start": 549,
           "end": 551,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 552,
-          "end": 576,
+          "end": 552,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 577,
-          "end": 579,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+          "start": 553,
+          "end": 553,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 580,
-          "end": 580,
+          "start": 554,
+          "end": 554,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 581,
-          "end": 585,
+          "start": 555,
+          "end": 556,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 557,
+          "end": 557,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 558,
+          "end": 558,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 559,
+          "end": 583,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 584,
+          "end": 586,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 586,
+          "start": 587,
+          "end": 587,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 588,
           "end": 592,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 593,
-          "end": 593,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 594,
-          "end": 594,
+          "end": 599,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 595,
-          "end": 596,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 597,
-          "end": 597,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 598,
+          "start": 600,
           "end": 600,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 601,
-          "end": 606,
+          "end": 601,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 607,
-          "end": 608,
+          "start": 602,
+          "end": 603,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 609,
-          "end": 609,
+          "start": 604,
+          "end": 604,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 610,
+          "start": 605,
+          "end": 607,
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 608,
+          "end": 613,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 614,
+          "end": 615,
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 616,
           "end": 616,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 617,
-          "end": 617,
+          "end": 623,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 618,
-          "end": 618,
+          "start": 624,
+          "end": 624,
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 625,
+          "end": 625,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 619,
-          "end": 619,
+          "start": 626,
+          "end": 626,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 620,
-          "end": 635,
+          "start": 627,
+          "end": 642,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 636,
-          "end": 637,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 638,
-          "end": 639,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 640,
-          "end": 640,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 641,
+          "start": 643,
           "end": 644,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 645,
-          "end": 650,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+          "end": 646,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 651,
+          "start": 647,
+          "end": 647,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 648,
           "end": 651,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 652,
+          "end": 653,
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 654,
           "end": 655,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 656,
-          "end": 656,
+          "end": 659,
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 660,
+          "end": 660,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 657,
-          "end": 657,
+          "start": 661,
+          "end": 664,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 658,
-          "end": 674,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 675,
-          "end": 682,
+          "start": 665,
+          "end": 665,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 683,
+          "start": 666,
+          "end": 666,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 667,
           "end": 683,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 684,
-          "end": 684,
-          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 685,
-          "end": 685,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 686,
-          "end": 689,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 690,
           "end": 691,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 692,
           "end": 692,
-          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 693,
+          "end": 693,
+          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 694,
           "end": 694,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 695,
-          "end": 699,
+          "end": 698,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 700,
+          "start": 699,
           "end": 700,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 701,
-          "end": 703,
+          "end": 701,
           "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 704,
-          "end": 710,
+          "start": 702,
+          "end": 703,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 711,
-          "end": 711,
+          "start": 704,
+          "end": 708,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 712,
-          "end": 712,
+          "start": 709,
+          "end": 709,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 710,
+          "end": 712,
+          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 713,
-          "end": 718,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 719,
           "end": 719,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 720,
-          "end": 722,
-          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
+          "end": 720,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 723,
+          "start": 721,
+          "end": 721,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 722,
           "end": 723,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 724,
-          "end": 728,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "end": 724,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 729,
+          "start": 725,
+          "end": 725,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 726,
+          "end": 726,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 727,
           "end": 729,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
@@ -6442,246 +6842,288 @@
           "path": "src/base_agent/base_agent.py",
           "start": 730,
           "end": 730,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 731,
-          "end": 731,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 732,
           "end": 733,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 734,
-          "end": 735,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 736,
-          "end": 736,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 737,
-          "end": 737,
+          "end": 734,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 738,
-          "end": 738,
+          "start": 735,
+          "end": 739,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 739,
-          "end": 743,
+          "start": 740,
+          "end": 740,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 744,
+          "start": 741,
+          "end": 741,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 742,
+          "end": 742,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 743,
           "end": 744,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 745,
-          "end": 751,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 752,
-          "end": 752,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 753,
-          "end": 753,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 754,
-          "end": 761,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 762,
-          "end": 773,
+          "end": 746,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 774,
-          "end": 789,
+          "start": 747,
+          "end": 747,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 790,
-          "end": 799,
+          "start": 748,
+          "end": 748,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 800,
-          "end": 803,
+          "start": 749,
+          "end": 749,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 804,
-          "end": 804,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 805,
-          "end": 806,
+          "start": 750,
+          "end": 754,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 807,
-          "end": 811,
+          "start": 755,
+          "end": 755,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 756,
+          "end": 762,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 763,
+          "end": 763,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 764,
+          "end": 764,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 812,
-          "end": 816,
-          "commit": "18bd5abcdf74dcec6a2ca3cf2db205a2c15c2327"
+          "start": 765,
+          "end": 772,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 817,
+          "start": 773,
+          "end": 784,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 785,
+          "end": 800,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 801,
+          "end": 810,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 811,
+          "end": 814,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 815,
+          "end": 815,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 816,
+          "end": 817,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 818,
           "end": 822,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 823,
-          "end": 854,
+          "end": 827,
           "commit": "18bd5abcdf74dcec6a2ca3cf2db205a2c15c2327"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 855,
-          "end": 855,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "start": 828,
+          "end": 828,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 856,
-          "end": 861,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "start": 829,
+          "end": 829,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 862,
-          "end": 862,
-          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+          "start": 830,
+          "end": 834,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 863,
-          "end": 863,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "start": 835,
+          "end": 866,
+          "commit": "18bd5abcdf74dcec6a2ca3cf2db205a2c15c2327"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 864,
+          "start": 867,
           "end": 867,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
           "start": 868,
-          "end": 870,
+          "end": 873,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 871,
-          "end": 872,
-          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 873,
-          "end": 881,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 882,
-          "end": 883,
-          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 884,
-          "end": 900,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/base_agent/base_agent.py",
-          "start": 901,
-          "end": 901,
+          "start": 874,
+          "end": 874,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 902,
-          "end": 927,
+          "start": 875,
+          "end": 875,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 876,
+          "end": 879,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 880,
+          "end": 882,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 883,
+          "end": 884,
+          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 885,
+          "end": 893,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 894,
+          "end": 895,
+          "commit": "1fb2aaf5c3465f7637e3e8a3bef99af209aa8e1a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 896,
+          "end": 912,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 913,
+          "end": 913,
+          "commit": "16290df67a178e011d97097cd4b996d691e27db0"
+        },
+        {
+          "path": "src/base_agent/base_agent.py",
+          "start": 914,
+          "end": 939,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 928,
-          "end": 933,
+          "start": 940,
+          "end": 945,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 934,
-          "end": 935,
+          "start": 946,
+          "end": 947,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 936,
-          "end": 941,
+          "start": 948,
+          "end": 953,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 942,
-          "end": 959,
+          "start": 954,
+          "end": 971,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 960,
-          "end": 961,
+          "start": 972,
+          "end": 973,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/base_agent/base_agent.py",
-          "start": 962,
-          "end": 962,
+          "start": 974,
+          "end": 974,
           "commit": "16290df67a178e011d97097cd4b996d691e27db0"
         }
       ]
@@ -6963,79 +7405,109 @@
         {
           "path": "src/server/agent_manager.py",
           "start": 43,
-          "end": 96,
+          "end": 82,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 97,
-          "end": 105,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "start": 83,
+          "end": 84,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 106,
-          "end": 107,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "start": 85,
+          "end": 90,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 108,
-          "end": 108,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "start": 91,
+          "end": 92,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 109,
+          "start": 93,
+          "end": 100,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agent_manager.py",
+          "start": 101,
           "end": 109,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/agent_manager.py",
           "start": 110,
+          "end": 110,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/server/agent_manager.py",
+          "start": 111,
           "end": 111,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agent_manager.py",
           "start": 112,
           "end": 112,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/agent_manager.py",
           "start": 113,
+          "end": 113,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/server/agent_manager.py",
+          "start": 114,
+          "end": 115,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/server/agent_manager.py",
+          "start": 116,
           "end": 116,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agent_manager.py",
           "start": 117,
-          "end": 122,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/server/agent_manager.py",
-          "start": 123,
-          "end": 124,
+          "end": 120,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 125,
-          "end": 207,
+          "start": 121,
+          "end": 126,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 208,
-          "end": 215,
+          "start": 127,
+          "end": 128,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/server/agent_manager.py",
+          "start": 129,
+          "end": 211,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agent_manager.py",
+          "start": 212,
+          "end": 219,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "src/server/agent_manager.py",
-          "start": 216,
-          "end": 225,
+          "start": 220,
+          "end": 229,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         }
       ]
@@ -7088,457 +7560,493 @@
         {
           "path": "src/server/agents.py",
           "start": 21,
-          "end": 65,
+          "end": 46,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/agents.py",
-          "start": 66,
+          "start": 47,
+          "end": 48,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 49,
+          "end": 58,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 59,
+          "end": 60,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 61,
+          "end": 63,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 64,
           "end": 68,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agents.py",
           "start": 69,
-          "end": 69,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "end": 70,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/agents.py",
-          "start": 70,
-          "end": 79,
+          "start": 71,
+          "end": 73,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 80,
-          "end": 83,
+          "start": 74,
+          "end": 74,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 75,
+          "end": 84,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 85,
+          "end": 88,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agents.py",
-          "start": 84,
-          "end": 99,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 100,
+          "start": 89,
           "end": 104,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 105,
-          "end": 111,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 112,
-          "end": 112,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 113,
-          "end": 115,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 116,
-          "end": 116,
+          "end": 109,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 110,
+          "end": 116,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 117,
           "end": 117,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/agents.py",
           "start": 118,
           "end": 120,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 121,
           "end": 121,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
           "start": 122,
           "end": 122,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 123,
           "end": 125,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/agents.py",
           "start": 126,
           "end": 126,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 127,
           "end": 127,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agents.py",
           "start": 128,
-          "end": 128,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "end": 130,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 129,
-          "end": 132,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 133,
-          "end": 134,
+          "start": 131,
+          "end": 131,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 135,
+          "start": 132,
+          "end": 132,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 133,
+          "end": 133,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 134,
           "end": 137,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agents.py",
           "start": 138,
-          "end": 138,
+          "end": 139,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 139,
-          "end": 146,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "start": 140,
+          "end": 142,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agents.py",
-          "start": 147,
-          "end": 147,
+          "start": 143,
+          "end": 143,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 148,
-          "end": 155,
+          "start": 144,
+          "end": 151,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 156,
-          "end": 159,
+          "start": 152,
+          "end": 152,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 153,
+          "end": 160,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 161,
+          "end": 164,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agents.py",
-          "start": 160,
-          "end": 165,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 166,
-          "end": 166,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 167,
+          "start": 165,
           "end": 170,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 171,
-          "end": 172,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 173,
-          "end": 180,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 181,
-          "end": 181,
+          "end": 171,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 182,
+          "start": 172,
+          "end": 175,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 176,
+          "end": 177,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 178,
           "end": 185,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 186,
-          "end": 187,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 188,
-          "end": 195,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 196,
-          "end": 196,
+          "end": 186,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 197,
-          "end": 201,
+          "start": 187,
+          "end": 190,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 191,
+          "end": 192,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 193,
+          "end": 200,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 201,
+          "end": 201,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
           "start": 202,
-          "end": 202,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 203,
-          "end": 215,
+          "end": 206,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 216,
-          "end": 218,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "start": 207,
+          "end": 207,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agents.py",
-          "start": 219,
-          "end": 222,
+          "start": 208,
+          "end": 220,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 223,
-          "end": 225,
+          "start": 221,
+          "end": 223,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agents.py",
-          "start": 226,
-          "end": 226,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 227,
+          "start": 224,
           "end": 227,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
           "start": 228,
-          "end": 238,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 239,
-          "end": 239,
+          "end": 230,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agents.py",
-          "start": 240,
-          "end": 240,
+          "start": 231,
+          "end": 231,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agents.py",
-          "start": 241,
-          "end": 246,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 247,
-          "end": 247,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 248,
-          "end": 248,
+          "start": 232,
+          "end": 232,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 249,
-          "end": 259,
+          "start": 233,
+          "end": 243,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agents.py",
-          "start": 260,
-          "end": 260,
+          "start": 244,
+          "end": 244,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/agents.py",
-          "start": 261,
-          "end": 261,
+          "start": 245,
+          "end": 245,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agents.py",
-          "start": 262,
+          "start": 246,
+          "end": 251,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 252,
+          "end": 252,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 253,
+          "end": 253,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 254,
           "end": 264,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/agents.py",
           "start": 265,
-          "end": 267,
+          "end": 265,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 266,
+          "end": 266,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 267,
+          "end": 269,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 270,
+          "end": 272,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 268,
-          "end": 268,
+          "start": 273,
+          "end": 273,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 269,
-          "end": 278,
+          "start": 274,
+          "end": 283,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 279,
-          "end": 286,
+          "start": 284,
+          "end": 291,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/server/agents.py",
-          "start": 287,
-          "end": 287,
+          "start": 292,
+          "end": 292,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 288,
-          "end": 288,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "start": 293,
+          "end": 293,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agents.py",
-          "start": 289,
-          "end": 301,
+          "start": 294,
+          "end": 306,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 302,
-          "end": 304,
+          "start": 307,
+          "end": 309,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/agents.py",
-          "start": 305,
-          "end": 305,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 306,
+          "start": 310,
           "end": 310,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
           "start": 311,
-          "end": 311,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 312,
-          "end": 329,
+          "end": 315,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/agents.py",
-          "start": 330,
-          "end": 332,
+          "start": 316,
+          "end": 316,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 317,
+          "end": 334,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 335,
+          "end": 337,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 333,
-          "end": 333,
+          "start": 338,
+          "end": 338,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/agents.py",
-          "start": 334,
-          "end": 343,
+          "start": 339,
+          "end": 348,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 344,
-          "end": 344,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "start": 349,
+          "end": 349,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/agents.py",
-          "start": 345,
-          "end": 351,
+          "start": 350,
+          "end": 356,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/agents.py",
-          "start": 352,
-          "end": 353,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 354,
-          "end": 355,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/agents.py",
-          "start": 356,
+          "start": 357,
           "end": 358,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/server/agents.py",
           "start": 359,
-          "end": 361,
+          "end": 360,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 361,
+          "end": 363,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+        },
+        {
+          "path": "src/server/agents.py",
+          "start": 364,
+          "end": 366,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         }
       ]
@@ -7580,7 +8088,7 @@
           "path": "src/server/app.py",
           "start": 24,
           "end": 25,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/app.py",
@@ -7604,7 +8112,7 @@
           "path": "src/server/app.py",
           "start": 45,
           "end": 45,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/app.py",
@@ -7657,8 +8165,14 @@
         {
           "path": "src/server/app.py",
           "start": 59,
-          "end": 60,
+          "end": 59,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/app.py",
+          "start": 60,
+          "end": 60,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/app.py",
@@ -7800,42 +8314,54 @@
         {
           "path": "src/server/config.py",
           "start": 29,
-          "end": 34,
+          "end": 33,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 34,
+          "end": 34,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/config.py",
           "start": 35,
           "end": 35,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
           "start": 36,
           "end": 36,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
           "start": 37,
-          "end": 37,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 38,
-          "end": 43,
+          "end": 42,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
-          "start": 44,
-          "end": 44,
+          "start": 43,
+          "end": 43,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 45,
+          "start": 44,
+          "end": 45,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 46,
+          "end": 46,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 47,
           "end": 47,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
@@ -7843,7 +8369,7 @@
           "path": "src/server/config.py",
           "start": 48,
           "end": 48,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
@@ -7855,240 +8381,234 @@
           "path": "src/server/config.py",
           "start": 50,
           "end": 50,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
           "start": 51,
-          "end": 51,
+          "end": 53,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
-          "start": 52,
-          "end": 52,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 53,
-          "end": 55,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 56,
-          "end": 56,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 57,
-          "end": 57,
+          "start": 54,
+          "end": 54,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/config.py",
-          "start": 58,
-          "end": 58,
+          "start": 55,
+          "end": 55,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 59,
-          "end": 62,
+          "start": 56,
+          "end": 59,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 63,
-          "end": 67,
+          "start": 60,
+          "end": 64,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
-          "start": 68,
-          "end": 76,
+          "start": 65,
+          "end": 65,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 77,
-          "end": 79,
+          "start": 66,
+          "end": 78,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 79,
+          "end": 86,
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 87,
+          "end": 89,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 80,
-          "end": 80,
+          "start": 90,
+          "end": 90,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
-          "start": 81,
-          "end": 82,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 83,
+          "start": 91,
           "end": 92,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
           "start": 93,
-          "end": 93,
+          "end": 102,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 103,
+          "end": 103,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
-          "start": 94,
-          "end": 95,
+          "start": 104,
+          "end": 105,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 96,
-          "end": 108,
+          "start": 106,
+          "end": 118,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 109,
-          "end": 109,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 110,
-          "end": 111,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 112,
-          "end": 112,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 113,
-          "end": 114,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 115,
-          "end": 115,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 116,
-          "end": 116,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 117,
-          "end": 119,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 120,
+          "start": 119,
           "end": 120,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/config.py",
           "start": 121,
-          "end": 123,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "end": 121,
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 124,
-          "end": 125,
+          "start": 122,
+          "end": 122,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 123,
+          "end": 124,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 125,
+          "end": 125,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
           "start": 126,
-          "end": 128,
+          "end": 126,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 127,
+          "end": 129,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 129,
-          "end": 142,
+          "start": 130,
+          "end": 130,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 131,
+          "end": 133,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/config.py",
-          "start": 143,
-          "end": 143,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 144,
-          "end": 145,
+          "start": 134,
+          "end": 135,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 146,
-          "end": 146,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 147,
-          "end": 151,
+          "start": 136,
+          "end": 138,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 152,
+          "start": 139,
           "end": 152,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/config.py",
           "start": 153,
-          "end": 154,
-          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
-        },
-        {
-          "path": "src/server/config.py",
-          "start": 155,
-          "end": 157,
+          "end": 153,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 158,
-          "end": 159,
+          "start": 154,
+          "end": 155,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "src/server/config.py",
-          "start": 160,
-          "end": 160,
+          "start": 156,
+          "end": 156,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/config.py",
-          "start": 161,
-          "end": 165,
+          "start": 157,
+          "end": 161,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/config.py",
-          "start": 166,
+          "start": 162,
+          "end": 162,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 163,
+          "end": 164,
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 165,
           "end": 167,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 168,
+          "end": 169,
+          "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 170,
+          "end": 170,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 171,
+          "end": 175,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/config.py",
+          "start": 176,
+          "end": 177,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         }
       ]
@@ -8228,42 +8748,66 @@
         {
           "path": "src/server/init_agents.py",
           "start": 18,
-          "end": 48,
+          "end": 32,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 49,
-          "end": 51,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "start": 33,
+          "end": 34,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 52,
+          "start": 35,
+          "end": 42,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 43,
+          "end": 44,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 45,
+          "end": 46,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 47,
+          "end": 50,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 51,
           "end": 52,
-          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/init_agents.py",
           "start": 53,
-          "end": 54,
+          "end": 55,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 55,
-          "end": 57,
-          "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
+          "start": 56,
+          "end": 56,
+          "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 58,
-          "end": 59,
+          "start": 57,
+          "end": 58,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 60,
+          "start": 59,
           "end": 61,
           "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
         },
@@ -8276,85 +8820,103 @@
         {
           "path": "src/server/init_agents.py",
           "start": 64,
-          "end": 64,
+          "end": 65,
           "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 65,
+          "start": 66,
+          "end": 66,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 67,
           "end": 67,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/init_agents.py",
           "start": 68,
-          "end": 73,
+          "end": 68,
+          "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 69,
+          "end": 71,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 72,
+          "end": 77,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 74,
-          "end": 75,
+          "start": 78,
+          "end": 79,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 76,
-          "end": 84,
+          "start": 80,
+          "end": 88,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 85,
-          "end": 85,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/server/init_agents.py",
-          "start": 86,
+          "start": 89,
           "end": 89,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/server/init_agents.py",
           "start": 90,
-          "end": 90,
-          "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
-        },
-        {
-          "path": "src/server/init_agents.py",
-          "start": 91,
-          "end": 91,
+          "end": 93,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 92,
-          "end": 92,
-          "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
-        },
-        {
-          "path": "src/server/init_agents.py",
-          "start": 93,
+          "start": 94,
           "end": 94,
-          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+          "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
         },
         {
           "path": "src/server/init_agents.py",
           "start": 95,
-          "end": 99,
+          "end": 95,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 96,
+          "end": 96,
           "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 100,
-          "end": 100,
+          "start": 97,
+          "end": 98,
+          "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 99,
+          "end": 103,
           "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
         },
         {
           "path": "src/server/init_agents.py",
-          "start": 101,
-          "end": 112,
+          "start": 104,
+          "end": 104,
+          "commit": "59937463a794c9e9b789f7f0c7fcd3895ee72c25"
+        },
+        {
+          "path": "src/server/init_agents.py",
+          "start": 105,
+          "end": 116,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         }
       ]
@@ -8365,80 +8927,122 @@
         {
           "path": "src/server/log_watcher.py",
           "start": 1,
-          "end": 99,
+          "end": 40,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 100,
-          "end": 107,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+          "start": 41,
+          "end": 54,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 108,
+          "start": 55,
+          "end": 57,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 58,
+          "end": 58,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 59,
+          "end": 92,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 93,
+          "end": 94,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 95,
+          "end": 106,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 107,
+          "end": 108,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 109,
+          "end": 110,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 111,
           "end": 111,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         },
         {
           "path": "src/server/log_watcher.py",
           "start": 112,
-          "end": 113,
-          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
-        },
-        {
-          "path": "src/server/log_watcher.py",
-          "start": 114,
-          "end": 115,
+          "end": 112,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 116,
-          "end": 119,
+          "start": 113,
+          "end": 120,
           "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 120,
-          "end": 229,
+          "start": 121,
+          "end": 124,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 230,
-          "end": 230,
+          "start": 125,
+          "end": 126,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 127,
+          "end": 128,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 129,
+          "end": 132,
+          "commit": "0d16d175b4edbcd9a62f047863561e843335a9b7"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 133,
+          "end": 242,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 243,
+          "end": 243,
           "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 231,
-          "end": 231,
+          "start": 244,
+          "end": 244,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 232,
-          "end": 232,
-          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
-        },
-        {
-          "path": "src/server/log_watcher.py",
-          "start": 233,
-          "end": 233,
-          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
-        },
-        {
-          "path": "src/server/log_watcher.py",
-          "start": 234,
-          "end": 234,
-          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
-        },
-        {
-          "path": "src/server/log_watcher.py",
-          "start": 235,
+          "start": 245,
           "end": 245,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/server/log_watcher.py",
@@ -8450,18 +9054,60 @@
           "path": "src/server/log_watcher.py",
           "start": 247,
           "end": 247,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "ef87388ae9f28d65bc34c4de82287404a150fc23"
         },
         {
           "path": "src/server/log_watcher.py",
           "start": 248,
-          "end": 250,
+          "end": 258,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 259,
+          "end": 259,
           "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
         },
         {
           "path": "src/server/log_watcher.py",
-          "start": 251,
-          "end": 289,
+          "start": 260,
+          "end": 260,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 261,
+          "end": 263,
+          "commit": "01387aa0874836bf7ebba9f0a5e3fa8004309bec"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 264,
+          "end": 296,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 297,
+          "end": 302,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 303,
+          "end": 303,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 304,
+          "end": 304,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/server/log_watcher.py",
+          "start": 305,
+          "end": 306,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         }
       ]
@@ -8769,6 +9415,17 @@
       ]
     },
     {
+      "path": "src/tools/context.py",
+      "intervals": [
+        {
+          "path": "src/tools/context.py",
+          "start": 1,
+          "end": 353,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
       "path": "src/tools/files.py",
       "intervals": [
         {
@@ -8911,25 +9568,37 @@
         {
           "path": "src/tools/git_helper.py",
           "start": 99,
-          "end": 138,
+          "end": 116,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/tools/git_helper.py",
-          "start": 139,
-          "end": 148,
+          "start": 117,
+          "end": 129,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/tools/git_helper.py",
+          "start": 130,
+          "end": 146,
+          "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
+        },
+        {
+          "path": "src/tools/git_helper.py",
+          "start": 147,
+          "end": 156,
           "commit": "ab7c1b0938429628a7b1c7b665c9e01b956b86f8"
         },
         {
           "path": "src/tools/git_helper.py",
-          "start": 149,
-          "end": 158,
+          "start": 157,
+          "end": 166,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "src/tools/git_helper.py",
-          "start": 159,
-          "end": 327,
+          "start": 167,
+          "end": 335,
           "commit": "ab7c1b0938429628a7b1c7b665c9e01b956b86f8"
         }
       ]
@@ -11789,91 +12458,151 @@
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
           "start": 10,
-          "end": 73,
+          "end": 17,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 74,
-          "end": 81,
+          "start": 18,
+          "end": 20,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 21,
+          "end": 75,
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 76,
+          "end": 83,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 82,
-          "end": 93,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
-        },
-        {
-          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 94,
+          "start": 84,
           "end": 95,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
           "start": 96,
-          "end": 96,
-          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
+          "end": 97,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 97,
+          "start": 98,
           "end": 98,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+          "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
           "start": 99,
-          "end": 102,
+          "end": 100,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 101,
+          "end": 104,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 103,
-          "end": 116,
+          "start": 105,
+          "end": 118,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 117,
-          "end": 122,
+          "start": 119,
+          "end": 124,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 123,
-          "end": 123,
+          "start": 125,
+          "end": 125,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 124,
+          "start": 126,
+          "end": 128,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 129,
+          "end": 129,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 130,
+          "end": 130,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 131,
+          "end": 131,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 132,
           "end": 135,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
           "start": 136,
-          "end": 155,
+          "end": 136,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 137,
+          "end": 137,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 138,
+          "end": 138,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 139,
+          "end": 141,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "src/ui/src/components/agents/NewAgentModal.jsx",
+          "start": 142,
+          "end": 161,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 156,
-          "end": 157,
+          "start": 162,
+          "end": 163,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 158,
-          "end": 171,
+          "start": 164,
+          "end": 177,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "src/ui/src/components/agents/NewAgentModal.jsx",
-          "start": 172,
-          "end": 187,
+          "start": 178,
+          "end": 193,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         }
       ]
@@ -12330,151 +13059,187 @@
         {
           "path": "start.sh",
           "start": 8,
-          "end": 48,
+          "end": 46,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 49,
-          "end": 49,
+          "start": 47,
+          "end": 51,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "start.sh",
+          "start": 52,
+          "end": 52,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "start.sh",
+          "start": 53,
+          "end": 53,
           "commit": "74c7b5d812ef55d057910367b3ac8b487628b294"
         },
         {
           "path": "start.sh",
-          "start": 50,
-          "end": 78,
+          "start": 54,
+          "end": 82,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 79,
-          "end": 187,
+          "start": 83,
+          "end": 191,
           "commit": "ee08076ce1ce165763102ee311f6a133dfc4529f"
         },
         {
           "path": "start.sh",
-          "start": 188,
-          "end": 203,
+          "start": 192,
+          "end": 207,
           "commit": "ca15994f93275a947ae1d2b36601b80df8f418af"
         },
         {
           "path": "start.sh",
-          "start": 204,
-          "end": 208,
-          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
-        },
-        {
-          "path": "start.sh",
-          "start": 209,
+          "start": 208,
           "end": 209,
-          "commit": "06953ab74b813fc7913c4771f01098a11a2a2900"
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
           "start": 210,
-          "end": 211,
+          "end": 328,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "start.sh",
+          "start": 329,
+          "end": 331,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 212,
-          "end": 212,
+          "start": 332,
+          "end": 332,
+          "commit": "06953ab74b813fc7913c4771f01098a11a2a2900"
+        },
+        {
+          "path": "start.sh",
+          "start": 333,
+          "end": 334,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 213,
-          "end": 215,
+          "start": 335,
+          "end": 335,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "start.sh",
+          "start": 336,
+          "end": 338,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "start.sh",
-          "start": 216,
-          "end": 216,
+          "start": 339,
+          "end": 339,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 217,
-          "end": 217,
+          "start": 340,
+          "end": 340,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "start.sh",
-          "start": 218,
-          "end": 218,
+          "start": 341,
+          "end": 341,
           "commit": "06953ab74b813fc7913c4771f01098a11a2a2900"
         },
         {
           "path": "start.sh",
-          "start": 219,
-          "end": 245,
+          "start": 342,
+          "end": 368,
           "commit": "09a5ca8a13552d41c8e3f0e1302a97900eb6ddc8"
         },
         {
           "path": "start.sh",
-          "start": 246,
-          "end": 251,
+          "start": 369,
+          "end": 374,
           "commit": "06953ab74b813fc7913c4771f01098a11a2a2900"
         },
         {
           "path": "start.sh",
-          "start": 252,
-          "end": 254,
+          "start": 375,
+          "end": 377,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 255,
-          "end": 255,
+          "start": 378,
+          "end": 378,
           "commit": "06953ab74b813fc7913c4771f01098a11a2a2900"
         },
         {
           "path": "start.sh",
-          "start": 256,
-          "end": 258,
+          "start": 379,
+          "end": 381,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 259,
-          "end": 259,
+          "start": 382,
+          "end": 382,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 260,
-          "end": 271,
+          "start": 383,
+          "end": 394,
           "commit": "06953ab74b813fc7913c4771f01098a11a2a2900"
         },
         {
           "path": "start.sh",
-          "start": 272,
-          "end": 274,
+          "start": 395,
+          "end": 397,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 275,
-          "end": 276,
+          "start": 398,
+          "end": 399,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         },
         {
           "path": "start.sh",
-          "start": 277,
-          "end": 278,
+          "start": 400,
+          "end": 401,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
         },
         {
           "path": "start.sh",
-          "start": 279,
-          "end": 281,
+          "start": 402,
+          "end": 404,
           "commit": "0c3f614e5e789a31794ef822c331bd76e3308276"
         },
         {
           "path": "start.sh",
-          "start": 282,
-          "end": 289,
+          "start": 405,
+          "end": 407,
+          "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
+        },
+        {
+          "path": "start.sh",
+          "start": 408,
+          "end": 409,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        },
+        {
+          "path": "start.sh",
+          "start": 410,
+          "end": 412,
           "commit": "ce4ee1a0b809fe04e79c9a22867d13b07d1e1e40"
         }
       ]
@@ -12896,6 +13661,39 @@
           "start": 144,
           "end": 146,
           "commit": "c65886a580ca2eddd16815a9dc9b993b243b0e2a"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_memtool_empty_results.py",
+      "intervals": [
+        {
+          "path": "tests/test_memtool_empty_results.py",
+          "start": 1,
+          "end": 232,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_memtool_integration.py",
+      "intervals": [
+        {
+          "path": "tests/test_memtool_integration.py",
+          "start": 1,
+          "end": 286,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_memtool_type_coercion.py",
+      "intervals": [
+        {
+          "path": "tests/test_memtool_type_coercion.py",
+          "start": 1,
+          "end": 168,
+          "commit": "06c162ac318857bc34abbfdafa3bd4b54c68429b"
         }
       ]
     },

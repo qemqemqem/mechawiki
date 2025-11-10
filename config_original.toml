@@ -3,7 +3,7 @@
 story_start = 0
 
 # How many words to advance per chunk
-chunk_size = 20000
+chunk_size = 5000
 
 # Current story being processed
 current_story = "tales_of_wonder"
@@ -26,19 +26,16 @@ words_per_article = 500
 # LLM provider and model to use
 # Supported providers: anthropic, openai, together, replicate
 llm_provider = "anthropic"
-model = "claude-haiku-4-5-20251001"
+model = "claude-3-5-haiku-20241022"
 
 # Temperature for creativity
-temperature = 1.0
+temperature = 0.7
 
 # Number of most recent messages to pass to the LLM each turn
 message_window = 12
 
 # Maximum number of agent model turns per run (very high by default)
 max_steps = 1000000
-
-# Use mock agents for testing (set to true to disable real LLM-powered agents)
-use_mock_agents = false
 
 [image]
 # Image generator to use
@@ -52,11 +49,7 @@ quality = "standard"
 [paths]
 # Where is the content stored. This must be a local directory, and it must be a git repo
 # TODO(andrew): The user should be able to specify a git repo URL, and have downloading occur automatically
-content_repo = "D:/Projects/MechaWiki/wikicontent"
-
-# Git branch to use in the content repo
-# All agent data (configs, logs, costs) will be stored in the agents/ directory on this branch
-content_branch = "tales_of_wonder/main"
+content_repo = "/home/keenan/Dev/wikicontent"
 
 # Articles subdirectory
 articles_dir = "articles"
@@ -66,6 +59,3 @@ images_dir = "images"
 
 # Songs subdirectory
 songs_dir = "songs"
-
-# Agents subdirectory (contains agents.json, logs/, costs.log)
-agents_dir = "agents"

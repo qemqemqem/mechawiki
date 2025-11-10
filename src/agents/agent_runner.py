@@ -102,7 +102,7 @@ class AgentRunner:
         
         # Create file handler for debug logs
         debug_log_file = agent_config.debug_logs_dir / f"{self.agent_id}.log"
-        file_handler = logging.FileHandler(debug_log_file, mode='a')
+        file_handler = logging.FileHandler(debug_log_file, mode='a', encoding='utf-8')
         file_handler.setLevel(logging.DEBUG)
         
         # Create detailed formatter for debug logs

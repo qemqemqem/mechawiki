@@ -5,17 +5,20 @@
 # Exit on any error
 set -e
 
+# Set UTF-8 encoding for Python (fixes emoji/Unicode issues on Windows)
+export PYTHONIOENCODING=utf-8
+
 echo "🏰 Starting MechaWiki..."
 echo ""
 
 # Check for Python
-if ! command -v python3 &> /dev/null; then
+if ! command -v python &> /dev/null; then
     echo "❌ Python 3 not found!"
     echo "Please install Python 3.8 or higher"
     exit 1
 fi
 
-echo "✓ Python 3 found: $(python3 --version)"
+echo "✓ Python 3 found: $(python --version)"
 
 # Check for Node/npm
 if ! command -v node &> /dev/null; then
@@ -38,20 +41,21 @@ echo ""
 echo "📦 Checking Python dependencies..."
 if [ ! -d ".venv" ]; then
     echo "Creating Python virtual environment..."
-    python3 -m venv .venv
+    python -m venv .venv
 fi
 
 echo "Activating virtual environment..."
-source .venv/bin/activate
+source .venv/Scripts/activate
 
 # Check if memtool is installed (key dependency)
-if ! .venv/bin/python3 -c "import memtool" 2>/dev/null; then
+if ! .venv/Scripts/python -c "import memtool" 2>/dev/null; then
     echo "Installing Python dependencies..."
     pip install -q -r requirements.txt
 elif ! pip show flask &> /dev/null; then
     echo "Installing Python dependencies..."
     pip install -q -r requirements.txt
 else
+	pip install -q -r requirements.txt
     echo "✓ Python dependencies installed"
 fi
 
@@ -83,8 +87,9 @@ fi
 # Validate wikicontent configuration
 echo "🌿 Validating wikicontent configuration..."
 
+
 # Use Python to parse config.toml and extract paths
-WIKICONTENT_INFO=$(python3 << 'PYEOF'
+WIKICONTENT_INFO=$(python << 'PYEOF'
 import toml
 import sys
 try:
@@ -209,7 +214,7 @@ echo ""
 
 # Check for memtool installation and install if needed
 echo "🧠 Checking memtool installation..."
-if ! .venv/bin/python3 -c "import memtool" 2>/dev/null; then
+if ! .venv/Scripts/python -c "import memtool" 2>/dev/null; then
     echo "⚠️  memtool not found, attempting to install..."
     
     # Common paths to check for AgenticMemory
@@ -269,21 +274,21 @@ fi
 # Start memtool server
 echo "🧠 Starting memtool server (port 18861)..."
 
-# Check if server is already running
-if lsof -Pi :18861 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+# Check if server is already running (Windows-compatible)
+if netstat -ano | grep ":18861" | grep "LISTENING" >/dev/null 2>&1 ; then
     echo "⚠️  Port 18861 is already in use!"
     echo "   This might be an old memtool server."
     echo "   Attempting to stop it..."
-    
+
     # Try to stop via memtool CLI
-    if .venv/bin/python3 -m memtool.cli server stop 2>/dev/null; then
+    if .venv/Scripts/python -m memtool.cli server stop 2>/dev/null; then
         echo "✓ Stopped old server"
         sleep 1
     else
-        # Force kill
-        OLD_PID=$(lsof -ti:18861)
+        # Force kill - get PID from netstat on Windows
+        OLD_PID=$(netstat -ano | grep ":18861" | grep "LISTENING" | awk '{print $5}' | head -1)
         if [ -n "$OLD_PID" ]; then
-            kill $OLD_PID 2>/dev/null || kill -9 $OLD_PID 2>/dev/null
+            taskkill //PID $OLD_PID //F 2>/dev/null
             echo "✓ Killed process on port 18861"
             sleep 1
         fi
@@ -291,7 +296,7 @@ if lsof -Pi :18861 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
 fi
 
 # Start memtool server in background (no --repo argument needed)
-.venv/bin/python3 -m memtool.cli server start --port 18861 > memtool.log 2>&1 &
+.venv/Scripts/python -m memtool.cli server start --port 18861 > memtool.log 2>&1 &
 MEMTOOL_PID=$!
 echo "memtool PID: $MEMTOOL_PID"
 
@@ -317,7 +322,7 @@ fi
 # Build index (or load if exists)
 echo "📚 Building/loading memtool index..."
 
-if ! .venv/bin/python3 scripts/ensure_memtool_index.py; then
+if ! .venv/Scripts/python scripts/ensure_memtool_index.py; then
     echo "❌ Index build/load failed"
     kill $MEMTOOL_PID 2>/dev/null
     exit 1
@@ -328,8 +333,8 @@ echo ""
 
 # Start backend in background
 echo "🚀 Starting Flask backend (port 5000)..."
-source .venv/bin/activate
-python3 run_server.py > backend.log 2>&1 &
+source .venv/Scripts/activate
+python run_server.py > backend.log 2>&1 &
 BACKEND_PID=$!
 echo "Backend PID: $BACKEND_PID"
 
